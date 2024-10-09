@@ -127,12 +127,14 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 		{
 			// Token command ou quoted
 			j = i;
-			while (cmd_tokens[j] && (cmd_tokens[j] == 'c' || cmd_tokens[j] == 'q') && cmd_str[j] != ' ')
+			while (cmd_tokens[j] && (cmd_tokens[j] == 'c'
+				|| cmd_tokens[j] == 'q') /* && cmd_str[j] == ' ' */)
 				j++;
 			tokens[token_count++] = ft_strndup(&cmd_str[i], j - i);
 			i = j;
 		}
-		else if (cmd_tokens[i] == 'p' || cmd_tokens[i] == '>' || cmd_tokens[i] == '<')
+		else if (cmd_tokens[i] == 'p' || cmd_tokens[i] == '>'
+			|| cmd_tokens[i] == '<')
 		{
 			// Token unique pour pipe ou redirection
 			tokens[token_count++] = ft_strndup(&cmd_str[i], 1);
@@ -177,8 +179,8 @@ char check_all_char(const char cmd)
 		return 'q'; // Single quotes ' '
 	else if (cmd == '$')
 		return 'a'; // Arguments $ARG pas bien traité ... !!
-	else if ((cmd >= '0' && cmd <= '9') || (cmd >= 'a' && cmd <= 'z') 
-		|| (cmd >= 'A' && cmd <= 'Z'))
+	else if ((cmd >= '0' && cmd <= '9') || (cmd >= 'a' && cmd <= 'z')
+		|| (cmd >= 'A' && cmd <= 'Z') /* || (cmd == ' ') */)
 		return 'c'; // Command
 	else 
 		return 'o'; // Pour les autres

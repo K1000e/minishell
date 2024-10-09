@@ -5,8 +5,22 @@
 #include <stdio.h> 
 #include <readline/readline.h> 
 #include <readline/history.h> 
-#include "libft/includes/libft.h"
+#include "../libft/includes/libft.h"
+#include "../pipex/includes/pipex.h"
+#include <pwd.h>
+#include <time.h>
+#include <string.h>
+// Définir la couleur du texte
+#define RED "\033[1;31m"
+#define YELLOW "\033[1;33m"
+#define GREEN "\033[1;32m"
+#define RESET "\033[0m"
 
+typedef enum e_bool
+{
+	FALSE = 0,
+	TRUE = 1
+}	t_bool;
 
 /* FUNCTIONS */
 char *ft_strndup(char *str, size_t len);

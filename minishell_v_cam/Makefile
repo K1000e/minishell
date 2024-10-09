@@ -1,51 +1,62 @@
+NAME		:=	minihell
 
-# Nom de l'exécutable
-NAME = minihell
+CC			:=	cc
+FLAGS		:= -Wall -Wextra -lreadline #-g -fsanitize=address -Werror
 
-# Fichiers sources
-SRCS = main.c parsing.c 
+DIR_SRCS	:=	srcs
+DIR_OBJS	:=	.objs
+DIR_INCS	:=	include
+DIR_LIBFT	:=	libft
+LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
-# Fichiers objets
-OBJS = $(SRCS:.c=.o)
+LST_SRCS	:=	main.c		\
+				parsing.c
 
-# Dossier où sont situées les bibliothèques (comme libft)
-LIBFT_DIR = ./libft
-LIBFT = $(LIBFT_DIR)/libft.a
+LST_OBJS	:=	$(LST_SRCS:.c=.o)
+LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
 
-# Options de compilation
-CC = gcc
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include
-LDFLAGS = -L/opt/homebrew/opt/readline/lib -lreadline
+LST_INCS	:=	minihell.h
+
+SRCS		:=	$(addprefix $(DIR_SRCS)/,$(LST_SRCS)) \
+				pipex_execute.c \
+				pipex_main.c \
+				pipex_open_free.c
+OBJS		:=	$(addprefix $(DIR_OBJS)/,$(LST_OBJS))
+INCS		:=	$(addprefix $(DIR_INCS)/,$(LST_INCS))
+
+ERASE		=	\033[A\033[2K\r
+BLUE		=	\033[34m
+YELLOW		=	\033[33m
+GREEN		=	\033[32m
+END			=	\033[0m
+
+$(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
+	@mkdir -p $(DIR_OBJS)
+	$(CC) $(FLAGS) -I $(DIR_INCS) -c $< -o $@
+	printf "$(ERASE)$(BLUE) > Compilation :$(END) $< \n"
 
 
-# Règle par défaut
-all: $(NAME)
+all: $(LIBFT_LIB) $(NAME)
 
-# Règle de compilation de l'exécutable
-$(NAME): $(OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT)  $(LDFLAGS)
+$(LIBFT_LIB):
+	@$(MAKE) -C $(DIR_LIBFT) --no-print-director
+	@echo "Finished compiling libft."
 
-# Règle pour compiler les fichiers .c en .o
-%.o: %.c
-	$(CC) $(CFLAGS) -I$(LIBFT_DIR) -c $< -o $@
+$(NAME):	$(OBJS)
+	@$(CC) $(FLAGS) $(OBJS) -o $@ libft/libft.a
+	printf "$(ERASE)$(GREEN)$@ made\n$(END)"
 
-# Règle pour construire libft si nécessaire
-$(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR)
-
-# Règle pour nettoyer les fichiers objets
 clean:
-	rm -f $(OBJS)
-	$(MAKE) -C $(LIBFT_DIR) clean
+	@rm -rf $(DIR_OBJS)
+	$(MAKE) -C $(DIR_LIBFT) clean --no-print-director
+	printf "$(YELLOW)$(DIR_OBJS) removed$(END)\n"
 
-# Règle pour nettoyer les fichiers objets et l'exécutable
-fclean: clean
-	rm -f $(NAME)
-	$(MAKE) -C $(LIBFT_DIR) fclean
+fclean:		clean
+	rm -rdf	$(NAME)
+	rm -rdf	libft/libft.a
+	printf "$(YELLOW)$(NAME) & checker & libft removed$(END)\n"
 
-# Règle pour recompiler tout
-re: fclean all
+re:			fclean all
 
-# Règles auxiliaires
-.PHONY: all clean fclean re
+.PHONY:	all clean fclean re
+.SILENT: 
