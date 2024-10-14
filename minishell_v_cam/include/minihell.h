@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minihell.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
+/*   Updated: 2024/10/14 18:56:40 by cgorin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINIHELL_H
 # define MINIHELL_H
 
@@ -16,6 +28,16 @@
 #define GREEN "\033[1;32m"
 #define RESET "\033[0m"
 
+/* STRUCTURES */
+
+typedef struct s_cmd {
+	char *cmd;			// Nom de la commande
+	char **args;		// Tableau d'arguments
+	char *out_file;		// Fichier pour la sortie redirigée
+	char *in_file;		// Fichier pour l'entrée redirigée
+	struct s_cmd *next;	// Pointeur vers la commande suivante
+}	t_cmd;
+
 typedef enum e_bool
 {
 	FALSE = 0,
@@ -25,9 +47,12 @@ typedef enum e_bool
 /* FUNCTIONS */
 char *ft_strndup(char *str, size_t len);
 t_list	*create_cmd_list(char *all, char *tmp, int i, int j);
-t_list	*parse_cmd(char *all);
+t_cmd	*parse_cmd(char *all);
 int count_tokens(const char *cmd_tokens);
 char **tokenise_command(char *cmd_str, char *cmd_tokens);
 char check_all_char(const char cmd);
+
+void ft_exit(t_cmd *cmd);
+void free_cmd_list(t_cmd *cmd_list);
 
 #endif

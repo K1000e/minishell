@@ -9,6 +9,7 @@ char	*ft_strndup(char *str, size_t len)
 	char	*dup;
 	size_t	len_dup;
 
+	len_dup = 0;
 	len_dup = ft_strlen(str);
 	if (len_dup > len)
 		len_dup = len;
@@ -19,25 +20,46 @@ char	*ft_strndup(char *str, size_t len)
 	return dup;
 }
 
+
+/* Fonction pour libérer la mémoire allouée à la liste de commandes */
+void free_cmd_list(t_cmd *cmd_list)
+{
+	t_cmd *current;
+		
+	while (cmd_list)
+	{
+		current = cmd_list;
+		cmd_list = cmd_list->next;
+		free(current->cmd);
+		if (current->args) {
+			for (int i = 0; current->args[i]; i++)
+				free(current->args[i]);
+			free(current->args);
+		}
+		free(current->out_file);
+		free(current->in_file);
+		free(current);
+	}
+}
+
 /*
-** create_cmd_list crée un nœud de liste avec une commande 
-** et ses tokens entre les indices i et j.
+** create_cmd_node crée un nœud avec une commande et ses tokens.
 */
 
-t_list	*create_cmd_list(char *all, char *tmp, int i, int j)
+t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 {
-	char	*cmd_str;
-	char	*cmd_tokens;
-	char	**cmd_split;
-	t_list	*list_cmd;
+	t_cmd *new_cmd;
 
-	cmd_str = ft_strndup(&all[i], j - i);
-	cmd_tokens = ft_strndup(&tmp[i], j - i);
-	cmd_split = tokenise_command(cmd_str, cmd_tokens);
-	list_cmd = ft_lstnew(cmd_split);
-	free(cmd_str);
-	free(cmd_tokens);
-	return (list_cmd);
+	new_cmd = malloc(sizeof(t_cmd));
+	if (!new_cmd) {
+		return NULL;
+	}
+	new_cmd->cmd = ft_strdup(cmd_str);
+	new_cmd->args = tokenise_command(cmd_str, cmd_tokens);
+	new_cmd->out_file = NULL;
+	new_cmd->in_file = NULL;
+	new_cmd->next = NULL;
+	return (new_cmd);
 }
 
 /*
@@ -45,14 +67,16 @@ t_list	*create_cmd_list(char *all, char *tmp, int i, int j)
 ** et retourne une liste de commandes tokenisées.
 */
 
-t_list	*parse_cmd(char *all)
+t_cmd	*parse_cmd(char *all)
 {
-	t_list	*list_cmd;
+	t_cmd	*cmd_lst;
 	char	*tmp;
 	int		i;
 	int		j;
+	t_bool	in_quotes;
 
-	list_cmd = NULL;
+	cmd_lst = NULL;
+	in_quotes = FALSE;
 	tmp = ft_strdup(all);
 	i = -1;
 	while (tmp[++i])
@@ -60,17 +84,37 @@ t_list	*parse_cmd(char *all)
 	i = 0;
 	while (tmp[i])
 	{
-		if (tmp[i] == 's' && ++i)
+		if (tmp[i] == 'q')
+		{
+			in_quotes = !in_quotes;
+			i++;
 			continue;
-		j = i;
-		while (tmp[j] && tmp[j] != 's')
-			j++;
-		ft_lstadd_back(&list_cmd, create_cmd_list(all, tmp, i, j));
-		i = j;
+		}
+		if (!in_quotes  && (tmp[i] == '>' || tmp[i] == '|' || !tmp[i]))
+		{
+			if (i > j)
+			{ //penser a free les strndup !!!!!!!!!!!!!!!!!!!!!!!!!!!!! segfault + leaks sa mere
+				t_cmd *new_cmd = create_cmd_node(ft_strndup(&all[j], i - j), ft_strndup(&tmp[j], i - j));
+				ft_lstadd_back((t_list **)&cmd_lst, (t_list *)new_cmd);
+			}
+			// Créer une commande spécifique pour la redirection ou le pipe
+			t_cmd *redir_cmd = create_cmd_node(ft_strndup(&all[i], 1), ft_strndup(&tmp[i], 1));
+			ft_lstadd_back((t_list **)&cmd_lst, (t_list *)redir_cmd);
+			i++;
+			j = i;
+			continue;
+		}
+		i++;
+	}
+	// Ajouter la dernière commande si elle existe
+	if (j < i) {
+		t_cmd *new_cmd = create_cmd_node(ft_strndup(&all[j], i - j), ft_strndup(&tmp[j], i - j));
+		ft_lstadd_back((t_list **)&cmd_lst, (t_list *)new_cmd);
 	}
 	free(tmp);
-	return (list_cmd);
+	return cmd_lst;
 }
+
 
 /*
 ** count_tokens compte le nombre de tokens dans une chaîne 
@@ -86,19 +130,39 @@ int count_tokens(const char *cmd_tokens)
 	i = -1;
 	while (cmd_tokens[++i])
 	{
-		if (cmd_tokens[i] == 'c' || cmd_tokens[i] == 'q')
+		if (cmd_tokens[i] == 'q')
 		{
 			count++;
-			while (cmd_tokens[i] && (cmd_tokens[i] == 'c' 
-				|| cmd_tokens[i] == 'q'))
+			while (cmd_tokens[i] && !(cmd_tokens[i] == 'q'))
 				i++;
 		}
-		else if (cmd_tokens[i] == 'p' || cmd_tokens[i] == '>' 
-			|| cmd_tokens[i] == '<' || cmd_tokens[i] == 'a')
+		else if (cmd_tokens[i] == 'c')
+		{
+			// Chaque caractère de type 'c' est un token unique
+			count++;
+			while (cmd_tokens[i] && cmd_tokens[i] == 'c')
+				i++;
+		}
+		else if (cmd_tokens[i] == 'p')
 		{
 			//Chaque caractère de type 'p', '>', '<', ou 'a' est un token unique
 			count++;
 			i++;
+		}
+		else if (cmd_tokens[i] == '>' || cmd_tokens[i] == '<')
+		{
+			if ((cmd_tokens[i] == '>' && cmd_tokens[i + 1] == '>' ) || (cmd_tokens[i] == '<' && cmd_tokens[i + 1] == '<'))
+			{
+				// Token unique pour redirection heredoc
+				count++;
+				i += 2;
+			}
+			else
+			{
+				// Token unique pour redirection simple
+				count++;
+				i++;
+			}
 		}
 	}
 	return count;
@@ -114,8 +178,9 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 {
 	int i = 0, j;
 	int token_count = 0;
-	char **tokens = (char **)malloc(sizeof(char *) * (count_tokens(cmd_tokens) + 1));
+	char **tokens;
 
+	tokens = (char **)malloc(sizeof(char *) * (count_tokens(cmd_tokens) + 1));
 	while (cmd_tokens[i])
 	{
 		// Ignorer les espaces dans la chaîne de commande
@@ -123,21 +188,46 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 			i++;
 		if (!cmd_tokens[i])
 			break;
-		if (cmd_tokens[i] == 'c' || cmd_tokens[i] == 'q')
+		 if (cmd_tokens[i] == 'q')
+		{
+			// Token quoted
+			j = i + 1;
+			while (cmd_tokens[++j] && cmd_tokens[j] != 'q')
+				j++;
+			tokens[token_count++] = ft_strndup(&cmd_str[i], j + 1 - i);
+			i = j;
+		}
+		if (cmd_tokens[i] == 'c')
 		{
 			// Token command ou quoted
 			j = i;
-			while (cmd_tokens[j] && (cmd_tokens[j] == 'c'
-				|| cmd_tokens[j] == 'q') /* && cmd_str[j] == ' ' */)
+			while (cmd_tokens[j] && cmd_tokens[j] == 'c')
 				j++;
 			tokens[token_count++] = ft_strndup(&cmd_str[i], j - i);
 			i = j;
 		}
-		else if (cmd_tokens[i] == 'p' || cmd_tokens[i] == '>'
-			|| cmd_tokens[i] == '<')
+		else if (cmd_tokens[i] == 'p')
 		{
 			// Token unique pour pipe ou redirection
 			tokens[token_count++] = ft_strndup(&cmd_str[i], 1);
+			i++;
+		}
+		else if (cmd_tokens[i] == '>' || cmd_tokens[i] == '<')
+		{
+			if (cmd_tokens[i] == '>' && cmd_tokens[i + 1] == '>')
+			{
+				// Token unique pour redirection append
+				tokens[token_count++] = ft_strndup(&cmd_str[i], 2);
+				i++;
+			}
+			else if (cmd_tokens[i] == '<' && cmd_tokens[i + 1] == '<')
+			{
+				// Token unique pour redirection heredoc
+				tokens[token_count++] = ft_strndup(&cmd_str[i], 2);
+				i++;
+			}
+			else // Token unique pour redirection standard
+				tokens[token_count++] = ft_strndup(&cmd_str[i], 1);
 			i++;
 		}
 		else if (cmd_tokens[i] == 'a')
@@ -165,9 +255,9 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 
 char check_all_char(const char cmd)
 {
-	if (cmd == ';') // Separateur
-		return 's';
-	else if (cmd == '|') // Pipe
+	/* if (cmd == ';') // Separateur
+		return 's'; */
+	if (cmd == '|') // Pipe
 		return 'p';
 	else if (cmd == '>') // Redirection (a voir comment on fait pour >>)
 		return '>';

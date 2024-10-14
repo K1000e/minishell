@@ -1,7 +1,8 @@
 NAME		:=	minihell
 
 CC			:=	cc
-FLAGS		:= -Wall -Wextra -lreadline #-g -fsanitize=address -Werror
+CFLAGS		:= -Wall -Wextra -Werror -g #-fsanitize=address 
+LDFLAGS		:= -lreadline
 
 DIR_SRCS	:=	srcs
 DIR_OBJS	:=	.objs
@@ -10,7 +11,8 @@ DIR_LIBFT	:=	libft
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c		\
-				parsing.c
+				parsing.c 	\
+				bultins.c
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
@@ -32,7 +34,7 @@ END			=	\033[0m
 
 $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 	@mkdir -p $(DIR_OBJS)
-	$(CC) $(FLAGS) -I $(DIR_INCS) -c $< -o $@
+	$(CC) $(CFLAGS) -I $(DIR_INCS) -c $< -o $@
 	printf "$(ERASE)$(BLUE) > Compilation :$(END) $< \n"
 
 
@@ -43,7 +45,7 @@ $(LIBFT_LIB):
 	@echo "Finished compiling libft."
 
 $(NAME):	$(OBJS)
-	@$(CC) $(FLAGS) $(OBJS) -o $@ libft/libft.a
+	@$(CC) $(CFLAGS) $(OBJS) -o $@ libft/libft.a $(LDFLAGS)
 	printf "$(ERASE)$(GREEN)$@ made\n$(END)"
 
 clean:
