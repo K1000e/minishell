@@ -1,0 +1,36 @@
+==101618== 60 bytes in 1 blocks are still reachable in loss record 21 of 72
+==101618==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==101618==    by 0x4032EB: ft_calloc (in /home/cgorin/Documents/GitHub/Cursus/Milestone_3/minishell_/minishell_v_cam/minihell)
+==101618==    by 0x402F6B: ft_strjoin (in /home/cgorin/Documents/GitHub/Cursus/Milestone_3/minishell_/minishell_v_cam/minihell)
+==101618==    by 0x4012D9: prompt_hell (main.c:46)
+==101618==    by 0x401894: main (main.c:209)
+
+
+==101618== 48 bytes in 1 blocks are still reachable in loss record 19 of 72
+==101618==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==101618==    by 0x401BA9: create_cmd_node (parsing.c:53)
+==101618==    by 0x402290: parse_cmd (parsing.c:130)
+==101618==    by 0x401934: main (main.c:235)
+
+==101618== 16 bytes in 1 blocks are still reachable in loss record 11 of 72
+==101618==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==101618==    by 0x401C65: tokenise_command (parsing.c:207)
+==101618==    by 0x401BE5: create_cmd_node (parsing.c:58)
+==101618==    by 0x402290: parse_cmd (parsing.c:130)
+==101618==    by 0x401934: main (main.c:235)
+
+==101618== 5 bytes in 1 blocks are still reachable in loss record 2 of 72
+==101618==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==101618==    by 0x402E7C: ft_strdup (in /home/cgorin/Documents/GitHub/Cursus/Milestone_3/minishell_/minishell_v_cam/minihell)
+==101618==    by 0x401BCE: create_cmd_node (parsing.c:57)
+==101618==    by 0x402290: parse_cmd (parsing.c:130)
+==101618==    by 0x401934: main (main.c:235)
+
+
+==101618== 5 bytes in 1 blocks are still reachable in loss record 3 of 72
+==101618==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==101618==    by 0x401A8B: ft_strndup (parsing.c:16)
+==101618==    by 0x401E13: tokenise_command (parsing.c:230)
+==101618==    by 0x401BE5: create_cmd_node (parsing.c:58)
+==101618==    by 0x402290: parse_cmd (parsing.c:130)
+==101618==    by 0x401934: main (main.c:235)

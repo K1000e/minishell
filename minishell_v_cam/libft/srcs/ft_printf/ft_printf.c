@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/10 23:52:35 by cgorin            #+#    #+#             */
-/*   Updated: 2024/09/15 01:19:48 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/15 18:50:57 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,34 @@ static int	ft_printf_format(const char *format, va_list ap)
 }
 
 int	ft_printf(const char *format, ...)
+{
+	va_list	ap;
+	int		len;
+
+	va_start(ap, format);
+	len = 0;
+	while (*format)
+	{
+		if (*format == '%' && ft_strchr("cspdiuxX%", *(format + 1)))
+		{
+			format++;
+			if (ft_strchr("cspdiuxX", *format))
+			{
+				len += ft_printf_format(format, ap);
+				va_arg(ap, void *);
+			}
+			else if (*format == '%')
+				len += (ft_print_char('%'));
+		}
+		else
+			len += (ft_print_char(*format));
+		format++;
+	}
+	va_end(ap);
+	return (len);
+}
+
+int	ft_joinf(const char *format, ...)
 {
 	va_list	ap;
 	int		len;

@@ -1,7 +1,8 @@
 #include "minihell.h"
 
-/*
-** ft_strndup crée une copie d'une chaîne jusqu'à une longueur donnée.
+/* 
+** Fonction : ft_strndup
+** Crée une copie d'une chaîne jusqu'à une longueur donnée.
 */
 
 char	*ft_strndup(char *str, size_t len)
@@ -20,8 +21,11 @@ char	*ft_strndup(char *str, size_t len)
 	return dup;
 }
 
+/* 
+** Fonction : free_cmd_list
+** Libère la mémoire allouée à la liste de commandes.
+*/
 
-/* Fonction pour libérer la mémoire allouée à la liste de commandes */
 void free_cmd_list(t_cmd *cmd_list)
 {
 	t_cmd *current;
@@ -38,14 +42,14 @@ void free_cmd_list(t_cmd *cmd_list)
 		}
 		free(current->out_file);
 		free(current->in_file);
-		free(current);
+		//free(current);
 	}
 }
 
-/*
-** create_cmd_node crée un nœud avec une commande et ses tokens.
+/* 
+** Fonction : create_cmd_node
+** Crée un nœud avec une commande et ses tokens.
 */
-
 t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 {
 	t_cmd *new_cmd;
@@ -63,7 +67,7 @@ t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 }
 
 /*
-** parse_cmd divise la chaîne en commandes séparées par ';' 
+** Fonction qui analyse une chaîne de caractères
 ** et retourne une liste de commandes tokenisées.
 */
 
@@ -74,14 +78,21 @@ t_cmd	*parse_cmd(char *all)
 	int		i;
 	int		j;
 	t_bool	in_quotes;
+	char	*cmd;
+	char	*tokens;
+	//t_cmd *redir_cmd;
+	t_cmd *new_cmd;
 
 	cmd_lst = NULL;
 	in_quotes = FALSE;
 	tmp = ft_strdup(all);
+	if (!tmp)
+		return NULL;
 	i = -1;
 	while (tmp[++i])
 		tmp[i] = check_all_char(tmp[i]);
 	i = 0;
+	j = 0;
 	while (tmp[i])
 	{
 		if (tmp[i] == 'q')
@@ -90,16 +101,25 @@ t_cmd	*parse_cmd(char *all)
 			i++;
 			continue;
 		}
-		if (!in_quotes  && (tmp[i] == '>' || tmp[i] == '|' || !tmp[i]))
+		if (!in_quotes  && (tmp[i] == '>' || tmp[i] == '<' 
+			|| tmp[i] == 'p' || !tmp[i]))
 		{
 			if (i > j)
-			{ //penser a free les strndup !!!!!!!!!!!!!!!!!!!!!!!!!!!!! segfault + leaks sa mere
-				t_cmd *new_cmd = create_cmd_node(ft_strndup(&all[j], i - j), ft_strndup(&tmp[j], i - j));
+			{
+				cmd = ft_strndup(&all[j], i - j);
+				tokens = ft_strndup(&tmp[j], i - j);
+				new_cmd = create_cmd_node(cmd, tokens);
 				ft_lstadd_back((t_list **)&cmd_lst, (t_list *)new_cmd);
+				free(cmd);
+				free(tokens);
 			}
 			// Créer une commande spécifique pour la redirection ou le pipe
-			t_cmd *redir_cmd = create_cmd_node(ft_strndup(&all[i], 1), ft_strndup(&tmp[i], 1));
-			ft_lstadd_back((t_list **)&cmd_lst, (t_list *)redir_cmd);
+			cmd = ft_strndup(&all[i], 1);
+			tokens = ft_strndup(&tmp[i], 1);
+			new_cmd = create_cmd_node(cmd, tokens);
+			free(cmd);
+			free(tokens);
+			ft_lstadd_back((t_list **)&cmd_lst, (t_list *)new_cmd);
 			i++;
 			j = i;
 			continue;
@@ -107,9 +127,14 @@ t_cmd	*parse_cmd(char *all)
 		i++;
 	}
 	// Ajouter la dernière commande si elle existe
-	if (j < i) {
-		t_cmd *new_cmd = create_cmd_node(ft_strndup(&all[j], i - j), ft_strndup(&tmp[j], i - j));
+	if (j < i)
+	{
+		cmd = ft_strndup(&all[j], i - j);
+		tokens =  ft_strndup(&tmp[j], i - j);
+		new_cmd = create_cmd_node(cmd, tokens);
 		ft_lstadd_back((t_list **)&cmd_lst, (t_list *)new_cmd);
+		free(cmd);
+		free(tokens);
 	}
 	free(tmp);
 	return cmd_lst;
@@ -127,8 +152,8 @@ int count_tokens(const char *cmd_tokens)
 	int i;
 
 	count = 0;
-	i = -1;
-	while (cmd_tokens[++i])
+	i = 0;
+	while (cmd_tokens[i])
 	{
 		if (cmd_tokens[i] == 'q')
 		{
@@ -151,7 +176,8 @@ int count_tokens(const char *cmd_tokens)
 		}
 		else if (cmd_tokens[i] == '>' || cmd_tokens[i] == '<')
 		{
-			if ((cmd_tokens[i] == '>' && cmd_tokens[i + 1] == '>' ) || (cmd_tokens[i] == '<' && cmd_tokens[i + 1] == '<'))
+			if ((cmd_tokens[i] == '>' && cmd_tokens[i + 1] == '>' ) 
+				|| (cmd_tokens[i] == '<' && cmd_tokens[i + 1] == '<'))
 			{
 				// Token unique pour redirection heredoc
 				count++;
@@ -164,6 +190,8 @@ int count_tokens(const char *cmd_tokens)
 				i++;
 			}
 		}
+		else
+			i++;
 	}
 	return count;
 }
@@ -250,7 +278,7 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 
 /*
 ** check_all_char assigne un type de token à chaque caractère 
-** et retourne le type.
+** et renvoie le type.
 */
 
 char check_all_char(const char cmd)
@@ -269,9 +297,8 @@ char check_all_char(const char cmd)
 		return 'q'; // Single quotes ' '
 	else if (cmd == '$')
 		return 'a'; // Arguments $ARG pas bien traité ... !!
-	else if ((cmd >= '0' && cmd <= '9') || (cmd >= 'a' && cmd <= 'z')
-		|| (cmd >= 'A' && cmd <= 'Z') /* || (cmd == ' ') */)
-		return 'c'; // Command
+	else if (!ft_isspace(cmd))
+		return 'c';  // Command
 	else 
-		return 'o'; // Pour les autres
+		return ' '; // Pour les autres
 }

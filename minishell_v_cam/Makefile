@@ -10,9 +10,12 @@ DIR_INCS	:=	include
 DIR_LIBFT	:=	libft
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
-LST_SRCS	:=	main.c		\
-				parsing.c 	\
-				bultins.c
+LST_SRCS	:=	main.c			\
+				bultins.c 		\
+				environment.c	\
+				check_errors.c 	\
+				parsing.c 		\
+				prompt.c 		
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
@@ -31,6 +34,8 @@ BLUE		=	\033[34m
 YELLOW		=	\033[33m
 GREEN		=	\033[32m
 END			=	\033[0m
+RED 		=	\033[31m
+
 
 $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 	@mkdir -p $(DIR_OBJS)
@@ -59,6 +64,41 @@ fclean:		clean
 	printf "$(YELLOW)$(NAME) & checker & libft removed$(END)\n"
 
 re:			fclean all
+
+hell: 
+	@echo "$(RED)                            (                                   "
+	@echo "                .            )        )                         "
+	@echo "                         (  (|              .                   "
+	@echo "                     )   )\/ ( ( (                              "
+	@echo "             *  (   ((  /     ))\))  (  )    )                  "
+	@echo "           (     \   )\(          |  ))( )  (|                  "
+	@echo "           >)     ))/   |          )/  \((  ) \                 "
+	@echo "           (     (      .        -.     V )/   )(    (          "
+	@echo "            \   /     .   \            .       \))   ))         "
+	@echo "              )(      (  | |   )            .    (  /           "
+	@echo "             )(    , ))     \ /          \(  .    )             "
+	@echo "             (\>  , /__      ))            __ .  /              "
+	@echo "            ( \   | /  ___   ( \/     ___   \ | ( (             "
+	@echo "             \.)  |/  /   \__      __/   \   \|  ))             "
+	@echo "            .  \. |>  \      | __ |      /   <|  /              "
+	@echo "                 )/    \____/ :..: \____/     \ <               "
+	@echo "          )   \ (|__  .      / ;: \          __| )  (           "
+	@echo "         ((    )\)  ~--_     --  --      _--~    /  ))          "
+	@echo "          \    (    |  ||               ||  |   (  /            "
+	@echo "                \.  |  ||_             _||  |  /                "
+	@echo "                  > :  |  ~V+-I_I_I-+V~  |  : (.                "
+	@echo "                 (  \:  T\   _     _   /T  : ./                 "
+	@echo "                  \  :    T^T T-+-T T^T    ;<                   "
+	@echo "                   \.. _       -+-       _   )                  "
+	@echo "         )            .  --=.._____..=-- . ./         (         "
+	@echo "        ((     ) (          )             (     ) (   )>        "
+	@echo "         > \/^/) )) (   ( /(.      ))     ))._/(__))./ (_.      "
+	@echo "        (  _../ ( \))    )   \ (  / \.  ./ ||  ..__:|  _. \     "
+	@echo "        |  \__.  ) |   (/  /: :)) |   \/   |(  <.._  )|  ) )    "
+	@echo "       ))  _./   |  )  ))  __  <  | :(     :))   .//( :  : |    "
+	@echo "       (: <     ):  --:   ^  \  )(   )\/:   /   /_/ ) :._) :    "
+	@echo "        \..)   (_..  ..  :    :  : .(   \..:..    ./__.  ./     "
+
 
 .PHONY:	all clean fclean re
 .SILENT: 
