@@ -1,8 +1,8 @@
 NAME		:=	minihell
 
 CC			:=	cc
-CFLAGS		:= -Wall -Wextra -Werror -g #-fsanitize=address 
-LDFLAGS		:= -lreadline
+CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include -g -fsanitize=address 
+LDFLAGS = -L/opt/homebrew/opt/readline/lib -lreadline
 
 DIR_SRCS	:=	srcs
 DIR_OBJS	:=	.objs
@@ -11,6 +11,7 @@ DIR_LIBFT	:=	libft
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c			\
+				bultins_env.c 	\
 				bultins.c 		\
 				environment.c	\
 				check_errors.c 	\
@@ -50,7 +51,7 @@ $(LIBFT_LIB):
 	@echo "Finished compiling libft."
 
 $(NAME):	$(OBJS)
-	@$(CC) $(CFLAGS) $(OBJS) -o $@ libft/libft.a $(LDFLAGS)
+	@$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBFT_LIB) $(LDFLAGS)
 	printf "$(ERASE)$(GREEN)$@ made\n$(END)"
 
 clean:

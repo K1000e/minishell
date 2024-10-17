@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/16 00:08:03 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/16 18:26:20 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,23 +81,6 @@ void	ft_echo(t_cmd *cmd)
 		printf("\n");
 }
 
-void	ft_env(t_cmd *cmd, t_env *env)
-{
-	t_env	*current;
-
-	if (cmd->args[1] != NULL)
-	{
-		printf("env: ‘%s’: No such file or directory\n", cmd->args[1]);
-		return ;
-	}
-	current = env;
-	while (current)
-	{
-		printf("%s%s\n", current->key, current->value);
-		current = current->next;
-	}
-	
-}
 
 void	ft_pwd()
 {

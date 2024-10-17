@@ -9,9 +9,9 @@ void	ft_exec(t_cmd *cmd, t_env *env)
 	/* else if (ft_strcmp(cmd->args[0], "cd") == 0)
 		ft_cd(cmd, env); */
 	/* else if (ft_strcmp(cmd->args[0], "export") == 0)
-		ft_cd(cmd, env); */
-	/* else if (ft_strcmp(cmd->args[0], "unset") == 0)
-		ft_cd(cmd, env); */
+		ft_export(cmd, env); */
+	else if (ft_strcmp(cmd->args[0], "unset") == 0)
+		ft_unset(cmd, env);
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
 		ft_pwd();
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
@@ -24,78 +24,109 @@ void	ft_command(char *line, t_env *env)
 {
 	t_cmd	*commands;
 	t_cmd	*tmp;
+	int j; 
 
 	commands = parse_cmd(line);
+	if (commands == NULL) // Ensure the parsed commands are valid
+        return;
 	tmp = commands;
 	int cmd_index = 0;
 	while (tmp)
 	{
-	// test du parsing
-		//printf("Commande %d : %s\n", cmd_index, tmp->cmd);
-		//for (int j = 0; tmp->args && tmp->args[j]; j++)
-			//printf("  Argument[%d]: %s\n", j, tmp->args[j]);
-		
-		ft_exec(tmp, env);
+		if (tmp->cmd)
+			printf("Commande %d : %s\n", cmd_index, tmp->cmd);
+		if (tmp->args)
+        {
+			j = -1;
+            while (tmp->args[++j])
+                printf("  Argument[%d]: %s\n", j, tmp->args[j]);
+        }
+		//if (tmp != NULL)
+        ft_exec(tmp, env);
 		tmp = tmp->next;
 		cmd_index++;
 	}
 	free_cmd_list(commands);
-	free(commands);
-	free(tmp);
+	//free(commands);
+	//free(tmp);
+}
+
+#include <signal.h>
+
+void ignore_sigint(int sig)
+{
+	(void)sig;
+	printf("\n");
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
+
+void explosion()
+{
+	printf("      ______________________________    . \\  | / .");
+	printf("     /                            / \\     \\ \\ / /");
+	printf("    |                            | ==========  - -");
+	printf("     \\____________________________\\_/     / / \\ \\ ");
+	printf("  ______________________________      \\  | / | \\ ");
+	printf(" /                            / \\     \\ \\ / /.   .");
+	printf("|                            | ==========  - -");
+	printf(" \\____________________________\\_/     / / \\ \\    /");
+	printf("      ______________________________   / |\\  | /  .");
+	printf("     /                            / \\     \\ \\ / /");
+	printf("    |                            | ==========  -  - -");
+	printf("     \\____________________________\\_/     / / \\ \\ ");
+	printf("                                        .  / | \\  .");
+	printf(YELLOW "🔥 Oh no ! The HellShell explodes! 🔥\n" RESET);
+    rl_clear_history();
+    exit(1);
+}
+
+void minihell(t_env *env)
+{
+	char	*prompt_hell_e;
+	char	*line;
+	int		i;
+
+	i = 0;
+	while (1)
+	{
+		prompt_hell_e = prompt_hell(i);
+		if (i == 100) 
+			explosion();
+		line = readline(prompt_hell_e);
+		if (line == NULL)
+			break;
+		add_history(line);
+		if (!match_quotes(line) || !count_redir(line))
+		{
+			free(line);
+			continue ;
+		}
+		ft_command(line, env);
+		free (line);
+		free(prompt_hell_e);
+		i++;
+	}
 }
 
 
 int main(int argc, char **argv, char **environment)
 {
-	char	*line;
-	int		i;
 	t_env	*env = NULL;
-
-	char	*prompt_hell_e;
-
+	
 	(void)argc;
 	(void)argv;
-	i = 0;
+
 	env = get_env(environment, env);
-	while (1)
-	{
-		prompt_hell_e = prompt_hell(i);
-		if (i == 100) 
-		{
-			printf(YELLOW "🔥 Oh no ! The HellShell explodes! 🔥\n" RESET);
-			rl_clear_history();
-			exit(1);
-		}
-		line = readline(prompt_hell_e);
-		if (!line)
-			continue ;
-		add_history(line);
-		if (!match_quotes(line) || !count_redir(line))
-		{
-			printf("Error\n");
-			free(line);
-			continue;
-		}
-		ft_command(line, env);
-	/* 	commands = parse_cmd(line);
-		tmp = commands;
-		int cmd_index = 0;
-		while (tmp)
-		{
-		// test du parsing
-			//printf("Commande %d : %s\n", cmd_index, tmp->cmd);
-			//for (int j = 0; tmp->args && tmp->args[j]; j++)
-				//printf("  Argument[%d]: %s\n", j, tmp->args[j]);
-			ft_exec(tmp, env);
-			tmp = tmp->next;
-			cmd_index++;
-		} */
-		/* free_cmd_list(commands);
-		free(commands);
-		free(tmp); */
-		free (line);
-		free(prompt_hell_e);
-		i++;
-	}
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, ignore_sigint);
+	minihell(env);
 	return (0);
 }
+
+/*
+** TODO :
+** - Handle errors during command execution.
+** - Improve error handling.
+*/

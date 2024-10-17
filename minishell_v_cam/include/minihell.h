@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/16 00:27:52 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/17 00:26:57 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <readline/readline.h> 
 #include <readline/history.h> 
 #include "../libft/includes/libft.h"
-#include "../pipex/includes/pipex.h"
+#include "../pipex/include/pipex.h"
 #include <pwd.h>
 #include <time.h>
 #include <string.h>
@@ -30,6 +30,12 @@
 
 /* STRUCTURES */
 
+typedef enum e_bool
+{
+	FALSE = 0,
+	TRUE = 1
+}	t_bool;
+
 typedef struct s_cmd
 {
 	char			*cmd;			// Commande entiere
@@ -38,6 +44,7 @@ typedef struct s_cmd
 	char			*out_file;		// Fichier pour la sortie redirigée
 	char			*in_file;		// Fichier pour l'entrée redirigée
 	struct s_cmd	*next;			// Pointeur vers la commande suivante
+	t_bool			append;			// Pour savoir si on doit append ou trunk
 }	t_cmd;
 
 typedef struct s_env
@@ -46,12 +53,6 @@ typedef struct s_env
 	char			*value;		// Valeur
 	struct s_env	*next;		// Pointeur vers la clé suivante
 }	t_env;
-
-typedef enum e_bool
-{
-	FALSE = 0,
-	TRUE = 1
-}	t_bool;
 
 /* FUNCTIONS *//* MAIN */
 void	ft_command(char *line, t_env *env);
@@ -63,8 +64,10 @@ void	ft_echo(t_cmd *cmd);
 void	ft_env(t_cmd *cmd, t_env *env);
 void	ft_pwd();
 void	ft_cd(t_cmd *cmd, t_env *env);
+void	ft_unset(t_cmd *cmd, t_env *env);
 
 /* FUNCTIONS *//* CHECK_ERRORS */
+t_bool check_error(char *line);
 t_bool	count_redir(const char *line);
 t_bool	match_quotes(char *line);
 

@@ -1,32 +1,71 @@
 #include "minihell.h"
 
+/*
+> test   OK
+< test   OK
+
+test >
+zsh: parse error near `\n'
+test <
+zsh: parse error near `\n'
+
+ls |
+pipe> cat
+Makefile
+hek
+include
+libft
+minihell
+pipex
+srcs
+
+
+| cat
+zsh: parse error near `|'
+
+*/
+
+
+/* t_bool check_error(char *line)
+{
+	if ()
+	{
+		return (FALSE);
+	}
+	return (TRUE);
+} */
+
 t_bool count_redir(const char *line)
 {
 	int j;
 
-	j = -1;
-	while (line[++j])
+	j = 0;
+	while (line[j])
 	{
 		if (line[j] == '>')
 		{
-			if (line[j + 1] == '>')
+			if (line[j + 1] && line[j + 1] == '>')
 			{
-				if (line[j + 2] == '>')
+				if (line[j + 2] && line[j + 2] == '>')
 					return FALSE;
-				j++;
+				j += 2;
 			}
-			j++;
+			else
+				j++;
 		}
-		if (line[j] == '<')
+		else if (line[j] == '<')
 		{
-			if (line[j + 1] == '<')
+			if (line[j + 1] && line[j + 1] == '<')
 			{
-				if (line[j + 2] == '<')
+				if (line[j + 2] && line[j + 2] == '<')
 					return FALSE;
-				j++;
+				j += 2;
 			}
-			j++;
+			else
+				j++;
 		}
+		else
+			j++; // Move j forward normally for non-redirection characters
 	}
 	return TRUE;
 }
@@ -56,6 +95,5 @@ t_bool match_quotes(char *line)
 		printf("Error: Unmatched quote\n");
 		return FALSE;
 	}
-
 	return TRUE;
 }
