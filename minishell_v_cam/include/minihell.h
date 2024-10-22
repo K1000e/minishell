@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/22 11:32:42 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/22 18:45:04 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <readline/history.h> 
 #include "../libft/includes/libft.h"
 #include <signal.h>
-#include "../pipex/include/pipex.h"
+#include "../srcs/pipex.h"
 #include <pwd.h>
 #include <time.h>
 #include <string.h>
@@ -54,10 +54,29 @@ typedef struct s_cmd
 
 typedef struct s_env
 {
+	char **all;
 	char			*key;		// Nom de la clé
 	char			*value;		// Valeur
 	struct s_env	*next;		// Pointeur vers la clé suivante
 }	t_env;
+
+typedef struct s_pipex
+{
+	pid_t	*pid;
+	int		n_cmd;
+	int		pipe_fd[2];
+	int		prev_pipe_fd[2];
+	char	*file_in_name;
+	int		file_i;
+	int		file_o;
+	int		status;
+	int		test;
+	int		argc;
+	char	**argv;
+	char	*limiter;
+	char	*outfile;
+}	t_pipex;
+
 
 /* FUNCTIONS *//* MAIN */
 void	ft_command(char *line, t_env *env);
@@ -97,5 +116,23 @@ char	*get_username();
 char	*prompt_hell(int i);
 
 //t_list	*create_cmd_list(char *all, char *tmp, int i, int j);
+
+char	*find_executable(char *command, t_env *env);
+t_env *ft_find_key(t_env *env, char *key);
+
+int		pipex(t_cmd *cmd, t_env *env);
+t_pipex	*init_pipex(t_pipex *pipex, t_cmd *cmd);
+void	ft_pipex(t_cmd *cmd, t_env *env, t_pipex *pipex);
+void	pipeline(t_cmd *cmd, t_env *env, t_pipex *pipex, int i);
+
+// pipex_open_free.c
+void	open_infile(t_pipex *pipex);
+void	open_outfile(t_pipex *pipex);
+void	free_all(t_pipex *pipex);
+void	error(t_pipex *pipex, char *message, int error_code);
+
+//pipex_execute.c
+void	exec_pipe(t_pipex *pipex, t_cmd *cmd, t_env *env);
+char	*get_path_variable(t_env *env);
 
 #endif

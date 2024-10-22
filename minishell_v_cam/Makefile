@@ -1,8 +1,11 @@
 NAME		:=	minihell
 
 CC			:=	cc
-CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include -g -fsanitize=address 
-LDFLAGS = -L/opt/homebrew/opt/readline/lib -lreadline
+CFLAGS		:= -Wall -Wextra -Werror #-g -fsanitize=address 
+LDFLAGS		:= -lreadline
+
+#CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include #-g -fsanitize=address 
+#LDFLAGS = -L/opt/homebrew/opt/readline/lib -lreadline
 
 DIR_SRCS	:=	srcs
 DIR_OBJS	:=	.objs
@@ -18,9 +21,9 @@ LST_SRCS	:=	main.c			\
 				check_errors.c 	\
 				parsing.c 		\
 				prompt.c 		\
-				#pipex/pipex.c \
-				pipex/pipex_execute.c \
-				pipex/pipex_open_free.c 
+				pipex_execute.c \
+				pipex.c \
+				pipex_open_free.c 
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)

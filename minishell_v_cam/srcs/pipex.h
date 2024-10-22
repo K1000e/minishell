@@ -21,12 +21,12 @@
 # include <sys/types.h>
 # include <string.h>
 # include <errno.h>
-# include "../../include/minihell.h"
+# include "../include/minihell.h"
 # ifndef BONUS
 #  define BONUS 0
 # endif
 
-typedef struct s_pipex
+/* typedef struct s_pipex
 {
 	pid_t	*pid;
 	int		n_cmd;
@@ -41,12 +41,12 @@ typedef struct s_pipex
 	char	**argv;
 	char	*limiter;
 	char	*outfile;
-}	t_pipex;
+}	t_pipex; */
 
 /* FUNCTIONS */
 
 // pipex_main.c
-int	pipex(t_cmd *cmd, t_env *env);
+/* int		pipex(t_cmd *cmd, t_env *env);
 t_pipex	init_pipex(t_cmd *cmd);
 void	ft_pipex(t_cmd *cmd, t_env *env, t_pipex *pipex);
 void	pipeline(char *cmd, t_env *env, t_pipex *pipex, int i);
@@ -59,7 +59,7 @@ void	error(t_pipex *pipex, char *message, int error_code);
 
 //pipex_execute.c
 void	exec_pipe(t_pipex *pipex, t_cmd *cmd, char **env);
-char	*find_executable(char *command, char **env);
+//char	*find_executable(char *command, t_env *env);
 char	*get_path_variable(char **env);
-
+ */
 #endif

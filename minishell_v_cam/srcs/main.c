@@ -17,6 +17,9 @@ t_bool is_valid_command_format(const char *cmd)
 
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
+	t_env *current;
+
+	current = env->next;
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
 	else if (ft_strcmp(cmd->args[0], "echo") == 0)
@@ -24,13 +27,39 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 	/* else if (ft_strcmp(cmd->args[0], "cd") == 0)
 		ft_cd(cmd, env); */
 	else if (ft_strcmp(cmd->args[0], "export") == 0)
-		ft_export(cmd, env);
+		ft_export(cmd, current);
 	else if (ft_strcmp(cmd->args[0], "unset") == 0)
-		ft_unset(cmd, env);
+		ft_unset(cmd, current);
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
 		ft_pwd();
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
-		ft_env(cmd, env);
+		ft_env(cmd, current);
+}
+
+void execute_non_builtin(t_cmd *cmd, t_env *env)
+{
+	pid_t	pid;
+	int		i;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		if (access(cmd->args[0], X_OK) != 0)
+			cmd->args[0] = find_executable(cmd->args[0], env);
+		if (!cmd->cmd)
+			printf("command not found: no path");
+			//error(pipex, "command not found: no path", 0);
+		if (execve(cmd->args[0], cmd->args, env->all) == -1)
+		{
+			printf("command not found");
+			i = -1;
+			while (cmd->args[++i])
+				free(cmd->args[i]);
+			free(cmd->args);
+			//error(pipex, "command not found", 127);
+		}
+	}
+	waitpid(pid, 0, 0);
 }
 
 void	ft_exec(t_cmd *cmd, t_env *env)
@@ -52,9 +81,9 @@ void	ft_exec(t_cmd *cmd, t_env *env)
 		ft_strcmp(cmd->args[0], "exit") == 0
 	);
 	if (is_builtin)
-        execute_builtin(cmd, env);  // Function to handle built-ins
-    //else
-     //   pipex(cmd, env);  // Function to exec non-built-in
+		execute_builtin(cmd, env);  // Function to handle built-ins
+	else
+		execute_non_builtin(cmd, env);  // Function to exec non-built-in
 }
 
 void	print_cmd_list(t_cmd *cmd_lst)
@@ -100,9 +129,9 @@ void	ft_command(char *line, t_env *env)
 	}
 	print_cmd_list(commands);
 	tmp = commands;
-	/* if (tmp->next)
-		ft_pipex(&tmp, env); */
-	//else
+	if (tmp->next)
+		pipex(tmp, env); 
+	else
 		ft_exec(tmp, env);
 	free_cmd_list(commands);
 }
@@ -118,20 +147,20 @@ void ignore_sigint(int sig)
 
 void explosion()
 {
-	printf("	  ______________________________	. \\  | / .\n");
-	printf("	 /								/ \\	 \\ \\ / /\n");
-	printf("	|								| ==========  - -\n");
-	printf("	 \\____________________________\\_/	 / / \\ \\ \n");
-	printf("  ______________________________	  \\  | / | \\ \n");
-	printf(" /								/ \\	 \\ \\ / /.   .\n");
-	printf("|								| ==========  - -\n");
-	printf(" \\____________________________\\_/	 / / \\ \\	/\n");
-	printf("	  ______________________________   / |\\  | /  .\n");
-	printf("	 /								/ \\	 \\ \\ / /\n");
-	printf("	|								| ==========  -  - -\n");
-	printf("	 \\____________________________\\_/	 / / \\ \\ \n");
-	printf("										.  / | \\  .\n");
-	printf(YELLOW "🔥 Oh no ! The HellShell explodes! 🔥\n" RESET);
+	printf(YELLOW "      ______________________________       . \\  | / .\n");
+	printf("     /                              / \\     \\ \\ / /\n");
+	printf("    |                              | ==========  - -\n");
+	printf("     \\_____________________________\\_/     / / \\ \\ \n");
+	printf("  _______________________________       \\  | / | \\ \n");
+	printf(" /                               / \\     \\ \\ / /.   .\n");
+	printf("|                               | ==========  - -\n");
+	printf(" \\______________________________\\_/     / / \\ \\    /\n");
+	printf("      ______________________________     / |\\  | /  .\n");
+	printf("     /                              / \\     \\ \\ / /\n");
+	printf("    |                               | ==========  -  - -\n");
+	printf("     \\______________________________\\_/     / / \\ \\ \n");
+	printf("                                         .  / | \\  .\n");
+	printf( "🔥 Oh no ! The HellShell explodes! 🔥\n" RESET);
 	rl_clear_history();
 	exit(1);
 }
@@ -154,6 +183,7 @@ void minihell(t_env *env)
 		add_history(line);
 		if (!match_quotes(line) || !count_redir(line))
 		{
+			printf("Error\n");
 			free(line);
 			continue ;
 		}
@@ -162,6 +192,7 @@ void minihell(t_env *env)
 		free(prompt_hell_e);
 		i++;
 	}
+	exit(0);
 }
 
 

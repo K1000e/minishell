@@ -53,6 +53,16 @@ t_env	*get_env(char **env, t_env *new_env)
 		j = -1;
 		while (env[i][++j])
 		{
+			if (new_env == NULL)
+			{
+				new_env = malloc(sizeof(t_env));
+				if (!new_env)
+					return NULL;
+				new_env->all = env;
+				new_env->key = NULL;
+				new_env->value = NULL;
+				new_env->next = NULL;
+			}
 			if (env[i][j] == '=')
 			{
 				key = ft_strndup(env[i], j);

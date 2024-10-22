@@ -15,23 +15,25 @@
 
 int	pipex(t_cmd *cmd, t_env *env)
 {
-	t_pipex	pipex;
+	t_pipex	*pipex;
 
+	pipex = NULL;
+		
 	/* if ((argc == 5 && !BONUS) || (argc >= 5 && BONUS))
 	{ */
 		/* pipex.argc = argc;
 		pipex.argv = argv; */
-		pipex = init_pipex(cmd);
+		pipex = init_pipex(pipex, cmd);
 		/* if ((!BONUS && argc == 5) || (BONUS && argc >= 5
 				&& ft_strcmp(argv[1], "here_doc") != 0)) */
-		ft_pipex(cmd, env, &pipex);
+		ft_pipex(cmd, env, pipex);
 		/* else if (BONUS && argc >= 6 && ft_strcmp(argv[1], "here_doc") == 0)
 			ft_pipex(argv + 1, env, &pipex); */
-		free_all(&pipex);
-		if (errno == 0)
+		//free_all(&pipex);
+		/* if (errno == 0)
 			exit(EXIT_SUCCESS);
 		else
-			exit(WEXITSTATUS(pipex.status));
+			exit(WEXITSTATUS(pipex.status)); */
 	//}
 	/* else if (!BONUS)
 		ft_printf("-> %s file1 cmd1 cmd2 file2\n", argv[0]);
@@ -39,25 +41,37 @@ int	pipex(t_cmd *cmd, t_env *env)
 		ft_printf("-> %s {file1}/{here_doc LIMITER} cmd1 .. cmd2 file2\n",
 			argv[0]);
 	exit(EXIT_FAILURE); */
+	return 0;
 }
 
-t_pipex init_pipex(t_cmd *cmd)
+t_pipex *init_pipex(t_pipex *pipex, t_cmd *cmd)
 {
-	/* int	i;
+	int	i;
+	t_cmd *current;
+	//int 
 
+	current = cmd;
 	pipex->status = 0;
-	if (ft_strcmp(pipex->argv[1], "here_doc") == 0)
+	/* if (ft_strcmp(pipex->argv[1], "here_doc") == 0)
 	{
 		pipex->file_in_name = pipex->argv[1];
 		pipex->n_cmd = pipex->argc - 4;
 		pipex->limiter = ft_strjoin(pipex->argv[2], "\n");
 	}
 	else
+	{ */
+		printf(RED"there\n\033[0m"RESET);
+	i = 0;
+	while (current)
 	{
-		pipex->file_in_name = NULL;
-		pipex->n_cmd = pipex->argc - 3;
-		pipex->limiter = NULL;
+		i++;
+		current = current->next;
 	}
+	printf("nb cmd : %d", i);
+	//pipex->file_in_name = NULL;
+	pipex->n_cmd = i;
+	//pipex->limiter = NULL;
+	//}
 	pipex->pid = malloc(sizeof(pid_t) * (pipex->n_cmd));
 	pipex->pipe_fd[0] = -1;
 	pipex->pipe_fd[1] = -1;
@@ -67,15 +81,12 @@ t_pipex init_pipex(t_cmd *cmd)
 	pipex->file_o = -1;
 	i = -1;
 	while (++i < pipex->n_cmd)
-		pipex->pid[i] = -1; */
-	t_pipex pipex;
+		pipex->pid[i] = -1;
 
-	pipex.status = 0;
-	pipex.n_cmd = count_cmds(cmd);
-	return pipex;
+	return (pipex);
 }
 
-void ft_pipex(t_cmd *cmd, t_env **env, t_pipex *pipex)
+void ft_pipex(t_cmd *cmd, t_env *env, t_pipex *pipex)
 {
 	int	i;
 
@@ -108,9 +119,9 @@ void ft_pipex(t_cmd *cmd, t_env **env, t_pipex *pipex)
     } */
 }
 
-void	pipeline(char *cmd, char **env, t_pipex *pipex, int i)
+void	pipeline(t_cmd *cmd, t_env *env, t_pipex *pipex, int i)
 {
-	if (!cmd || !*cmd)
+	if (!cmd || !cmd->cmd)
 		error(pipex, "Invalid command: command is empty or NULL", 1);
 	if (i == 0)
 	{

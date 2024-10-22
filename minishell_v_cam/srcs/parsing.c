@@ -26,7 +26,6 @@ char	*ft_strndup(char *str, size_t len)
 ** Libère la mémoire allouée à la liste de commandes.
 */
 
-
 void free_cmd_list(t_cmd *cmd_list)
 {
 	t_cmd *current;
@@ -133,6 +132,24 @@ t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 	new_cmd->append = FALSE;
 	redirection(new_cmd);
 	return (new_cmd);
+}
+
+
+void	ft_cmd_add_back(t_cmd **lst, t_cmd *new)
+{
+	t_cmd	*ptr;
+
+	if (!new)
+		return ;
+	if (!*lst)
+	{
+		*lst = new;
+		return ;
+	}
+	ptr = *lst;
+	while (ptr->next)
+		ptr = ptr->next;
+	ptr->next = new;
 }
 
 /*
@@ -245,20 +262,22 @@ t_cmd	*parse_cmd(char *all)
 	while (tmp[i])
 	{
 		in_quotes = handle_quotes(all[i], in_quotes);
-		if (!in_quotes && (tmp[i] == 'p' || !tmp[i]))
+		if (!in_quotes && (tmp[i] == '|' || !tmp[i]))
 		{
 			if (i > j)
 			{
+				printf("Enter in i > j  in parse_cmd\n");
 				new_cmd = process_command_node(all, tmp, i, j);
 				if (!new_cmd)
 				{
+					printf("error\n");
 					free_cmd_list(cmd_lst);
 					free(tmp);
 					return (NULL);
 				}
-				ft_lstadd_back((t_list **)&cmd_lst, (t_list *)new_cmd);
+				ft_cmd_add_back(&cmd_lst, new_cmd);
 			}
-			if (tmp[i] == 'p')
+			if (tmp[i] == '|')
 			{
 				printf("Pipe detected\n");
 				i++;
@@ -282,14 +301,16 @@ t_cmd	*parse_cmd(char *all)
 	}
 	if (j < i)
 	{
+		printf("Enter in last cmd of parse_cmd\n");
 		new_cmd = process_command_node(all, tmp, i, j);
 		if (!new_cmd)
 		{
+			printf("error\n");
 			free_cmd_list(cmd_lst);
 			free(tmp);
 			return (NULL);
 		}
-		ft_lstadd_back((t_list **)&cmd_lst, (t_list *)new_cmd);
+		ft_cmd_add_back(&cmd_lst, new_cmd);
 	}
 	free(tmp);
 	return (cmd_lst);
@@ -336,7 +357,7 @@ int count_tokens(const char *cmd_tokens)
 
 /*
 ** tokenise_command divise la chaîne de commande en tokens 
-** selon les types 'c', '\'', '"', 'p', '>', '<', et 'a'.
+** selon les types 'c', '\'', '"', '|', '>', '<', et 'a'.
 ** reprend un peu la logique du schema parsing (voir notion)
 */
 
@@ -349,6 +370,7 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 	int total_tokens;
 	char **tokens;
 	char quote_char = '\0';
+	int length;
 
 	i = 0;
 	start = 0;
@@ -365,12 +387,10 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 			break;
 		if (cmd_tokens[i] == '|' || cmd_tokens[i] == '>' || cmd_tokens[i] == '<')
 		{
-			int length = 1;
+			length = 1;
 			if ((cmd_tokens[i] == '>' && cmd_tokens[i + 1] == '>') ||
 				(cmd_tokens[i] == '<' && cmd_tokens[i + 1] == '<'))
-			{
 				length = 2; 
-			}
 			tokens[token_count] = ft_strndup(&cmd_str[i], length);
 			token_count++;
 			i += length;
@@ -387,6 +407,8 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 			if (cmd_tokens[i] == quote_char)
 				i++;
 		}
+		//else if (cmd_tokens[i] == '|')
+
 		else
 		{
 			start = i;
@@ -413,7 +435,7 @@ char check_all_char(const char cmd)
 	if (cmd == ';') // Separateur
 		return 's';
 	if (cmd == '|') // Pipe
-		return 'p';
+		return '|';
 	else if (cmd == '>') // Redirection (a voir comment on fait pour >>)
 		return '>';
 	else if (cmd == '<') // Redirection (a voir comment on fait pour <<)

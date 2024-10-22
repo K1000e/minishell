@@ -10,45 +10,50 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+//#include "pipex.h"
+#include "minihell.h"
 
-void	exec_pipe(t_pipex *pipex, char *cmd, char **env)
+void	exec_pipe(t_pipex *pipex, t_cmd *cmd, t_env *env)
 {
-	char	**cmd_args;
+	//char	**cmd_args;
 	int		i;
 
-	cmd_args = ft_split(cmd, ' ');
-	if (!cmd || !*cmd)
+	//cmd_args = ft_split(cmd, ' ');
+	if (!cmd || !cmd->cmd)
 		error(pipex, "command not found: NULL or empty command", 1);
-	if (access(cmd, X_OK) != 0)
-		cmd_args[0] = find_executable(cmd_args[0], env);
-	if (!cmd_args[0])
+	if (access(cmd->args[0], X_OK) != 0)
+		cmd->args[0] = find_executable(cmd->args[0], env);
+	if (!cmd->cmd)
 		error(pipex, "command not found: no path", 0);
-	if (execve(cmd_args[0], cmd_args, env) == -1)
+	if (execve(cmd->cmd, cmd->args, env->all) == -1)
 	{
 		i = -1;
-		while (cmd_args[++i])
-			free(cmd_args[i]);
-		free(cmd_args);
+		while (cmd->args[++i])
+			free(cmd->args[i]);
+		free(cmd->args);
 		error(pipex, "command not found", 127);
 	}
 }
 
-char	*get_path_variable(char **env)
+char	*get_path_variable(t_env *env)
 {
-	int	i;
+	t_env	*current;
 
-	i = 0;
-	while (env[i])
+	current = env->next;
+	current = ft_find_key(current, "PATH");
+	return(current->value + 1);
+	/* while (current != NULL)
 	{
-		if (ft_strncmp(env[i], "PATH=", 5) == 0)
-			return (env[i] + 5);
-		i++;
-	}
-	return (NULL);
+		//if (env->key == NULL)
+		if (ft_strcmp(current->key, "PATH") == 0)
+		{
+			return (current->value);
+		}
+		current = current->next;
+	} */
 }
 
-char	*find_executable(char *command, char **env)
+char	*find_executable(char *command, t_env *env)
 {
 	size_t	i;
 	char	*path;
@@ -56,6 +61,7 @@ char	*find_executable(char *command, char **env)
 	char	*full_path;
 	int		start;
 
+	printf("Enter in find executable\n");
 	path = get_path_variable(env);
 	if (!path)
 		return (NULL);
