@@ -1,6 +1,21 @@
 #include "minihell.h"
 
-void	ft_exec(t_cmd *cmd, t_env *env)
+t_bool is_valid_command_format(const char *cmd)
+{
+	int i = 0;
+
+	// Skip the first word (the command name)
+	while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\'' &&
+		   cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
+		i++;
+
+	if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>' 
+		&& cmd[i] != '<' && cmd[i] != '\0')
+		return FALSE;
+	return TRUE;
+}
+
+void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
@@ -8,50 +23,89 @@ void	ft_exec(t_cmd *cmd, t_env *env)
 		ft_echo(cmd);
 	/* else if (ft_strcmp(cmd->args[0], "cd") == 0)
 		ft_cd(cmd, env); */
-	/* else if (ft_strcmp(cmd->args[0], "export") == 0)
-		ft_export(cmd, env); */
+	else if (ft_strcmp(cmd->args[0], "export") == 0)
+		ft_export(cmd, env);
 	else if (ft_strcmp(cmd->args[0], "unset") == 0)
 		ft_unset(cmd, env);
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
 		ft_pwd();
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, env);
-	/* else 
-		execve("../pipex/pipex", &cmd, env); */
+}
+
+void	ft_exec(t_cmd *cmd, t_env *env)
+{
+	int is_builtin;
+
+	if (!is_valid_command_format(cmd->cmd))
+	{
+		printf("Error: Invalid command format.\n");
+		return;
+	}
+	is_builtin = (
+		ft_strcmp(cmd->args[0], "echo") == 0 ||
+		ft_strcmp(cmd->args[0], "cd") == 0 ||
+		ft_strcmp(cmd->args[0], "pwd") == 0 ||
+		ft_strcmp(cmd->args[0], "env") == 0 ||
+		ft_strcmp(cmd->args[0], "export") == 0 ||
+		ft_strcmp(cmd->args[0], "unset") == 0 ||
+		ft_strcmp(cmd->args[0], "exit") == 0
+	);
+	if (is_builtin)
+        execute_builtin(cmd, env);  // Function to handle built-ins
+    //else
+     //   pipex(cmd, env);  // Function to exec non-built-in
+}
+
+void	print_cmd_list(t_cmd *cmd_lst)
+{
+	t_cmd	*current;
+	int		index;
+
+	current = cmd_lst;
+	index = 0;
+	while (current)
+	{
+		printf("Command Node %d:\n", index);
+		printf("  Command: %s\n", current->cmd);
+		if (current->args)
+		{
+			int i = 0;
+			while (current->args[i])
+			{
+				printf("  Arguments[%d]: ", i);
+				printf("%s \n", current->args[i]);
+				i++;
+			}
+		}
+		if (current->in_file)
+			printf("  Input Redirection: %s\n", current->in_file);
+		if (current->out_file)
+			printf("  Output Redirection: %s append ?%d\n",
+				current->out_file, current->append);
+		current = current->next;
+		index++;
+	}
 }
 
 void	ft_command(char *line, t_env *env)
 {
 	t_cmd	*commands;
 	t_cmd	*tmp;
-	int j; 
 
 	commands = parse_cmd(line);
-	if (commands == NULL) // Ensure the parsed commands are valid
-        return;
-	tmp = commands;
-	int cmd_index = 0;
-	while (tmp)
-	{
-		if (tmp->cmd)
-			printf("Commande %d : %s\n", cmd_index, tmp->cmd);
-		if (tmp->args)
-        {
-			j = -1;
-            while (tmp->args[++j])
-                printf("  Argument[%d]: %s\n", j, tmp->args[j]);
-        }
-		//if (tmp != NULL)
-        ft_exec(tmp, env);
-		tmp = tmp->next;
-		cmd_index++;
+	if (commands == NULL) {
+		printf("Error: No commands were parsed.\n");
+		return;
 	}
+	print_cmd_list(commands);
+	tmp = commands;
+	/* if (tmp->next)
+		ft_pipex(&tmp, env); */
+	//else
+		ft_exec(tmp, env);
 	free_cmd_list(commands);
-	//free(commands);
-	//free(tmp);
 }
-
-#include <signal.h>
 
 void ignore_sigint(int sig)
 {
@@ -64,22 +118,22 @@ void ignore_sigint(int sig)
 
 void explosion()
 {
-	printf("      ______________________________    . \\  | / .");
-	printf("     /                            / \\     \\ \\ / /");
-	printf("    |                            | ==========  - -");
-	printf("     \\____________________________\\_/     / / \\ \\ ");
-	printf("  ______________________________      \\  | / | \\ ");
-	printf(" /                            / \\     \\ \\ / /.   .");
-	printf("|                            | ==========  - -");
-	printf(" \\____________________________\\_/     / / \\ \\    /");
-	printf("      ______________________________   / |\\  | /  .");
-	printf("     /                            / \\     \\ \\ / /");
-	printf("    |                            | ==========  -  - -");
-	printf("     \\____________________________\\_/     / / \\ \\ ");
-	printf("                                        .  / | \\  .");
+	printf("	  ______________________________	. \\  | / .\n");
+	printf("	 /								/ \\	 \\ \\ / /\n");
+	printf("	|								| ==========  - -\n");
+	printf("	 \\____________________________\\_/	 / / \\ \\ \n");
+	printf("  ______________________________	  \\  | / | \\ \n");
+	printf(" /								/ \\	 \\ \\ / /.   .\n");
+	printf("|								| ==========  - -\n");
+	printf(" \\____________________________\\_/	 / / \\ \\	/\n");
+	printf("	  ______________________________   / |\\  | /  .\n");
+	printf("	 /								/ \\	 \\ \\ / /\n");
+	printf("	|								| ==========  -  - -\n");
+	printf("	 \\____________________________\\_/	 / / \\ \\ \n");
+	printf("										.  / | \\  .\n");
 	printf(YELLOW "🔥 Oh no ! The HellShell explodes! 🔥\n" RESET);
-    rl_clear_history();
-    exit(1);
+	rl_clear_history();
+	exit(1);
 }
 
 void minihell(t_env *env)

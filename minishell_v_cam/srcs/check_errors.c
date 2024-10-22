@@ -65,7 +65,7 @@ t_bool count_redir(const char *line)
 				j++;
 		}
 		else
-			j++; // Move j forward normally for non-redirection characters
+			j++;
 	}
 	return TRUE;
 }

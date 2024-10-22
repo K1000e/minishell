@@ -1,0 +1,7 @@
+test
+42_pipex_tester
+*.o
+pipex_tester_42
+*.a
+42_pipex_tester
+pipex

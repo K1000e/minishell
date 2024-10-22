@@ -8,6 +8,7 @@ DIR_SRCS	:=	srcs
 DIR_OBJS	:=	.objs
 DIR_INCS	:=	include
 DIR_LIBFT	:=	libft
+DIR_PIPEX	:=	pipex
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c			\
@@ -16,7 +17,10 @@ LST_SRCS	:=	main.c			\
 				environment.c	\
 				check_errors.c 	\
 				parsing.c 		\
-				prompt.c 		
+				prompt.c 		\
+				#pipex/pipex.c \
+				pipex/pipex_execute.c \
+				pipex/pipex_open_free.c 
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
@@ -50,10 +54,9 @@ $(LIBFT_LIB):
 	@$(MAKE) -C $(DIR_LIBFT) --no-print-director
 	@echo "Finished compiling libft."
 
-$(NAME):	$(OBJS)
+$(NAME):	$(OBJS) hell
 	@$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBFT_LIB) $(LDFLAGS)
-	printf "$(ERASE)$(GREEN)$@ made\n$(END)"
-
+	
 clean:
 	@rm -rf $(DIR_OBJS)
 	$(MAKE) -C $(DIR_LIBFT) clean --no-print-director
@@ -62,12 +65,12 @@ clean:
 fclean:		clean
 	rm -rdf	$(NAME)
 	rm -rdf	libft/libft.a
-	printf "$(YELLOW)$(NAME) & checker & libft removed$(END)\n"
+	printf "$(YELLOW)$(NAME) & libft removed$(END)\n"
 
 re:			fclean all
 
 hell: 
-	@echo "$(RED)                            (                                   "
+	@echo "$(RED)$(ERASE)                            (                                   "
 	@echo "                .            )        )                         "
 	@echo "                         (  (|              .                   "
 	@echo "                     )   )\/ ( ( (                              "
@@ -99,6 +102,14 @@ hell:
 	@echo "       ))  _./   |  )  ))  __  <  | :(     :))   .//( :  : |    "
 	@echo "       (: <     ):  --:   ^  \  )(   )\/:   /   /_/ ) :._) :    "
 	@echo "        \..)   (_..  ..  :    :  : .(   \..:..    ./__.  ./     "
+	@echo "	 ( /(       )\ )  )\ )  )\ )  ( /(       )\ )  )\ )  "
+	@echo "	 )\()) (   (()/( (()/( (()/(  )\()) (   (()/( (()/(  "
+	@echo "	((_)\  )\   /(_)) /(_)) /(_))((_)\  )\   /(_)) /(_)) "
+	@echo "	 _((_)((_) (_))  (_))  (_))   _((_)((_) (_))  (_))   "
+	@echo "	| || || __|| |   | |   / __| | || || __|| |   | |    "
+	@echo "	| __ || _| | |__ | |__ \__ \ | __ || _| | |__ | |__  "
+	@echo "	|_||_||___||____||____||___/ |_||_||___||____||____| "
+	@echo "	                                                     "
 
 
 .PHONY:	all clean fclean re

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/17 00:26:57 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:32:42 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <readline/readline.h> 
 #include <readline/history.h> 
 #include "../libft/includes/libft.h"
+#include <signal.h>
 #include "../pipex/include/pipex.h"
 #include <pwd.h>
 #include <time.h>
@@ -45,6 +46,10 @@ typedef struct s_cmd
 	char			*in_file;		// Fichier pour l'entrée redirigée
 	struct s_cmd	*next;			// Pointeur vers la commande suivante
 	t_bool			append;			// Pour savoir si on doit append ou trunk
+	t_bool			pipe_in;        // Pour savoir si on doit lire depuis un pipe
+	t_bool			pipe_out;       // Pour savoir si on doit écrire dans un pipe
+	t_bool 			heredoc;
+	char			*heredoc_exit;
 }	t_cmd;
 
 typedef struct s_env
@@ -74,7 +79,8 @@ t_bool	match_quotes(char *line);
 /* FUNCTIONS *//* ENVIRONMENT */
 t_env	*create_env_node(char *key, char *value);
 t_env	*get_env(char **env, t_env *new_env);
-
+void	ft_env_add_back_(t_env **lst, t_env *new);
+void	ft_export(t_cmd *cmd, t_env *env);
 
 /* FUNCTIONS *//* PARSING */
 char	*ft_strndup(char *str, size_t len);

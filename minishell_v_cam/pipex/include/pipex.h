@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/15 00:23:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/17 18:49:06 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/22 11:55:27 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,12 @@
 # include <sys/types.h>
 # include <string.h>
 # include <errno.h>
-# include "includes/libft.h"
+# include "../include/minihell.h"
 # ifndef BONUS
 #  define BONUS 0
 # endif
+
+
 
 typedef struct s_pipex
 {
@@ -46,6 +48,7 @@ typedef struct s_pipex
 /* FUNCTIONS */
 
 // pipex_main.c
+//int		pipex(t_cmd *cmd, t_env *env);
 void	init_pipex(t_pipex *pipex);
 void	ft_pipex(char **argv, char **env, t_pipex *pipex);
 void	pipeline(char *cmd, char **env, t_pipex *pipex, int i);
