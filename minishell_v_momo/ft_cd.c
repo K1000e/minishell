@@ -6,7 +6,7 @@
 /*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 22:14:03 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/10/23 07:48:26 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/10/23 08:14:06 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void ft_cd(t_cmd *cmd, t_env *env)
 	}
     if (cmd->args[1] == NULL)
     {
-		current = ft_find_key(env, "HOME"); //segfault ici
+		current = ft_find_key(env, "HOME");
 		if (current && current->value)
 			directory = current->value + 1;
 		else
