@@ -6,7 +6,7 @@
 /*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 22:14:03 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/10/23 03:24:21 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/10/23 04:23:00 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,11 @@ void ft_cd(t_cmd *cmd, t_env *env)
 	t_env	*current;
 	char	cwd[1024];
 
+	if (cmd->args[2] != NULL)
+	{
+		printf("cd: too many arguments\n");
+        return ;
+	}
     if (cmd->args[1] == NULL)
     {
 		current = ft_find_key(env, "HOME");
