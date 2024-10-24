@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/05 13:29:18 by cgorin            #+#    #+#             */
-/*   Updated: 2024/09/15 01:19:20 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/22 22:21:27 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,10 @@ void	free_all(t_pipex *pipex)
 	while (++i < pipex->n_cmd && pipex->pid[pipex->n_cmd - 1] != -1)
 		waitpid(pipex->pid[i], &pipex->status, 0);
 	free(pipex->pid);
-	if (pipex->file_in_name)
-		unlink(pipex->file_in_name);
-	if (pipex->limiter)
-		free(pipex->limiter);
+/* 	if (pipex->file_in_name)
+		unlink(pipex->file_in_name); */
+	/* if (pipex->limiter)
+		free(pipex->limiter); */
 }
 
 void	error(t_pipex *pipex, char *message, int error_code)

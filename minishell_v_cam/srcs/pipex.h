@@ -46,9 +46,9 @@
 /* FUNCTIONS */
 
 // pipex_main.c
-/* int		pipex(t_cmd *cmd, t_env *env);
-t_pipex	init_pipex(t_cmd *cmd);
-void	ft_pipex(t_cmd *cmd, t_env *env, t_pipex *pipex);
+/* int		ft_pipex_start(t_cmd *cmd, t_env *env);
+t_pipex	init_ft_pipex_start(t_cmd *cmd);
+void	ft_ft_pipex_start(t_cmd *cmd, t_env *env, t_pipex *pipex);
 void	pipeline(char *cmd, t_env *env, t_pipex *pipex, int i);
 
 // pipex_open_free.c

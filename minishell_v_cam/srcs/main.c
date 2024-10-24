@@ -24,14 +24,14 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 		ft_exit(cmd);
 	else if (ft_strcmp(cmd->args[0], "echo") == 0)
 		ft_echo(cmd);
-	/* else if (ft_strcmp(cmd->args[0], "cd") == 0)
-		ft_cd(cmd, env); */
+	else if (ft_strcmp(cmd->args[0], "cd") == 0)
+		ft_cd(cmd, env);
 	else if (ft_strcmp(cmd->args[0], "export") == 0)
 		ft_export(cmd, current);
 	else if (ft_strcmp(cmd->args[0], "unset") == 0)
 		ft_unset(cmd, current);
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
-		ft_pwd();
+		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
 }
@@ -47,16 +47,20 @@ void execute_non_builtin(t_cmd *cmd, t_env *env)
 		if (access(cmd->args[0], X_OK) != 0)
 			cmd->args[0] = find_executable(cmd->args[0], env);
 		if (!cmd->cmd)
-			printf("command not found: no path");
-			//error(pipex, "command not found: no path", 0);
+		{
+			perror("command not found: no path");
+			exit(0);
+		}
+			//printf("command not found: no path");
 		if (execve(cmd->args[0], cmd->args, env->all) == -1)
 		{
-			printf("command not found");
+			//printf("command not found");
 			i = -1;
 			while (cmd->args[++i])
 				free(cmd->args[i]);
 			free(cmd->args);
-			//error(pipex, "command not found", 127);
+			perror("command not found: no path");
+			exit(127);
 		}
 	}
 	waitpid(pid, 0, 0);
@@ -96,7 +100,8 @@ void	print_cmd_list(t_cmd *cmd_lst)
 	while (current)
 	{
 		printf("Command Node %d:\n", index);
-		printf("  Command: %s\n", current->cmd);
+		if (current->cmd)
+			printf("  Command: %s\n", current->cmd);
 		if (current->args)
 		{
 			int i = 0;
@@ -130,7 +135,7 @@ void	ft_command(char *line, t_env *env)
 	print_cmd_list(commands);
 	tmp = commands;
 	if (tmp->next)
-		pipex(tmp, env); 
+		ft_pipex_start(tmp, env); 
 	else
 		ft_exec(tmp, env);
 	free_cmd_list(commands);
@@ -188,8 +193,8 @@ void minihell(t_env *env)
 			continue ;
 		}
 		ft_command(line, env);
-		free (line);
 		free(prompt_hell_e);
+		free (line);
 		i++;
 	}
 	exit(0);

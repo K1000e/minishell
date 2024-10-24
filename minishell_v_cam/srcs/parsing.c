@@ -30,10 +30,12 @@ void free_cmd_list(t_cmd *cmd_list)
 {
 	t_cmd *current;
 	int i;
-
+	printf("here\n");	
 	current = cmd_list;
-	while (current) {
-		free(current->cmd);
+	while (current)
+	{
+		if (current->cmd)
+			free(current->cmd);
 		if (current->args)
 		{
 			i = -1;
@@ -41,8 +43,10 @@ void free_cmd_list(t_cmd *cmd_list)
 				free(current->args[i]);
 			free(current->args);
 		}
-		free(current->out_file);
-		free(current->in_file);
+		if (current->out_file)
+			free(current->out_file);
+		else if (current->out_file)
+			free(current->out_file);
 		current = current->next;
 	}
 	free(cmd_list);
@@ -131,6 +135,7 @@ t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 	new_cmd->next = NULL;
 	new_cmd->append = FALSE;
 	redirection(new_cmd);
+	//free(cmd_str);
 	return (new_cmd);
 }
 
@@ -205,6 +210,27 @@ int	handle_redirection(t_cmd *new_cmd, char *tokens, char *all, int k, int j)
 ** Crée un nouveau nœud de commande et le traite.
 */
 
+void free_cmd_node(t_cmd *cmd_node)
+{
+	if (cmd_node)
+	{
+		if (cmd_node->cmd)
+			free(cmd_node->cmd);  // Free the command string
+		if (cmd_node->args)
+		{
+			int i = 0;
+			while (cmd_node->args[i])
+			{
+				free(cmd_node->args[i]);  // Free each argument
+				i++;
+			}
+			free(cmd_node->args);  // Free the args array
+		}
+		free(cmd_node);  // Finally, free the command node itself
+	}
+}
+
+
 t_cmd	*process_command_node(char *all, char *tmp, int i, int j)
 {
 	t_cmd	*new_cmd;
@@ -225,6 +251,7 @@ t_cmd	*process_command_node(char *all, char *tmp, int i, int j)
 			{
 				free(cmd);
 				free(tokens);
+				//free_cmd_node(new_cmd);;
 				return (NULL);
 			}
 		}
@@ -233,6 +260,8 @@ t_cmd	*process_command_node(char *all, char *tmp, int i, int j)
 	}
 	free(cmd);
 	free(tokens);
+	//free(new_cmd);
+	//free_cmd_node(new_cmd);
 	return (new_cmd);
 }
 
@@ -361,7 +390,6 @@ int count_tokens(const char *cmd_tokens)
 ** reprend un peu la logique du schema parsing (voir notion)
 */
 
-
 char **tokenise_command(char *cmd_str, char *cmd_tokens)
 {
 	int i;
@@ -420,6 +448,8 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 			token_count++;
 		}
 	}
+	//free(cmd_str);
+	//free(cmd_tokens);
 	tokens[token_count] = NULL;
 	return tokens;
 }

@@ -13,23 +13,22 @@
 #include "minihell.h"
 #include "pipex.h"
 
-int	pipex(t_cmd *cmd, t_env *env)
+int	ft_pipex_start(t_cmd *cmd, t_env *env)
 {
-	t_pipex	*pipex;
+	t_pipex	pipex;
 
-	pipex = NULL;
-		
 	/* if ((argc == 5 && !BONUS) || (argc >= 5 && BONUS))
 	{ */
 		/* pipex.argc = argc;
 		pipex.argv = argv; */
-		pipex = init_pipex(pipex, cmd);
+		init_ft_pipex_start(&pipex, cmd);
+		
 		/* if ((!BONUS && argc == 5) || (BONUS && argc >= 5
 				&& ft_strcmp(argv[1], "here_doc") != 0)) */
-		ft_pipex(cmd, env, pipex);
+		ft_ft_pipex_start(cmd, env, &pipex);
 		/* else if (BONUS && argc >= 6 && ft_strcmp(argv[1], "here_doc") == 0)
-			ft_pipex(argv + 1, env, &pipex); */
-		//free_all(&pipex);
+			ft_ft_pipex_start(argv + 1, env, &pipex); */
+		free_all(&pipex);
 		/* if (errno == 0)
 			exit(EXIT_SUCCESS);
 		else
@@ -44,7 +43,7 @@ int	pipex(t_cmd *cmd, t_env *env)
 	return 0;
 }
 
-t_pipex *init_pipex(t_pipex *pipex, t_cmd *cmd)
+void	init_ft_pipex_start(t_pipex *pipex, t_cmd *cmd)
 {
 	int	i;
 	t_cmd *current;
@@ -57,17 +56,17 @@ t_pipex *init_pipex(t_pipex *pipex, t_cmd *cmd)
 		pipex->file_in_name = pipex->argv[1];
 		pipex->n_cmd = pipex->argc - 4;
 		pipex->limiter = ft_strjoin(pipex->argv[2], "\n");
+		printf(RED"there\n\033[0m"RESET);
 	}
 	else
 	{ */
-		printf(RED"there\n\033[0m"RESET);
 	i = 0;
 	while (current)
 	{
 		i++;
 		current = current->next;
 	}
-	printf("nb cmd : %d", i);
+	printf("nb cmd : %d\n", i);
 	//pipex->file_in_name = NULL;
 	pipex->n_cmd = i;
 	//pipex->limiter = NULL;
@@ -82,11 +81,9 @@ t_pipex *init_pipex(t_pipex *pipex, t_cmd *cmd)
 	i = -1;
 	while (++i < pipex->n_cmd)
 		pipex->pid[i] = -1;
-
-	return (pipex);
 }
 
-void ft_pipex(t_cmd *cmd, t_env *env, t_pipex *pipex)
+void ft_ft_pipex_start(t_cmd *cmd, t_env *env, t_pipex *pipex)
 {
 	int	i;
 
@@ -125,25 +122,69 @@ void	pipeline(t_cmd *cmd, t_env *env, t_pipex *pipex, int i)
 		error(pipex, "Invalid command: command is empty or NULL", 1);
 	if (i == 0)
 	{
-		open_infile(pipex);
-		dup2(pipex->file_i, STDIN_FILENO);
-		dup2(pipex->pipe_fd[1], STDOUT_FILENO);
+		printf("wtf1\n");
+		printf("in_file1 = %s", cmd->in_file);
+		printf("out_file1 = %s", cmd->out_file);
+		if (cmd->in_file)
+		{
+			open_infile(pipex);
+			dup2(pipex->file_i, STDIN_FILENO);
+		}
+		else 
+			dup2(pipex->pipe_fd[0], STDIN_FILENO);
+		if (cmd->out_file)
+		{
+			open_outfile(pipex);
+			dup2(pipex->file_o, STDOUT_FILENO);
+		}
+		else
+			dup2(pipex->pipe_fd[1], STDOUT_FILENO);
 		close(pipex->pipe_fd[1]);
 	}
 	else if (i == pipex->n_cmd - 1)
 	{
-		open_outfile(pipex);
+		printf("wtf2\n");
+		printf("in_file2 = %s", cmd->in_file);
+		printf("out_file2 = %s", cmd->out_file);
+		if (cmd->in_file)
+		{
+			open_infile(pipex);
+			dup2(pipex->file_i, STDIN_FILENO);
+		}
+		else
+			dup2(pipex->prev_pipe_fd[0], STDIN_FILENO);
+		if (cmd->out_file)
+		{
+			open_outfile(pipex);
+			dup2(pipex->file_o, STDOUT_FILENO);
+		}
+		else 
+			dup2(pipex->pipe_fd[1], STDOUT_FILENO);
 		close(pipex->pipe_fd[1]);
-		dup2(pipex->prev_pipe_fd[0], STDIN_FILENO);
-		dup2(pipex->file_o, STDOUT_FILENO);
 		close(pipex->prev_pipe_fd[0]);
 	}
 	else
 	{
-		dup2(pipex->prev_pipe_fd[0], STDIN_FILENO);
-		dup2(pipex->pipe_fd[1], STDOUT_FILENO);
+		printf("wtf3\n");
+		printf("in_file3 = %s", cmd->in_file);
+		printf("out_file3 = %s", cmd->out_file);
+		if (cmd->in_file)
+		{
+			open_infile(pipex);
+			dup2(pipex->file_i, STDIN_FILENO);
+		}
+		else
+			dup2(pipex->prev_pipe_fd[0], STDIN_FILENO);
+		if (cmd->out_file)
+		{
+			open_outfile(pipex);
+			dup2(pipex->file_o, STDOUT_FILENO);
+		}
+		else 
+			dup2(pipex->pipe_fd[1], STDOUT_FILENO);
 		close(pipex->prev_pipe_fd[1]);
 	}
+	printf("exit\n");
 	close(pipex->pipe_fd[0]);
 	exec_pipe(pipex, cmd, env);
 }

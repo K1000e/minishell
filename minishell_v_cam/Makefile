@@ -1,7 +1,7 @@
 NAME		:=	minihell
 
 CC			:=	cc
-CFLAGS		:= -Wall -Wextra -Werror #-g -fsanitize=address 
+CFLAGS		:= -Wall -Wextra -Werror -g #-fsanitize=address 
 LDFLAGS		:= -lreadline
 
 #CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include #-g -fsanitize=address 
@@ -54,15 +54,16 @@ $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 all: $(LIBFT_LIB) $(NAME)
 
 $(LIBFT_LIB):
-	@$(MAKE) -C $(DIR_LIBFT) --no-print-director
+	@$(MAKE) -C $(DIR_LIBFT) --no-print-directory
 	@echo "Finished compiling libft."
 
-$(NAME):	$(OBJS) hell
+$(NAME):	$(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBFT_LIB) $(LDFLAGS)
+	@$(MAKE) hell --no-print-directory
 	
 clean:
 	@rm -rf $(DIR_OBJS)
-	$(MAKE) -C $(DIR_LIBFT) clean --no-print-director
+	$(MAKE) -C $(DIR_LIBFT) clean --no-print-directory
 	printf "$(YELLOW)$(DIR_OBJS) removed$(END)\n"
 
 fclean:		clean

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/22 18:45:04 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/24 14:17:29 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,11 +82,13 @@ typedef struct s_pipex
 void	ft_command(char *line, t_env *env);
 void	ft_exec(t_cmd *cmd, t_env *env);
 
+void ft_update_key(t_env *env, char *key, char *value);
+
 /* FUNCTIONS *//* BULTINS */
 void	ft_exit(t_cmd *cmd);
 void	ft_echo(t_cmd *cmd);
 void	ft_env(t_cmd *cmd, t_env *env);
-void	ft_pwd();
+void	ft_pwd(t_env *env);
 void	ft_cd(t_cmd *cmd, t_env *env);
 void	ft_unset(t_cmd *cmd, t_env *env);
 
@@ -120,9 +122,9 @@ char	*prompt_hell(int i);
 char	*find_executable(char *command, t_env *env);
 t_env *ft_find_key(t_env *env, char *key);
 
-int		pipex(t_cmd *cmd, t_env *env);
-t_pipex	*init_pipex(t_pipex *pipex, t_cmd *cmd);
-void	ft_pipex(t_cmd *cmd, t_env *env, t_pipex *pipex);
+int		ft_pipex_start(t_cmd *cmd, t_env *env);
+void	init_ft_pipex_start(t_pipex *pipex, t_cmd *cmd);
+void	ft_ft_pipex_start(t_cmd *cmd, t_env *env, t_pipex *pipex);
 void	pipeline(t_cmd *cmd, t_env *env, t_pipex *pipex, int i);
 
 // pipex_open_free.c
@@ -134,5 +136,7 @@ void	error(t_pipex *pipex, char *message, int error_code);
 //pipex_execute.c
 void	exec_pipe(t_pipex *pipex, t_cmd *cmd, t_env *env);
 char	*get_path_variable(t_env *env);
+t_bool is_valid_command_format(const char *cmd);
+void execute_builtin(t_cmd *cmd, t_env *env);
 
 #endif

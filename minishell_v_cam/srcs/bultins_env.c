@@ -4,7 +4,7 @@ t_env *ft_find_key(t_env *env, char *key)
 {
 	t_env *current;
 
-	current = env;
+	current = env->next;
 	while (current)
 	{
 		if (ft_strcmp(current->key, key) == 0)
@@ -19,25 +19,17 @@ void ft_update_key(t_env *env, char *key, char *value)
 	t_env	*env_node;
 	t_env	*current;
 
-	current = env;
-	while(current)
-	{
-		if (ft_strcmp(current->key, key) == 0)
-			break;
-		current = current->next;
-	}
-	if (ft_strcmp(current->key, key) == 0)
+	current = ft_find_key(env, key);
+	if (current)
 	{
 		free(current->value);
-		current->value = value;
+		current->value = ft_strdup(value);
 	}
 	else
 	{
 		env_node = create_env_node(key, value);
 		ft_env_add_back_(&env, env_node);
 	}
-	free(key);
-	free(value);
 }
 
 void ft_print_declare_env(t_env *env)
@@ -69,6 +61,8 @@ void	ft_export(t_cmd *cmd, t_env *env)
 				key = ft_strndup(cmd->args[1], i);
 				value = ft_strdup(cmd->args[1] + i);
 				ft_update_key(env, key, value);
+				free(key);
+				free(value);
 				return ;
 			}
 		}
@@ -84,7 +78,7 @@ void	ft_env(t_cmd *cmd, t_env *env)
 		printf("env: ‘%s’: No such file or directory\n", cmd->args[1]);
 		return ;
 	}
-	current = env;
+	current = env->next;
 	while (current)
 	{
 		printf("%s%s\n", current->key, current->value);
@@ -100,7 +94,6 @@ void	ft_unset(t_cmd *cmd, t_env *env)
 	if (cmd->args[1] == NULL)
 		return ;
 	current = env;
-	//previous = NULL;
 	while (current)
 	{
 		if (ft_strcmp(current->key, cmd->args[1]) == 0)
