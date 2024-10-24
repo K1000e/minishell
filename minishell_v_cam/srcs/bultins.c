@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/24 14:17:17 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/24 23:16:17 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,19 +49,19 @@ void	ft_exit(t_cmd *cmd)
 	printf("exit: too many arguments\n");
 }
 
-t_bool ft_check_option_echo(t_cmd *cmd)
+t_bool ft_check_option_echo(t_cmd *cmd, int j)
 {
 	int		i;
 	t_bool	option;
 	
 	i = 0;
 	option = FALSE;
-	if (ft_strncmp(cmd->args[1], "-n", 2) == 0)
+	if (ft_strncmp(cmd->args[j], "-n", 2) == 0)
 	{
 		option = TRUE;
-		while (cmd->args[1][++i])
+		while (cmd->args[j][++i])
 		{
-			if (cmd->args[1][i] != 'n')
+			if (cmd->args[j][i] != 'n')
 				option = FALSE;
 		}
 	}
@@ -74,11 +74,12 @@ void	ft_echo(t_cmd *cmd)
 	t_bool	option;
 
 	option = FALSE;
-	i = 0;
 	if (cmd->args[1])
 	{
-		option = ft_check_option_echo(cmd);
+		option = ft_check_option_echo(cmd, 1);
 		i = option;
+		while (cmd->args[i + 1] && ft_check_option_echo(cmd, i + 1) == 1)
+			i++;
 		while (cmd->args[++i])
 		{
 			printf("%s",cmd->args[i]);
@@ -89,7 +90,6 @@ void	ft_echo(t_cmd *cmd)
 	if (!option)
 		printf("\n");
 }
-
 
 void	ft_pwd(t_env *env)
 {

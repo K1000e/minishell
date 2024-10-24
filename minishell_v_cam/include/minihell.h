@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/24 14:17:29 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/24 23:12:11 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct s_cmd
 	t_bool			pipe_in;        // Pour savoir si on doit lire depuis un pipe
 	t_bool			pipe_out;       // Pour savoir si on doit écrire dans un pipe
 	t_bool 			heredoc;
+	t_bool			redirection;
 	char			*heredoc_exit;
 }	t_cmd;
 
@@ -120,7 +121,7 @@ char	*prompt_hell(int i);
 //t_list	*create_cmd_list(char *all, char *tmp, int i, int j);
 
 char	*find_executable(char *command, t_env *env);
-t_env *ft_find_key(t_env *env, char *key);
+t_env	*ft_find_key(t_env *env, char *key);
 
 int		ft_pipex_start(t_cmd *cmd, t_env *env);
 void	init_ft_pipex_start(t_pipex *pipex, t_cmd *cmd);
@@ -138,5 +139,9 @@ void	exec_pipe(t_pipex *pipex, t_cmd *cmd, t_env *env);
 char	*get_path_variable(t_env *env);
 t_bool is_valid_command_format(const char *cmd);
 void execute_builtin(t_cmd *cmd, t_env *env);
+
+void	execute_builtin_redirection(t_cmd *cmd, t_env *env);
+void	parse_exec(t_cmd *cmd, t_env *env);
+
 
 #endif

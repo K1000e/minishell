@@ -30,7 +30,6 @@ void free_cmd_list(t_cmd *cmd_list)
 {
 	t_cmd *current;
 	int i;
-	printf("here\n");	
 	current = cmd_list;
 	while (current)
 	{
@@ -56,6 +55,7 @@ int	handle_output_redirection(t_cmd *cmd, char **args, int i)
 {
 	if (args[i + 1])
 	{
+		cmd->redirection = TRUE;
 		cmd->out_file = ft_strdup(args[i + 1]);
 		cmd->append = (ft_strcmp(args[i], ">>") == 0);
 		return (i + 2);
@@ -77,6 +77,7 @@ int	handle_input_redirection(t_cmd *cmd, char **args, int i)
 {
 	if (args[i + 1])
 	{
+		cmd->redirection = TRUE;
 		cmd->in_file = ft_strdup(args[i + 1]);
 		return (i + 2);
 	}
@@ -134,6 +135,7 @@ t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 	new_cmd->in_file = NULL;
 	new_cmd->next = NULL;
 	new_cmd->append = FALSE;
+	new_cmd->redirection = FALSE;
 	redirection(new_cmd);
 	//free(cmd_str);
 	return (new_cmd);

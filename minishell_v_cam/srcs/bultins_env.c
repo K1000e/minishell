@@ -90,24 +90,30 @@ void	ft_unset(t_cmd *cmd, t_env *env)
 {
 	t_env	*current;
 	t_env	*previous;
+	int		i;
 
 	if (cmd->args[1] == NULL)
 		return ;
 	current = env;
-	while (current)
+	i = 0;
+	while (cmd->args[++i])
 	{
-		if (ft_strcmp(current->key, cmd->args[1]) == 0)
+		while (current)
 		{
-			if (previous)
-				previous->next = current->next;
-			else
-				env = current->next;
-			free(current->key);
-			free(current->value);
-			free(current);
-			return ;
+			if (current->key && ft_strcmp(current->key, cmd->args[i]) == 0)
+			{
+				if (previous)
+					previous->next = current->next;
+				else
+					env = current->next;
+				free(current->key);
+				free(current->value);
+				free(current);
+				break;
+			}
+			previous = current;
+			current = current->next;
 		}
-		previous = current;
-		current = current->next;
+		current = env;
 	}
 }

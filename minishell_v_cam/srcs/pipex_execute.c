@@ -91,7 +91,6 @@ char	*find_executable(char *command, t_env *env)
 	char	*full_path;
 	int		start;
 
-	printf("Enter in find executable\n");
 	path = get_path_variable(env);
 	if (!path)
 		return (NULL);

@@ -14,28 +14,7 @@ t_bool is_valid_command_format(const char *cmd)
 		return FALSE;
 	return TRUE;
 }
-
-void execute_builtin(t_cmd *cmd, t_env *env)
-{
-	t_env *current;
-
-	current = env->next;
-	if (ft_strcmp(cmd->args[0], "exit") == 0)
-		ft_exit(cmd);
-	else if (ft_strcmp(cmd->args[0], "echo") == 0)
-		ft_echo(cmd);
-	else if (ft_strcmp(cmd->args[0], "cd") == 0)
-		ft_cd(cmd, env);
-	else if (ft_strcmp(cmd->args[0], "export") == 0)
-		ft_export(cmd, current);
-	else if (ft_strcmp(cmd->args[0], "unset") == 0)
-		ft_unset(cmd, current);
-	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
-		ft_pwd(env);
-	else if (ft_strcmp(cmd->args[0], "env") == 0)
-		ft_env(cmd, current);
-}
-
+/* 
 void execute_non_builtin(t_cmd *cmd, t_env *env)
 {
 	pid_t	pid;
@@ -51,10 +30,8 @@ void execute_non_builtin(t_cmd *cmd, t_env *env)
 			perror("command not found: no path");
 			exit(0);
 		}
-			//printf("command not found: no path");
 		if (execve(cmd->args[0], cmd->args, env->all) == -1)
 		{
-			//printf("command not found");
 			i = -1;
 			while (cmd->args[++i])
 				free(cmd->args[i]);
@@ -64,31 +41,7 @@ void execute_non_builtin(t_cmd *cmd, t_env *env)
 		}
 	}
 	waitpid(pid, 0, 0);
-}
-
-void	ft_exec(t_cmd *cmd, t_env *env)
-{
-	int is_builtin;
-
-	if (!is_valid_command_format(cmd->cmd))
-	{
-		printf("Error: Invalid command format.\n");
-		return;
-	}
-	is_builtin = (
-		ft_strcmp(cmd->args[0], "echo") == 0 ||
-		ft_strcmp(cmd->args[0], "cd") == 0 ||
-		ft_strcmp(cmd->args[0], "pwd") == 0 ||
-		ft_strcmp(cmd->args[0], "env") == 0 ||
-		ft_strcmp(cmd->args[0], "export") == 0 ||
-		ft_strcmp(cmd->args[0], "unset") == 0 ||
-		ft_strcmp(cmd->args[0], "exit") == 0
-	);
-	if (is_builtin)
-		execute_builtin(cmd, env);  // Function to handle built-ins
-	else
-		execute_non_builtin(cmd, env);  // Function to exec non-built-in
-}
+} */
 
 void	print_cmd_list(t_cmd *cmd_lst)
 {
@@ -137,7 +90,7 @@ void	ft_command(char *line, t_env *env)
 	if (tmp->next)
 		ft_pipex_start(tmp, env); 
 	else
-		ft_exec(tmp, env);
+		parse_exec(tmp, env);
 	free_cmd_list(commands);
 }
 
@@ -170,7 +123,7 @@ void explosion()
 	exit(1);
 }
 
-void minihell(t_env *env)
+void minihell(t_env *env, int save_stdin, int save_stdout)
 {
 	char	*prompt_hell_e;
 	char	*line;
@@ -193,8 +146,10 @@ void minihell(t_env *env)
 			continue ;
 		}
 		ft_command(line, env);
+		dup2(save_stdin, STDIN_FILENO);
+		dup2(save_stdout, STDOUT_FILENO);
 		free(prompt_hell_e);
-		free (line);
+		free(line);
 		i++;
 	}
 	exit(0);
@@ -205,13 +160,17 @@ int main(int argc, char **argv, char **environment)
 {
 	t_env	*env = NULL;
 	
+	int save_stdin;
+	int save_stdout;
 	(void)argc;
 	(void)argv;
+	save_stdin = dup(STDIN_FILENO);
+	save_stdout = dup(STDOUT_FILENO);
 
 	env = get_env(environment, env);
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGINT, ignore_sigint);
-	minihell(env);
+	minihell(env, save_stdin, save_stdout);
 	return (0);
 }
 
