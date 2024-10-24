@@ -6,11 +6,42 @@
 /*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 22:14:03 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/10/23 11:41:14 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/10/24 10:46:14 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell_v_cam/include/minihell.h"
+
+void ft_update_key(t_env *env, char *key, char *value)
+{
+	t_env	*env_node;
+	t_env	*current;
+
+	current = env;
+	while(current)
+	{
+		//printf("TEST 1\n");
+		if (ft_strcmp(current->key, key) == 0)
+			break;
+		current = current->next;
+	}
+	if (ft_strcmp(current->key, key) == 0)
+	{
+		//printf("TEST 2\n");
+		free(current->value);
+		current->value = value;
+	}
+	else
+	{
+		//printf("TEST 3\n");
+		env_node = create_env_node(key, value);
+		ft_env_add_back_(&env, env_node);
+	}
+	//printf("TEST 4\n"); //does print
+	//free(key);
+	//free(value);
+	//printf("TEST 5\n"); //DOES NOT PRINT BECAUSE OF FREES
+}
 
 void ft_cd(t_cmd *cmd, t_env *env)
 {
