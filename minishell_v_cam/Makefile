@@ -6,18 +6,18 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/10/25 14:59:54 by cgorin           ###   ########.fr        #
+#    Updated: 2024/10/26 01:08:42 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		:=	minihell
 
 CC			:=	cc
-#CFLAGS		:= -Wall -Wextra -Werror -ggdb #-fsanitize=address 
-#LDFLAGS		:= -lreadline
+CFLAGS		:= -Wall -Wextra -Werror -ggdb #-fsanitize=address 
+LDFLAGS		:= -lreadline
 
-CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include #-g -fsanitize=address 
-LDFLAGS = -L/opt/homebrew/opt/readline/lib -lreadline
+#CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include #-g -fsanitize=address 
+#LDFLAGS = -L/opt/homebrew/opt/readline/lib -lreadline
 
 DIR_SRCS	:=	srcs
 DIR_OBJS	:=	.objs
@@ -27,15 +27,16 @@ DIR_PIPEX	:=	pipex
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c			\
-				bultins_env.c 	\
-				bultins.c 		\
+				new_parsing.c 	\
 				environment.c	\
 				check_errors.c 	\
-				parsing.c 		\
-				exec.c 			\
 				prompt.c 		\
-				pipex_execute.c \
-				pipex.c 		\
+				parsing.c 		\
+				#bultins_env.c 	\
+				bultins.c 		\
+				#pipex_execute.c \
+				#pipex.c 		\
+				exec.c 			\
 				pipex_open_free.c 
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
@@ -44,7 +45,7 @@ LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
 LST_INCS	:=	minihell.h
 
 SRCS		:=	$(addprefix $(DIR_SRCS)/,$(LST_SRCS)) \
-				pipex_execute.c \
+				#pipex_execute.c \
 				pipex_main.c \
 				pipex_open_free.c
 OBJS		:=	$(addprefix $(DIR_OBJS)/,$(LST_OBJS))
@@ -73,7 +74,7 @@ $(LIBFT_LIB):
 
 $(NAME):	$(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) -o $@ $(LIBFT_LIB) $(LDFLAGS)
-#@$(MAKE) hell --no-print-directory
+	@$(MAKE) hell --no-print-directory
 	
 clean:
 	@rm -rf $(DIR_OBJS)

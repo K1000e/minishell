@@ -50,14 +50,23 @@ void free_cmd_list(t_cmd *cmd_list)
 	}
 	free(cmd_list);
 }
-
-int	handle_output_redirection(t_cmd *cmd, char **args, int i)
+/* 
+int	handle_output_redirection(t_cmd *cmd, char **args, int i, int *out)
 {
+	printf("here\n");
 	if (args[i + 1])
 	{
 		cmd->redirection = TRUE;
-		cmd->out_file = ft_strdup(args[i + 1]);
-		cmd->append = (ft_strcmp(args[i], ">>") == 0);
+		printf("out -> %d \n", *out);
+		printf("args[%d] -> %s", i, args[i + 1]);
+		cmd->out_file[*out] = ft_strdup(args[i + 1]);
+		printf("out_file -> %s", cmd->out_file[*out]);
+		cmd->out_file[*out + 1] = NULL;
+		cmd->append[*out] = (ft_strcmp(args[i], ">>") == 0);
+		printf("append -> %d", cmd->append[*out]);
+		cmd->nb_infile = *out + 1;
+		printf("nb_infile -> %d", cmd->nb_infile);
+		out++;
 		return (i + 2);
 	}
 	else
@@ -66,19 +75,21 @@ int	handle_output_redirection(t_cmd *cmd, char **args, int i)
 		free_cmd_list(cmd);
 		return (-1);
 	}
-}
+} */
 
 /*
 ** Fonction : handle_input_redirection
 ** Gère la redirection d'entrée.
 */
 
-int	handle_input_redirection(t_cmd *cmd, char **args, int i)
+int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)
 {
 	if (args[i + 1])
 	{
 		cmd->redirection = TRUE;
-		cmd->in_file = ft_strdup(args[i + 1]);
+		cmd->in_file[*in] = ft_strdup(args[i + 1]);
+		cmd->in_file[*in + 1] = NULL;
+		cmd->nb_infile = *in + 1;
 		return (i + 2);
 	}
 	else
@@ -89,40 +100,45 @@ int	handle_input_redirection(t_cmd *cmd, char **args, int i)
 	}
 }
 
-t_cmd *redirection(t_cmd *cmd)
-{
-	int i;
-	int arg_count;
-
-	i = 0;
-	arg_count = 0;
-	while (cmd->args[i])
-	{
-		if (ft_strcmp(cmd->args[i], ">") == 0
-			|| ft_strcmp(cmd->args[i], ">>") == 0)
-		{
-			i = handle_output_redirection(cmd, cmd->args, i);
-			if (i == -1)
-			    return NULL;
-		}
-		else if (ft_strcmp(cmd->args[i], "<") == 0)
-		{
-			i = handle_input_redirection(cmd, cmd->args, i);
-			if (i == -1)
-			    return NULL;
-		}
-		else
-			cmd->args[arg_count++] = cmd->args[i++];
-	}
-	cmd->args[arg_count] = NULL;
-	return (cmd);
-}
+// t_cmd *redirection(t_cmd *cmd)
+// {
+// 	int i;
+// 	int arg_count;
+// 	i = 0;
+// 	int out = 0;
+// 	int in = 0;
+// 	arg_count = 0;
+// 	while (cmd->args[i])
+// 	{
+// 		printf("cmd->args = %s\n", cmd->args[i]);
+// 		if (ft_strcmp(cmd->args[i], ">") == 0
+// 			|| ft_strcmp(cmd->args[i], ">>") == 0)
+// 		{
+// 			printf("here1\n");
+// 			i = handle_output_redirection(cmd, cmd->args, i, &out);
+// 			if (i == -1)
+// 				return NULL;
+// 		}
+// 		else if (ft_strcmp(cmd->args[i], "<") == 0)
+// 		{
+// 			printf("here2\n");
+// 			i = handle_input_redirection(cmd, cmd->args, i, &in);
+// 			if (i == -1)
+// 				return NULL;
+// 		}
+// 		else
+// 			cmd->args[arg_count++] = cmd->args[i++];
+// 	}
+// 	printf("end\n");
+// 	cmd->args[arg_count] = NULL;
+// 	return (cmd);
+// }
 
 /* 
 ** Fonction : create_cmd_node
 ** Crée un nœud avec une commande et ses tokens.
 */
-t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
+/* t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 {
 	t_cmd *new_cmd;
 
@@ -134,12 +150,14 @@ t_cmd *create_cmd_node(char *cmd_str, char *cmd_tokens)
 	new_cmd->out_file = NULL;
 	new_cmd->in_file = NULL;
 	new_cmd->next = NULL;
-	new_cmd->append = FALSE;
+	new_cmd->append = 0;
 	new_cmd->redirection = FALSE;
+	new_cmd->nb_infile = 0;
+	new_cmd->out_file = 0;
 	redirection(new_cmd);
 	//free(cmd_str);
 	return (new_cmd);
-}
+} */
 
 
 void	ft_cmd_add_back(t_cmd **lst, t_cmd *new)
@@ -164,19 +182,19 @@ void	ft_cmd_add_back(t_cmd **lst, t_cmd *new)
 ** Gère l'état de in_quotes en fonction du caractère actuel.
 */
 
-t_bool	handle_quotes(char current, t_bool in_quotes)
+/* t_bool	handle_quotes(char current, t_bool in_quotes)
 {
 	if (current == '"' || current == '\'')
 		return (!in_quotes);
 	return (in_quotes);
-}
+} */
 
 /*
 ** Fonction : handle_redirection
 ** Gère la logique de redirection des fichiers.
 */
 
-int	handle_redirection(t_cmd *new_cmd, char *tokens, char *all, int k, int j)
+/* int	handle_redirection(t_cmd *new_cmd, char *tokens, char *all, int k, int j, int *in, int *out)
 {
 	char	*file;
 
@@ -188,14 +206,14 @@ int	handle_redirection(t_cmd *new_cmd, char *tokens, char *all, int k, int j)
 		file = ft_strndup(&all[j + k], strlen(&all[j + k]));
 		if (tokens[k - 1] == '>')
 		{
-			new_cmd->out_file = file;
-			new_cmd->append = (tokens[k - 2] == '>' && tokens[k - 3] == '>');
-			printf("Adding output redirection to: %s\n", new_cmd->out_file);
+			new_cmd->out_file[*out] = file;
+			new_cmd->append[*out] = (tokens[k - 2] == '>' && tokens[k - 3] == '>');
+			printf("Adding output redirection to: %s\n", new_cmd->out_file[*out]);
 		}
 		else if (tokens[k - 1] == '<')
 		{
-			new_cmd->in_file = file;
-			printf("Adding input redirection to: %s\n", new_cmd->in_file);
+			new_cmd->in_file[*in] = file;
+			printf("Adding input redirection to: %s\n", new_cmd->in_file[*in]);
 		}
 		k++;
 	}
@@ -205,7 +223,7 @@ int	handle_redirection(t_cmd *new_cmd, char *tokens, char *all, int k, int j)
 		return (-1);
 	}
 	return (k);
-}
+} */
 
 /*
 ** Fonction : process_command_node
@@ -231,7 +249,7 @@ void free_cmd_node(t_cmd *cmd_node)
 		free(cmd_node);  // Finally, free the command node itself
 	}
 }
-
+/* 
 
 t_cmd	*process_command_node(char *all, char *tmp, int i, int j)
 {
@@ -240,15 +258,18 @@ t_cmd	*process_command_node(char *all, char *tmp, int i, int j)
 	char	*tokens;
 	int		k;
 
+
 	cmd = ft_strndup(&all[j], i - j);
 	tokens = ft_strndup(&tmp[j], i - j);
 	new_cmd = create_cmd_node(cmd, tokens);
+	int out = 0;
+	int in = 0;
 	k = 0;
 	while (tokens[k])
 	{
 		if (tokens[k] == '>' || tokens[k] == '<')
 		{
-			k = handle_redirection(new_cmd, tokens, all, k, j);
+			k = handle_redirection(new_cmd, tokens, all, k, j, &in, &out);
 			if (k == -1)
 			{
 				free(cmd);
@@ -263,13 +284,13 @@ t_cmd	*process_command_node(char *all, char *tmp, int i, int j)
 	free(cmd);
 	free(tokens);
 	return (new_cmd);
-}
+} */
 
 /*
 ** Fonction : parse_cmd
 ** Analyse une chaîne de commande et renvoie une liste de commandes.
 */
-
+/* 
 t_cmd	*parse_cmd(char *all)
 {
 	t_cmd	*cmd_lst = NULL;
@@ -343,12 +364,13 @@ t_cmd	*parse_cmd(char *all)
 	}
 	free(tmp);
 	return (cmd_lst);
-}
+}*/
 
 /*
 ** count_tokens compte le nombre de tokens dans une chaîne 
 ** en fonction de types de caractères spécifiques.
 */
+/*
 int count_tokens(const char *cmd_tokens)
 {
 	int count = 0;
@@ -382,14 +404,14 @@ int count_tokens(const char *cmd_tokens)
 	}
 	return count;
 }
-
+ */
 
 /*
 ** tokenise_command divise la chaîne de commande en tokens 
 ** selon les types 'c', '\'', '"', '|', '>', '<', et 'a'.
 ** reprend un peu la logique du schema parsing (voir notion)
 */
-
+/* 
 char **tokenise_command(char *cmd_str, char *cmd_tokens)
 {
 	int i;
@@ -410,11 +432,15 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 	while (cmd_tokens[i])
 	{
 		while (cmd_tokens[i] == ' ')
+		{
+			printf("cmd_tokens[%i] = %c\n", i, cmd_tokens[i]);
 			i++;
+		}
 		if (cmd_tokens[i] == '\0')
 			break;
 		if (cmd_tokens[i] == '|' || cmd_tokens[i] == '>' || cmd_tokens[i] == '<')
 		{
+			printf("cmd_tokens[%i] = %c\n", i, cmd_tokens[i]);
 			length = 1;
 			if ((cmd_tokens[i] == '>' && cmd_tokens[i + 1] == '>') ||
 				(cmd_tokens[i] == '<' && cmd_tokens[i + 1] == '<'))
@@ -425,11 +451,15 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 		}
 		else if (cmd_tokens[i] == '"' || cmd_tokens[i] == '\'')
 		{
+			printf("cmd_tokens[%i] = %c\n", i, cmd_tokens[i]);
 			quote_char = cmd_tokens[i];
 			i++;
 			start = i;
 			while (cmd_tokens[i] && cmd_tokens[i] != quote_char)
+			{
+				printf("cmd_tokens[%i] = %c\n", i, cmd_tokens[i]);
 				i++;
+			}
 			tokens[token_count] = ft_strndup(&cmd_str[start], i - start);
 			token_count++;
 			if (cmd_tokens[i] == quote_char)
@@ -443,7 +473,10 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 			while (cmd_tokens[i] && cmd_tokens[i] != ' ' && cmd_tokens[i] != '|' &&
 					cmd_tokens[i] != '>' && cmd_tokens[i] != '<' &&
 					cmd_tokens[i] != '"' && cmd_tokens[i] != '\'')
+			{
+				printf("cmd_tokens[%i] = %c\n", i, cmd_tokens[i]);
 				i++;
+			}
 			tokens[token_count] = ft_strndup(&cmd_str[start],  i - start);
 			token_count++;
 		}
@@ -452,14 +485,14 @@ char **tokenise_command(char *cmd_str, char *cmd_tokens)
 	//free(cmd_tokens);
 	tokens[token_count] = NULL;
 	return tokens;
-}
+} */
 
 
 /*
 ** check_all_char assigne un type de token à chaque caractère 
 ** et renvoie le type.
 */
-
+/* 
 char check_all_char(const char cmd)
 {
 	if (cmd == ';') // Separateur
@@ -481,3 +514,4 @@ char check_all_char(const char cmd)
 	else 
 		return ' '; // Pour les autres
 }
+ */

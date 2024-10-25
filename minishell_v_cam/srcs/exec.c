@@ -21,10 +21,17 @@ void	fake_error(t_pipex *pipex, char *message, int error_code)
 
 void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 {
+	int i;
 	//char	*line;
 
 	//if (cmd->in_file == NULL)
-		pipex->file_i = open(cmd->in_file, O_RDONLY);
+	i = -1;
+	while (cmd->in_file && cmd->in_file[++i])
+	{
+		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
+		if (i < cmd->nb_infile - 1)
+			close(pipex->file_i);
+	}
 	/* else
 	{
 		pipex->file_i = open("here_doc", O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -49,12 +56,20 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 
 void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 {
-	if (cmd->append == 0)
-		pipex->file_o = open(cmd->out_file, O_CREAT | O_TRUNC
-				| O_WRONLY, 0644);
-	else
-		pipex->file_o = open(cmd->out_file, O_CREAT | O_APPEND
-				| O_WRONLY, 0644);
+	int i;
+
+	i = -1;
+	while (cmd->out_file && cmd->out_file[++i])
+	{
+		if (cmd->append[i] == 0)
+			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC
+					| O_WRONLY, 0644);
+		else
+			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_APPEND
+					| O_WRONLY, 0644);
+		if (i < cmd->nb_infile - 1)
+			close(pipex->file_i);
+	}
 	if (pipex->file_o < 0)
 		fake_error(pipex, "Couldn't open output file", 1);
 }
@@ -224,9 +239,9 @@ void	execute_command(t_cmd *cmd ,t_env *env)
         child1 = fork();
         if (child1 == 0)
         {
-            dup2(pipefd[1], STDOUT_FILENO);
-            close(pipefd[0]);
-			close(pipefd[1]);
+            /* dup2(pipefd[1], STDOUT_FILENO);
+            close(pipefd[0]); 
+			close(pipefd[1]); */
 			cmd->is_pipe = FALSE;
             execute_command(cmd, env);
             exit(0);
