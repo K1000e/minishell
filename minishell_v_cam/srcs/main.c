@@ -75,22 +75,42 @@ void	print_cmd_list(t_cmd *cmd_lst)
 	}
 }
 
+void	is_pipe(t_cmd *cmd)
+{
+	t_cmd *current;
+
+	current = cmd;
+	while (current)
+	{
+		if (current->next)
+		{
+			printf("Pipe %s\n", current->cmd);
+            current->is_pipe = TRUE;
+		}
+		else
+			current->is_pipe = FALSE;
+		current = current->next;
+	}
+}
+
 void	ft_command(char *line, t_env *env)
 {
 	t_cmd	*commands;
 	t_cmd	*tmp;
 
 	commands = parse_cmd(line);
+	is_pipe(commands);
 	if (commands == NULL) {
 		printf("Error: No commands were parsed.\n");
 		return;
 	}
 	print_cmd_list(commands);
 	tmp = commands;
-	if (tmp->next)
+/* 	if (tmp->next)
 		ft_pipex_start(tmp, env); 
 	else
-		parse_exec(tmp, env);
+		parse_exec(tmp, env); */
+	execute_command(tmp, env);
 	free_cmd_list(commands);
 }
 

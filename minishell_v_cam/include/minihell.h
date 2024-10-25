@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/24 23:12:11 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/10/25 15:42:19 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ typedef struct s_cmd
 	char			*cmd;			// Commande entiere
 	char			**args;			// Tableau d'arguments
 	char			*token;
+	int				nb_outfile;		// Nombre de redirection out
+	int				nb_infile;		// Nombre de redirection in
 	char			*out_file;		// Fichier pour la sortie redirigée
 	char			*in_file;		// Fichier pour l'entrée redirigée
 	struct s_cmd	*next;			// Pointeur vers la commande suivante
@@ -51,6 +53,8 @@ typedef struct s_cmd
 	t_bool 			heredoc;
 	t_bool			redirection;
 	char			*heredoc_exit;
+	t_bool          is_pipe;
+	t_bool			is_bultins;
 }	t_cmd;
 
 typedef struct s_env
@@ -142,6 +146,6 @@ void execute_builtin(t_cmd *cmd, t_env *env);
 
 void	execute_builtin_redirection(t_cmd *cmd, t_env *env);
 void	parse_exec(t_cmd *cmd, t_env *env);
-
+void	execute_command(t_cmd *cmd ,t_env *env);
 
 #endif

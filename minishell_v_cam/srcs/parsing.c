@@ -262,8 +262,6 @@ t_cmd	*process_command_node(char *all, char *tmp, int i, int j)
 	}
 	free(cmd);
 	free(tokens);
-	//free(new_cmd);
-	//free_cmd_node(new_cmd);
 	return (new_cmd);
 }
 

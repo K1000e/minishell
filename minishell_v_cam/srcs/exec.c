@@ -44,7 +44,7 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 		pipex->file_i = open("here_doc", O_RDONLY);
 	} */
 	if (pipex->file_i < 0)
-		error(pipex, "Couldn't open input file", 1);
+		fake_error(pipex, "Couldn't open input file", 1);
 }
 
 void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
@@ -56,15 +56,13 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 		pipex->file_o = open(cmd->out_file, O_CREAT | O_APPEND
 				| O_WRONLY, 0644);
 	if (pipex->file_o < 0)
-		error(pipex, "Couldn't open output file", 1);
+		fake_error(pipex, "Couldn't open output file", 1);
 }
 
 void	redirection_exec(t_cmd *cmd)
 {
 	t_pipex pipex;
 
-	pipex.pipe_fd[0] = -1;
-	pipex.pipe_fd[1] = -1;
 	pipex.file_i = -1;
 	pipex.file_o = -1;
 	if (!cmd || !cmd->cmd)
@@ -74,8 +72,8 @@ void	redirection_exec(t_cmd *cmd)
 		fake_open_infile(&pipex, cmd);
 		dup2(pipex.file_i, STDIN_FILENO);
 	}
-	else 
-		dup2(pipex.pipe_fd[0], STDIN_FILENO);
+ 	else 
+ 		dup2(pipex.pipe_fd[0], STDIN_FILENO);
 	if (cmd->out_file)
 	{
 		fake_open_outfile(&pipex, cmd);
@@ -93,7 +91,7 @@ void	redirection_exec(t_cmd *cmd)
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
-
+	printf("exec_builtins\n");
 	current = env;
 	if (cmd->redirection)
 		redirection_exec(cmd);
@@ -116,6 +114,7 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env)
 {
 	int i;
+	printf("enter in execute_non_builtins\n");
 
 	if (access(cmd->args[0], X_OK) != 0)
 		cmd->args[0] = find_executable(cmd->args[0], env);
@@ -143,13 +142,12 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	t_pipex pipex;
 	pid_t pid;
 
-	pipex.pipe_fd[0] = -1;
-	pipex.pipe_fd[1] = -1;
 	pipex.status = 0;
 	pipex.file_i = -1;
 	pipex.file_o = -1;
 	pid = -1;
 
+    printf("exec_non_builtins\n");
 	if (pipe(pipex.pipe_fd) == -1)
 		fake_error(&pipex, "Couldn't open pipe", 1);
 	pid = fork();
@@ -187,4 +185,65 @@ void	parse_exec(t_cmd *cmd, t_env *env)
 		execute_builtin(cmd, env);
 	else
 		exec_non_builtins(cmd, env);
+}
+
+t_bool is_builtin(char *cmd)
+{
+	t_bool is_builtin;
+
+	is_builtin = (
+		ft_strcmp(cmd, "echo") == 0 ||
+		ft_strcmp(cmd, "cd") == 0 ||
+		ft_strcmp(cmd, "pwd") == 0 ||
+		ft_strcmp(cmd, "env") == 0 ||
+		ft_strcmp(cmd, "export") == 0 ||
+		ft_strcmp(cmd, "unset") == 0 ||
+		ft_strcmp(cmd, "exit") == 0
+	);
+	return (is_builtin);
+}
+
+
+void	execute_command(t_cmd *cmd ,t_env *env)
+{
+	pid_t child1;
+	pid_t child2;
+	int pipefd[2];
+
+	if (!cmd->is_pipe)
+	{
+		printf("Enter in no pipe mode\n");
+		if (is_builtin(cmd->args[0]))
+			execute_builtin(cmd, env);
+		else 
+			exec_non_builtins(cmd, env);
+	}
+	else
+	{
+		pipe(pipefd);
+        child1 = fork();
+        if (child1 == 0)
+        {
+            dup2(pipefd[1], STDOUT_FILENO);
+            close(pipefd[0]);
+			close(pipefd[1]);
+			cmd->is_pipe = FALSE;
+            execute_command(cmd, env);
+            exit(0);
+        }
+        child2 = fork();
+        if (child2 == 0)
+        {
+            dup2(pipefd[0], STDIN_FILENO);
+			close(pipefd[0]);
+            close(pipefd[1]);
+			cmd = cmd->next;
+            execute_command(cmd, env);
+            exit(0);
+        }
+        close(pipefd[0]);
+        close(pipefd[1]);
+        waitpid(child1, NULL, 0);
+        waitpid(child2, NULL, 0);
+	}
 }
