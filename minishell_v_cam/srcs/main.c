@@ -52,7 +52,7 @@ void	print_cmd_list(t_cmd *cmd_lst)
 	index = 0;
 	while (current)
 	{
-		printf("Command Node %d:\n", index);
+		printf("Command Node %d\n", index);
 		if (current->cmd)
 			printf("  Command: %s\n", current->cmd);
 		if (current->args)
@@ -87,7 +87,7 @@ void	print_cmd_list(t_cmd *cmd_lst)
 	}
 	printf("complete command print \n");
 }
-
+/* 
 void	is_pipe(t_cmd *cmd)
 {
 	t_cmd *current;
@@ -104,7 +104,7 @@ void	is_pipe(t_cmd *cmd)
 			current->is_pipe = FALSE;
 		current = current->next;
 	}
-}
+} */
 
 void	ft_command(char *line, t_env *env)
 {
@@ -113,7 +113,6 @@ void	ft_command(char *line, t_env *env)
 
 	commands = parse_command(line);
 	(void) env;
-	//is_pipe(commands);
 	if (commands == NULL)
 	{
 		printf("Error: No commands were parsed.\n");
@@ -121,10 +120,6 @@ void	ft_command(char *line, t_env *env)
 	}
 	print_cmd_list(commands);
 	tmp = commands;
-/* 	if (tmp->next)
-		ft_pipex_start(tmp, env); 
-	else
-		parse_exec(tmp, env); */
 	execute_command(tmp, env);
 	free_cmd_list(commands);
 }
@@ -167,6 +162,8 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 	i = 0;
 	while (1)
 	{
+		dup2(save_stdin, STDIN_FILENO);
+		dup2(save_stdout, STDOUT_FILENO);
 		prompt_hell_e = prompt_hell(i);
 		if (i == 100) 
 			explosion();
@@ -181,8 +178,6 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 			continue ;
 		}
 		ft_command(line, env);
-		dup2(save_stdin, STDIN_FILENO);
-		dup2(save_stdout, STDOUT_FILENO);
 		free(prompt_hell_e);
 		free(line);
 		i++;
@@ -194,14 +189,13 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 int main(int argc, char **argv, char **environment)
 {
 	t_env	*env = NULL;
-	
 	int save_stdin;
 	int save_stdout;
+
 	(void)argc;
 	(void)argv;
 	save_stdin = dup(STDIN_FILENO);
 	save_stdout = dup(STDOUT_FILENO);
-
 	env = get_env(environment, env);
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGINT, ignore_sigint);

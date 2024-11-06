@@ -137,15 +137,15 @@ void	redirection_exec(t_cmd *cmd)
 		fake_open_infile(&pipex, cmd);
 		dup2(pipex.file_i, STDIN_FILENO);
 	}
- 	else 
- 		dup2(pipex.pipe_fd[0], STDIN_FILENO);
+	/* else 
+		dup2(pipex.pipe_fd[0], STDIN_FILENO); */
 	if (cmd->out_file)
 	{
 		fake_open_outfile(&pipex, cmd);
 		dup2(pipex.file_o, STDOUT_FILENO);
 	}
-	else
-		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
+	/* else
+		dup2(pipex.pipe_fd[1], STDOUT_FILENO); */
 	if (pipex.pipe_fd[1] != -1)
 		close(pipex.pipe_fd[1]);
 	if (pipex.pipe_fd[0] != -1)
@@ -273,7 +273,8 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 {
 	pid_t child1;
 	pid_t child2;
-	int pipefd[2];
+	t_pipex pipex;
+	//int pipefd[2];
 
 	if (!cmd->is_pipe)
 	{
@@ -285,13 +286,14 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 	}
 	else
 	{
-		pipe(pipefd);
+		printf("Enter in pipe mode\n");
+		pipe(pipex.pipe_fd);
 		child1 = fork();
 		if (child1 == 0)
 		{
-			/* dup2(pipefd[1], STDOUT_FILENO);
-			close(pipefd[0]); 
-			close(pipefd[1]); */
+			dup2(pipex.pipe_fd[1], STDOUT_FILENO);
+			close(pipex.pipe_fd[0]);
+			close(pipex.pipe_fd[1]);
 			cmd->is_pipe = FALSE;
 			execute_command(cmd, env);
 			exit(0);
@@ -299,15 +301,15 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 		child2 = fork();
 		if (child2 == 0)
 		{
-			dup2(pipefd[0], STDIN_FILENO);
-			close(pipefd[0]);
-			close(pipefd[1]);
+			dup2(pipex.pipe_fd[0], STDIN_FILENO);
+			close(pipex.pipe_fd[0]);
+			close(pipex.pipe_fd[1]);
 			cmd = cmd->next;
 			execute_command(cmd, env);
 			exit(0);
 		}
-		close(pipefd[0]);
-		close(pipefd[1]);
+		close(pipex.pipe_fd[0]);
+		close(pipex.pipe_fd[1]);
 		waitpid(child1, NULL, 0);
 		waitpid(child2, NULL, 0);
 	}
