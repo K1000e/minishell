@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/26 01:18:29 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/06 15:41:37 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_cmd
 	char			*cmd;			// Commande entiere
 	char			**args;			// Tableau d'arguments
 	char			*token;
+	int				nb_token;
 	int				nb_outfile;		// Nombre de redirection out
 	int				nb_infile;		// Nombre de redirection in
 	char			**out_file;		// Fichier pour la sortie redirigée
@@ -152,7 +153,7 @@ t_cmd *parse_command(char *line);
 t_bool check_pipe_validity(char *line, int i);
 t_cmd * create_commands(char *line, char *token_line, int start, int end, t_cmd *list_commands);
 t_cmd *	create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd);
-char **make_argument(char *cmd_str, char *cmd_tokens);
+char **make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd);
 int count_tokens_(const char *cmd_tokens);
 char **parse_args(char *cmd_str, char *cmd_tokens, char **args);
 char* check_char(char *cmd);

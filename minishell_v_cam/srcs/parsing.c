@@ -82,23 +82,7 @@ int	handle_output_redirection(t_cmd *cmd, char **args, int i, int *out)
 ** Gère la redirection d'entrée.
 */
 
-int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)
-{
-	if (args[i + 1])
-	{
-		cmd->redirection = TRUE;
-		cmd->in_file[*in] = ft_strdup(args[i + 1]);
-		cmd->in_file[*in + 1] = NULL;
-		cmd->nb_infile = *in + 1;
-		return (i + 2);
-	}
-	else
-	{
-		printf("Error: Missing file for input redirection.\n");
-		free_cmd_list(cmd);
-		return (-1);
-	}
-}
+
 
 // t_cmd *redirection(t_cmd *cmd)
 // {

@@ -1,5 +1,52 @@
 #include "minihell.h"
 
+char	*get_path_variable(t_env *env)
+{
+	t_env	*current;
+
+	current = env->next;
+	current = ft_find_key(current, "PATH");
+	return(current->value + 1);
+	/* while (current != NULL)
+	{
+		//if (env->key == NULL)
+		if (ft_strcmp(current->key, "PATH") == 0)
+		{
+			return (current->value);
+		}
+		current = current->next;
+	} */
+}
+
+char	*find_executable(char *command, t_env *env)
+{
+	size_t	i;
+	char	*path;
+	char	*dir;
+	char	*full_path;
+	int		start;
+
+	path = get_path_variable(env);
+	if (!path)
+		return (NULL);
+	start = 0;
+	i = -1;
+	while (++i <= ft_strlen(path))
+	{
+		if (path[i] == ':' || path[i] == '\0')
+		{
+			dir = ft_substr(path, start, i - start);
+			full_path = ft_join(ft_join(dir, "/"), command);
+			if (access(full_path, X_OK) == 0)
+				return (full_path);
+			free(full_path);
+			start = i + 1;
+		}
+	}
+	return (command);
+}
+
+
 void	fake_free_all(t_pipex *pipex)
 {
 	if (pipex->pipe_fd[0] != -1)
@@ -58,8 +105,9 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 {
 	int i;
 
-	i = -1;
-	while (cmd->out_file && cmd->out_file[++i])
+	i = 0;
+	printf("cmd->out_file[i] -> %s\n", cmd->out_file[i]);
+	while (cmd->out_file[i])
 	{
 		if (cmd->append[i] == 0)
 			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC
@@ -69,6 +117,7 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 					| O_WRONLY, 0644);
 		if (i < cmd->nb_infile - 1)
 			close(pipex->file_i);
+		i++;
 	}
 	if (pipex->file_o < 0)
 		fake_error(pipex, "Couldn't open output file", 1);
@@ -80,6 +129,7 @@ void	redirection_exec(t_cmd *cmd)
 
 	pipex.file_i = -1;
 	pipex.file_o = -1;
+	pipe(pipex.pipe_fd);
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
 	if (cmd->in_file)
@@ -162,7 +212,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	pipex.file_o = -1;
 	pid = -1;
 
-    printf("exec_non_builtins\n");
+	printf("exec_non_builtins\n");
 	if (pipe(pipex.pipe_fd) == -1)
 		fake_error(&pipex, "Couldn't open pipe", 1);
 	pid = fork();
@@ -236,29 +286,29 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 	else
 	{
 		pipe(pipefd);
-        child1 = fork();
-        if (child1 == 0)
-        {
-            /* dup2(pipefd[1], STDOUT_FILENO);
-            close(pipefd[0]); 
+		child1 = fork();
+		if (child1 == 0)
+		{
+			/* dup2(pipefd[1], STDOUT_FILENO);
+			close(pipefd[0]); 
 			close(pipefd[1]); */
 			cmd->is_pipe = FALSE;
-            execute_command(cmd, env);
-            exit(0);
-        }
-        child2 = fork();
-        if (child2 == 0)
-        {
-            dup2(pipefd[0], STDIN_FILENO);
+			execute_command(cmd, env);
+			exit(0);
+		}
+		child2 = fork();
+		if (child2 == 0)
+		{
+			dup2(pipefd[0], STDIN_FILENO);
 			close(pipefd[0]);
-            close(pipefd[1]);
+			close(pipefd[1]);
 			cmd = cmd->next;
-            execute_command(cmd, env);
-            exit(0);
-        }
-        close(pipefd[0]);
-        close(pipefd[1]);
-        waitpid(child1, NULL, 0);
-        waitpid(child2, NULL, 0);
+			execute_command(cmd, env);
+			exit(0);
+		}
+		close(pipefd[0]);
+		close(pipefd[1]);
+		waitpid(child1, NULL, 0);
+		waitpid(child2, NULL, 0);
 	}
 }

@@ -65,22 +65,27 @@ void	print_cmd_list(t_cmd *cmd_lst)
 				i++;
 			}
 		}
-		if (current->in_file)
+		if (current->nb_infile)
 		{
+			printf("infile -> %d\n", current->nb_infile);
 			int i = -1;
 			while(current->in_file[++i])
 				printf("  Input Redirection: %s\n", current->in_file[i]);
 		}
-		if (current->out_file)
+		if (current->nb_outfile)
 		{
+			printf("outfile %d\n", current->nb_outfile);
 			int i = -1;
-			while(current->in_file[++i])
-				printf("  Output Redirection: %s append ?%d\n",
-				current->out_file[i], current->append[i]);
+			while(current->out_file[++i] && i < current->nb_outfile)
+			{
+				printf("  Output Redirection: %s\n",current->out_file[i]);
+				printf("  Output Append ?%d\n", current->append[i]);
+			}
 		}
 		current = current->next;
 		index++;
 	}
+	printf("complete command print \n");
 }
 
 void	is_pipe(t_cmd *cmd)
@@ -120,7 +125,7 @@ void	ft_command(char *line, t_env *env)
 		ft_pipex_start(tmp, env); 
 	else
 		parse_exec(tmp, env); */
-	//execute_command(tmp, env);
+	execute_command(tmp, env);
 	free_cmd_list(commands);
 }
 

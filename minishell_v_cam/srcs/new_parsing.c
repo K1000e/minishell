@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/26 01:40:42 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/06 17:25:23 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 t_cmd *parse_command(char *line)
 {
-	printf("Parsing command\n");
 	t_cmd	*cmd_list = NULL;
 	t_cmd	*new_cmd = NULL;
 	char	*token_line;
@@ -36,10 +35,11 @@ t_cmd *parse_command(char *line)
 			ft_cmd_add_back(&cmd_list, new_cmd);
 			if (token_line[i] == '|')
 			{
-				printf("Pipe detected\n");
 				cmd_list->is_pipe = TRUE;
 				i++;
 			}
+			/* else
+				cmd_list->is_pipe = FALSE; */
 			j = i;
 		}
 		if (!token_line[i])
@@ -49,29 +49,15 @@ t_cmd *parse_command(char *line)
 	return(cmd_list);
 }
 
-/* t_bool	handle_quotes(char current, t_bool in_quotes)
-{
-	if (current == '"' || current == '\'')
-		return (!in_quotes);
-	return (in_quotes);
-} */
-
 t_bool check_pipe_validity(char *line, int i)
 {
 	if (line[i] == '|')
 	{
-		printf("Pipe detected\n");
 		i++;
 		while (line[i] && ft_isspace(line[i]))
 			i++;
 		if (line[i] == '\0' || line[i] == '|')
-		{
-			printf("Error: Missing command after pipe.\n");
-			/* free_cmd_list(cmd_lst);
-			free(tmp);
-			return (NULL); */
 			return FALSE;
-		}
 	}
 	return TRUE;
 }
@@ -80,8 +66,7 @@ t_cmd *create_commands(char *line, char *token_line, int start, int end, t_cmd *
 {
 	char	*command;
 	char	*tokens;
-	
-	printf("Creating command\n");
+
 	command = ft_strndup(&line[start], end - start);
 	tokens = ft_strndup(&token_line[start], end - start);
 	cmd = create_cmd_node_(command, tokens, cmd);
@@ -109,10 +94,38 @@ int count_redirection(char *cmd, char type)
 	return (count);
 }
 
+char	**clear_redir(t_cmd *cmd)
+{
+	char **new_args;
+	int i;
+	int x;
+
+	cmd->nb_token -= (cmd->nb_infile * 2) - (cmd->nb_outfile * 2);
+	new_args = ft_calloc(sizeof(char *), (cmd->nb_token + 1));
+	i = -1;
+	x = 0;
+	while (cmd->args[++i])
+	{
+		if (ft_strcmp(cmd->args[i], ">") == 0
+			|| ft_strcmp(cmd->args[i], ">>") == 0
+			|| ft_strcmp(cmd->args[i], "<") == 0
+			|| ft_strcmp(cmd->args[i], "<<") == 0)
+			i++;
+		else
+		{
+			new_args[x] = ft_strdup(cmd->args[i]);
+			x++;
+		}
+	}
+	/* while (cmd->args[++i])
+				free(cmd->args[i]);*/
+	free(cmd->args);
+	return(new_args);
+}
+
 t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
 	cmd = malloc(sizeof(t_cmd));
-	printf("Creating command node\n");
 	cmd->cmd = ft_strdup(cmd_str);
 	cmd->next = NULL;
 	cmd->append = 0;
@@ -120,26 +133,29 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->nb_infile = count_redirection(cmd_tokens, '<');
 	cmd->nb_outfile = count_redirection(cmd_tokens, '>');
 	if (cmd->nb_outfile)
-		cmd->out_file = ft_calloc(sizeof(char), (cmd->nb_infile + 1));
+	{
+		cmd->out_file = ft_calloc(sizeof(char), (cmd->nb_outfile + 1));
+		cmd->append = ft_calloc(sizeof(int), (cmd->nb_outfile + 1));
+	}
 	else
 		cmd->out_file = NULL;
 	if (cmd->nb_infile)
-		cmd->in_file = ft_calloc(sizeof(char), (cmd->nb_outfile + 1));
+		cmd->in_file = ft_calloc(sizeof(char), (cmd->nb_infile + 1));
 	else
 		cmd->in_file = NULL;
-	cmd->args = make_argument(cmd_str, cmd_tokens);
+	cmd->args = make_argument(cmd_str, cmd_tokens, cmd);
 	cmd = handle_redirection_(cmd);
+	cmd->args = clear_redir(cmd);
 	return (cmd);
 }
 
-char **make_argument(char *cmd_str, char *cmd_tokens)
+char **make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
 	char **args;
-	int nb_args;
-	
-	printf("Making arguments\n");
-	nb_args = count_tokens_(cmd_tokens);
-	args = malloc(sizeof(char *) * (nb_args + 1));
+	//int nb_args;
+
+	cmd->nb_token = count_tokens_(cmd_tokens);
+	args = malloc(sizeof(char *) * (cmd->nb_token + 1));
 	args = parse_args(cmd_str, cmd_tokens, args);
 	return (args);
 }
@@ -147,18 +163,14 @@ char **make_argument(char *cmd_str, char *cmd_tokens)
 int count_tokens_(const char *cmd_tokens)
 {
 	int count = 0;
-	//t_bool	in_quotes;
-	//char quote;
 	int i = 0;
 	char token;
-	printf("Counting tokens\n");
-	printf("cmd_tokens = %s\n", cmd_tokens);
+
 	while (cmd_tokens[i])
 	{
 		while (cmd_tokens[i] && cmd_tokens[i] == ' ')
 			i++;
 		token = cmd_tokens[i];
-		printf("token = %c\n", token);
 		while(cmd_tokens[i] && cmd_tokens[i] == token)
 			i++;
 		count++;
@@ -170,7 +182,6 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 {
 	int start;
 	int i;
-	//char quote_char;
 	int nb_args;
 	char token;
 
@@ -182,13 +193,15 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 	{
 		while (cmd_tokens[i] && cmd_tokens[i] == ' ')
 			i++;
-		//while (cmd_tokens[i] && cmd_tokens[i])
-		token = cmd_tokens[i];
-		start = i;
-		while (cmd_tokens[i] && cmd_tokens[i] == token)
-			i++;
-		args[nb_args] = ft_strndup(&cmd_str[start],  i - start);
-			nb_args++;
+		if (cmd_tokens[i])
+		{
+			token = cmd_tokens[i];
+			start = i;
+			while (cmd_tokens[i] && cmd_tokens[i] == token)
+				i++;
+			args[nb_args] = ft_strndup(&cmd_str[start],  i - start);
+				nb_args++;
+		}
 		/* 
 		if (cmd_tokens[i] == '"')
 		{
@@ -225,7 +238,6 @@ char* check_char(char *cmd)
 {
 	int i;
 
-	printf("Checking characters\n");
 	i = -1;
 	while(cmd[++i])
 	{
@@ -257,27 +269,32 @@ char* check_char(char *cmd)
 	return (cmd);
 }
 
-int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
+int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)
 {
-	printf("here\n");
 	if (args[i + 1])
 	{
 		cmd->redirection = TRUE;
-		printf("out -> %d \n", *out);
-		printf("args[%d] -> %s\n", i, args[i + 1]);
-		cmd->out_file[*out] = ft_strdup(args[i + 1]);
-		printf("out_file -> %s\n", cmd->out_file[*out]);
-		cmd->out_file[*out + 1] = NULL;
-		cmd->append[*out] = (ft_strcmp(args[i], ">>") == 0);
-		printf("append -> %d\n", cmd->append[*out]);
-		cmd->nb_infile = *out + 1;
-		printf("nb_infile -> %d\n", cmd->nb_infile);
-		//out++;
-		return (i + 2);
+		cmd->in_file[*in] = ft_strdup(args[i + 1]);
+		return (i);
 	}
 	else
 	{
-		printf("Error: Missing file for redirection.\n");
+		free_cmd_list(cmd);
+		return (-1);
+	}
+}
+
+int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
+{
+	if (args[i + 1])
+	{
+		cmd->redirection = TRUE;
+		cmd->out_file[*out] = ft_strdup(args[i + 1]);
+		cmd->append[*out] = (ft_strcmp(args[i], ">>") == 0);
+		return (i);
+	}
+	else
+	{
 		free_cmd_list(cmd);
 		return (-1);
 	}
@@ -285,36 +302,32 @@ int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
 
 t_cmd	*handle_redirection_(t_cmd *new_cmd)
 {
-	//char	*file;
 	int		i;
 	int		in;
 	int		out;
 
-	printf("Handling redirection\n");
-	i = 0;
+	i = -1;
 	in = 0;
 	out = 0;
-	
-	while (new_cmd->args[i])
+	while (new_cmd->args[++i])
 	{
 		if (ft_strcmp(new_cmd->args[i], ">") == 0
 			|| ft_strcmp(new_cmd->args[i], ">>") == 0)
 		{
-			printf("ouput\n");
 			i = handle_output_redirection_(new_cmd, new_cmd->args, i, &out);
 			out++;
+			i++;
 			if (i == -1)
 				return NULL;
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)
 		{
-			printf("input\n");
 			i = handle_input_redirection(new_cmd, new_cmd->args, i, &in);
-			//in++;
+			in++;
 			if (i == -1)
 				return NULL;
+			i++;
 		}
-		i++;
 	}
 	return (new_cmd);
 }

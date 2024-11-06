@@ -6,7 +6,7 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/10/26 01:08:42 by cgorin           ###   ########.fr        #
+#    Updated: 2024/11/06 15:07:18 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,11 +32,11 @@ LST_SRCS	:=	main.c			\
 				check_errors.c 	\
 				prompt.c 		\
 				parsing.c 		\
-				#bultins_env.c 	\
+				exec.c 			\
+				bultins_env.c 	\
 				bultins.c 		\
 				#pipex_execute.c \
 				#pipex.c 		\
-				exec.c 			\
 				pipex_open_free.c 
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
