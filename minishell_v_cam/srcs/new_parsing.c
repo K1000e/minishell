@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/06 17:25:23 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/06 19:00:10 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ t_cmd *parse_command(char *line)
 				cmd_list->is_pipe = TRUE;
 				i++;
 			}
+			else 
+				new_cmd->is_pipe = FALSE;
 			/* else
 				cmd_list->is_pipe = FALSE; */
 			j = i;

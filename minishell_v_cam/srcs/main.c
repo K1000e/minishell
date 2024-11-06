@@ -112,6 +112,7 @@ void	ft_command(char *line, t_env *env)
 	t_cmd	*tmp;
 
 	commands = parse_command(line);
+	printf("PIPE ? %d \n", commands->is_pipe);
 	(void) env;
 	if (commands == NULL)
 	{
