@@ -268,37 +268,36 @@ void	parse_exec(t_cmd *cmd, t_env *env)
 void	execute_command(t_cmd *cmd ,t_env *env)
 {
 	pid_t child1;
-	pid_t child2;
 	int pipefd[2];
 
 	if (!cmd->is_pipe)
 	{
-		printf("Enter in no pipe mode\n");
+		printf("Enter in no pipe mode, %d\n", getpid());
 		parse_exec(cmd, env);
 	}
 	else
 	{
-		pipe(pipefd);
+		printf("Enter in pipe mode\n");
+		if (pipe(pipefd) == -1)
+			perror("Pipe failed");
 		child1 = fork();
+		if (child1 == -1)
+			perror("Fork failed");
 		if (child1 == 0)
 		{
-			cmd->is_pipe = FALSE;
-			execute_command(cmd, env);
-			exit(0);
-		}
-		child2 = fork();
-		if (child2 == 0)
-		{
-			dup2(pipefd[0], STDIN_FILENO);
+			dup2(pipefd[1], STDOUT_FILENO);
 			close(pipefd[0]);
 			close(pipefd[1]);
-			cmd = cmd->next;
-			execute_command(cmd, env);
+			parse_exec(cmd, env);
 			exit(0);
 		}
-		close(pipefd[0]);
-		close(pipefd[1]);
-		waitpid(child1, NULL, 0);
-		waitpid(child2, NULL, 0);
+		else
+		{
+			close(pipefd[1]);
+			dup2(pipefd[0], STDIN_FILENO);
+			close(pipefd[0]);
+			execute_command(cmd->next, env);
+			waitpid(child1, NULL, 0);
+		}
 	}
 }

@@ -98,7 +98,7 @@ void	is_pipe(t_cmd *cmd)
 		if (current->next)
 		{
 			printf("Pipe %s\n", current->cmd);
-            current->is_pipe = TRUE;
+			current->is_pipe = TRUE;
 		}
 		else
 			current->is_pipe = FALSE;
@@ -118,10 +118,11 @@ void	ft_command(char *line, t_env *env)
 		printf("Error: No commands were parsed.\n");
 		return;
 	}
-	//is_pipe(commands);
+	is_pipe(commands);
 	print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
+	while (waitpid(-1, NULL, 0) > 0); 
 	free_cmd_list(commands);
 }
 
@@ -166,7 +167,7 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 		dup2(save_stdin, STDIN_FILENO);
 		dup2(save_stdout, STDOUT_FILENO);
 		prompt_hell_e = prompt_hell(i);
-		if (i == 100) 
+		if (i > 100) 
 			explosion();
 		line = readline(prompt_hell_e);
 		if (line == NULL)
