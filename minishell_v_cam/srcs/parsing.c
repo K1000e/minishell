@@ -13,11 +13,10 @@ char	*ft_strndup(char *str, size_t len)
 	len_dup = ft_strlen(str);
 	if (len_dup > len)
 		len_dup = len;
-	dup = malloc((len_dup + 1) * sizeof(char));
+	dup = ft_calloc((len_dup + 1), sizeof(char));
 	if (!dup)
 		return NULL;
 	ft_strlcpy(dup, str, len_dup + 1);
-	dup[len_dup] = '\0';
 	return (dup);
 }
 
@@ -43,9 +42,21 @@ void free_cmd_list(t_cmd *cmd_list)
 			free(current->args);
 		}
 		if (current->out_file)
+		{
+			i = -1;
+			while (current->out_file[++i])
+				free(current->out_file[i]);
 			free(current->out_file);
-		else if (current->out_file)
-			free(current->out_file);
+		}
+		if (current->in_file)
+		{
+			i = -1;
+			while (current->in_file[++i])
+				free(current->in_file[i]);
+			free(current->in_file);
+		}
+		if (current->append)
+			free(current->append);
 		current = current->next;
 	}
 	free(cmd_list);

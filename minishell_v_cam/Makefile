@@ -6,14 +6,14 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/11/06 15:07:18 by cgorin           ###   ########.fr        #
+#    Updated: 2024/11/11 15:42:35 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		:=	minihell
 
 CC			:=	cc
-CFLAGS		:= -Wall -Wextra -Werror -ggdb #-fsanitize=address 
+CFLAGS		:= -Wall -Wextra -Werror -ggdb #-g3 -fsanitize=address 
 LDFLAGS		:= -lreadline
 
 #CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include #-g -fsanitize=address 

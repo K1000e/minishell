@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/06 19:00:10 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/11 14:18:09 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,15 @@ t_cmd *parse_command(char *line)
 				cmd_list->is_pipe = TRUE;
 				i++;
 			}
-			else 
-				new_cmd->is_pipe = FALSE;
-			/* else
-				cmd_list->is_pipe = FALSE; */
+			else
+				cmd_list->is_pipe = FALSE;
 			j = i;
 		}
 		if (!token_line[i])
 			break;
 		i++;
 	}
+	free(token_line);
 	return(cmd_list);
 }
 
@@ -95,7 +94,7 @@ int count_redirection(char *cmd, char type)
 	}
 	return (count);
 }
-
+            
 char	**clear_redir(t_cmd *cmd)
 {
 	char **new_args;
@@ -119,8 +118,9 @@ char	**clear_redir(t_cmd *cmd)
 			x++;
 		}
 	}
-	/* while (cmd->args[++i])
-				free(cmd->args[i]);*/
+	i = -1;
+	while (cmd->args[++i])
+				free(cmd->args[i]);
 	free(cmd->args);
 	return(new_args);
 }
@@ -136,18 +136,20 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->nb_outfile = count_redirection(cmd_tokens, '>');
 	if (cmd->nb_outfile)
 	{
-		cmd->out_file = ft_calloc(sizeof(char), (cmd->nb_outfile + 1));
+		cmd->out_file = ft_calloc(sizeof(char *), (cmd->nb_outfile + 1));
 		cmd->append = ft_calloc(sizeof(int), (cmd->nb_outfile + 1));
 	}
 	else
 		cmd->out_file = NULL;
 	if (cmd->nb_infile)
-		cmd->in_file = ft_calloc(sizeof(char), (cmd->nb_infile + 1));
+		cmd->in_file = ft_calloc(sizeof(char *), (cmd->nb_infile + 1));
 	else
 		cmd->in_file = NULL;
 	cmd->args = make_argument(cmd_str, cmd_tokens, cmd);
 	cmd = handle_redirection_(cmd);
 	cmd->args = clear_redir(cmd);
+	free(cmd_str);
+	free(cmd_tokens);
 	return (cmd);
 }
 
@@ -204,33 +206,6 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 			args[nb_args] = ft_strndup(&cmd_str[start],  i - start);
 				nb_args++;
 		}
-		/* 
-		if (cmd_tokens[i] == '"')
-		{
-			start = i;
-			while (cmd_tokens[i] == '"')
-				i++;
-			args[nb_args] = ft_strndup(&cmd_str[start], i - start);
-			nb_args++;
-		}
-		if (cmd_tokens[i] == '\'')
-		{
-			start = i;
-			while (cmd_tokens[i] == '\'')
-				i++;
-			args[nb_args] = ft_strndup(&cmd_str[start], i - start);
-			nb_args++;
-		}
-		else
-		{
-			start = i;
-			while (cmd_tokens[i] && cmd_tokens[i] != ' '
-				&& cmd_tokens[i] != '>' && cmd_tokens[i] != '<'
-				&& cmd_tokens[i] != '"' && cmd_tokens[i] != '\'')
-				i++;
-			args[nb_args] = ft_strndup(&cmd_str[start],  i - start);
-			nb_args++;
-		} */
 	}
 	args[nb_args] = NULL;
 	return (args);
@@ -291,6 +266,7 @@ int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
 	if (args[i + 1])
 	{
 		cmd->redirection = TRUE;
+		printf("%s\n", args[i + 1]);
 		cmd->out_file[*out] = ft_strdup(args[i + 1]);
 		cmd->append[*out] = (ft_strcmp(args[i], ">>") == 0);
 		return (i);

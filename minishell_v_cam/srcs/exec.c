@@ -69,9 +69,8 @@ void	fake_error(t_pipex *pipex, char *message, int error_code)
 void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 {
 	int i;
-	//char	*line;
+	char	*error;
 
-	//if (cmd->in_file == NULL)
 	i = -1;
 	while (cmd->in_file && cmd->in_file[++i])
 	{
@@ -98,16 +97,20 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 		pipex->file_i = open("here_doc", O_RDONLY);
 	} */
 	if (pipex->file_i < 0)
-		fake_error(pipex, "Couldn't open input file", 1);
+	{
+		//error = ft_strdup("bash: ");
+		error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]);
+		fake_error(pipex, error, 1);
+		free(error);
+	}
 }
 
 void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 {
 	int i;
 
-	i = 0;
-	printf("cmd->out_file[i] -> %s\n", cmd->out_file[i]);
-	while (cmd->out_file[i])
+	i = -1;
+	while (cmd->out_file && cmd->out_file[++i])
 	{
 		if (cmd->append[i] == 0)
 			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC
@@ -115,9 +118,8 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 		else
 			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_APPEND
 					| O_WRONLY, 0644);
-		if (i < cmd->nb_infile - 1)
-			close(pipex->file_i);
-		i++;
+		if (i < cmd->nb_outfile - 1)
+			close(pipex->file_o);
 	}
 	if (pipex->file_o < 0)
 		fake_error(pipex, "Couldn't open output file", 1);
@@ -130,6 +132,7 @@ void	redirection_exec(t_cmd *cmd)
 	pipex.file_i = -1;
 	pipex.file_o = -1;
 	pipe(pipex.pipe_fd);
+	printf("redirect\n");
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
 	if (cmd->in_file)
@@ -137,15 +140,15 @@ void	redirection_exec(t_cmd *cmd)
 		fake_open_infile(&pipex, cmd);
 		dup2(pipex.file_i, STDIN_FILENO);
 	}
-	/* else 
-		dup2(pipex.pipe_fd[0], STDIN_FILENO); */
+	else 
+		dup2(pipex.pipe_fd[0], STDIN_FILENO);
 	if (cmd->out_file)
 	{
 		fake_open_outfile(&pipex, cmd);
 		dup2(pipex.file_o, STDOUT_FILENO);
 	}
-	/* else
-		dup2(pipex.pipe_fd[1], STDOUT_FILENO); */
+	else
+		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
 	if (pipex.pipe_fd[1] != -1)
 		close(pipex.pipe_fd[1]);
 	if (pipex.pipe_fd[0] != -1)
@@ -156,6 +159,7 @@ void	redirection_exec(t_cmd *cmd)
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
+
 	printf("exec_builtins\n");
 	current = env;
 	if (cmd->redirection)
@@ -179,26 +183,29 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env)
 {
 	int i;
-	printf("enter in execute_non_builtins\n");
+	//printf("enter in execute_non_builtins\n");
 
-	if (access(cmd->args[0], X_OK) != 0)
-		cmd->args[0] = find_executable(cmd->args[0], env);
-	if (!cmd->args[0])
-		fake_error(pipex, "command not found: no path", 0);
-	if (execve(cmd->args[0] , cmd->args, env->all) == -1)
+	if (cmd->args[0])
 	{
-		if (cmd->args)
+		if (access(cmd->args[0], X_OK) != 0)
+			cmd->args[0] = find_executable(cmd->args[0], env);
+		if (!cmd->args[0])
+			fake_error(pipex, "command not found: no path", 0);
+		if (execve(cmd->args[0] , cmd->args, env->all) == -1)
 		{
-			i = -1;
-			while (cmd->args[++i])
-				free(cmd->args[i]);
-			free(cmd->args);
+			if (cmd->args)
+			{
+				i = -1;
+				while (cmd->args[++i])
+					free(cmd->args[i]);
+				free(cmd->args);
+			}
+			if (cmd->out_file)
+				free(cmd->out_file);
+			else if (cmd->out_file)
+				free(cmd->out_file);
+			fake_error(pipex, "command not found", 127);
 		}
-		if (cmd->out_file)
-			free(cmd->out_file);
-		else if (cmd->out_file)
-			free(cmd->out_file);
-		fake_error(pipex, "command not found", 127);
 	}
 }
 
@@ -228,30 +235,6 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	waitpid(pid, &pipex.status, 0);
 }
 
-void	parse_exec(t_cmd *cmd, t_env *env)
-{
-	int is_builtin;
-
-	if (!is_valid_command_format(cmd->cmd))
-	{
-		printf("Error: Invalid command format.\n");
-		return;
-	}
-	is_builtin = (
-		ft_strcmp(cmd->args[0], "echo") == 0 ||
-		ft_strcmp(cmd->args[0], "cd") == 0 ||
-		ft_strcmp(cmd->args[0], "pwd") == 0 ||
-		ft_strcmp(cmd->args[0], "env") == 0 ||
-		ft_strcmp(cmd->args[0], "export") == 0 ||
-		ft_strcmp(cmd->args[0], "unset") == 0 ||
-		ft_strcmp(cmd->args[0], "exit") == 0
-	);
-	if (is_builtin)
-		execute_builtin(cmd, env);
-	else
-		exec_non_builtins(cmd, env);
-}
-
 t_bool is_builtin(char *cmd)
 {
 	t_bool is_builtin;
@@ -268,32 +251,37 @@ t_bool is_builtin(char *cmd)
 	return (is_builtin);
 }
 
+void	parse_exec(t_cmd *cmd, t_env *env)
+{
+	if (!is_valid_command_format(cmd->cmd))
+	{
+		printf("Error: Invalid command format.\n");
+		return;
+	}
+	if (cmd->args[0] && is_builtin(cmd->args[0]))
+		execute_builtin(cmd, env);
+	else
+		exec_non_builtins(cmd, env);
+}
+
 
 void	execute_command(t_cmd *cmd ,t_env *env)
 {
 	pid_t child1;
 	pid_t child2;
-	t_pipex pipex;
-	//int pipefd[2];
+	int pipefd[2];
 
 	if (!cmd->is_pipe)
 	{
 		printf("Enter in no pipe mode\n");
-		if (is_builtin(cmd->args[0]))
-			execute_builtin(cmd, env);
-		else 
-			exec_non_builtins(cmd, env);
+		parse_exec(cmd, env);
 	}
 	else
 	{
-		printf("Enter in pipe mode\n");
-		pipe(pipex.pipe_fd);
+		pipe(pipefd);
 		child1 = fork();
 		if (child1 == 0)
 		{
-			dup2(pipex.pipe_fd[1], STDOUT_FILENO);
-			close(pipex.pipe_fd[0]);
-			close(pipex.pipe_fd[1]);
 			cmd->is_pipe = FALSE;
 			execute_command(cmd, env);
 			exit(0);
@@ -301,15 +289,15 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 		child2 = fork();
 		if (child2 == 0)
 		{
-			dup2(pipex.pipe_fd[0], STDIN_FILENO);
-			close(pipex.pipe_fd[0]);
-			close(pipex.pipe_fd[1]);
+			dup2(pipefd[0], STDIN_FILENO);
+			close(pipefd[0]);
+			close(pipefd[1]);
 			cmd = cmd->next;
 			execute_command(cmd, env);
 			exit(0);
 		}
-		close(pipex.pipe_fd[0]);
-		close(pipex.pipe_fd[1]);
+		close(pipefd[0]);
+		close(pipefd[1]);
 		waitpid(child1, NULL, 0);
 		waitpid(child2, NULL, 0);
 	}

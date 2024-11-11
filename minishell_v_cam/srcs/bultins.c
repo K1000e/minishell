@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/24 23:16:17 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/11 15:20:06 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ void	ft_echo(t_cmd *cmd)
 	}
 	if (!option)
 		printf("\n");
+	
 }
 
 void	ft_pwd(t_env *env)

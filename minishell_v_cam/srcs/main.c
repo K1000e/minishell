@@ -87,7 +87,7 @@ void	print_cmd_list(t_cmd *cmd_lst)
 	}
 	printf("complete command print \n");
 }
-/* 
+
 void	is_pipe(t_cmd *cmd)
 {
 	t_cmd *current;
@@ -104,7 +104,7 @@ void	is_pipe(t_cmd *cmd)
 			current->is_pipe = FALSE;
 		current = current->next;
 	}
-} */
+}
 
 void	ft_command(char *line, t_env *env)
 {
@@ -112,13 +112,13 @@ void	ft_command(char *line, t_env *env)
 	t_cmd	*tmp;
 
 	commands = parse_command(line);
-	printf("PIPE ? %d \n", commands->is_pipe);
 	(void) env;
 	if (commands == NULL)
 	{
 		printf("Error: No commands were parsed.\n");
 		return;
 	}
+	//is_pipe(commands);
 	print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
