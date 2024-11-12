@@ -53,15 +53,7 @@ t_bool is_valid_command_format(t_cmd *cmd)
 /* 
 void execute_non_builtin(t_cmd *cmd, t_env *env)
 {
-	pid_t	pid;
-	int		i;
-
-	pid = fork();
-	if (pid == 0)
-	{
-		if (access(cmd->args[0], X_OK) != 0)
-			cmd->args[0] = find_executable(cmd->args[0], env);
-		if (!cmd->cmd)
+	pid_t	pid;🔥 HellShell 🔥
 		{
 			perror("command not found: no path");
 			exit(0);
@@ -152,7 +144,7 @@ void	ft_command(char *line, t_env *env)
 	if (commands->cmd[0] == '\0')
 		return;
 	is_pipe(commands);
-	print_cmd_list(commands);
+	//print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
 	//while (waitpid(-1, NULL, 0) > 0); 
@@ -204,31 +196,36 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 {
 	//char	*prompt_hell_e;
 	char	*line;
-	int		i;
+	//int		i;
 
-	i = 0;
+	//i = 0;
 	while (1)
-	{
-		dup2(save_stdin, STDIN_FILENO);
-		dup2(save_stdout, STDOUT_FILENO);
-		//prompt_hell_e = prompt_hell(i);
-		/* if (i > 100) 
-			explosion(); */
-		//line = readline(prompt_hell_e);
-		line = readline("\001\033[1;31m\002🔥 HellShell 🔥 \001\033[0m\002");
-		if (line == NULL)
-			break;
-		add_history(line);
-		if (!match_quotes(line) || !count_redir(line))
-		{
-			printf("Error\n");
+	{		
+		//if (env->read)
+		//{
+			dup2(save_stdin, STDIN_FILENO);
+			dup2(save_stdout, STDOUT_FILENO);
+			//prompt_hell_e = prompt_hell(i);
+			/* if (i > 100) 
+				explosion(); */
+			//line = readline(prompt_hell_e);
+			line = readline("\001\033[1;31m\002🔥 HellShell 🔥 \001\033[0m\002");
+			if (line == NULL)
+				break;
+			if (ft_strlen(line) > 0)
+				add_history(line);
+			if (!match_quotes(line) || !count_redir(line))
+			{
+				printf("Error\n");
+				free(line);
+				continue ;
+			}
+			ft_command(line, env);
+			//free(prompt_hell_e);
 			free(line);
-			continue ;
-		}
-		ft_command(line, env);
-		//free(prompt_hell_e);
-		free(line);
-		i++;
+			//i++;
+			//usleep(2000);
+		//}
 	}
 	exit(0);
 }
@@ -237,6 +234,7 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 int main(int argc, char **argv, char **environment)
 {
 	t_env	*env = NULL;
+
 	int save_stdin;
 	int save_stdout;
 
@@ -245,6 +243,7 @@ int main(int argc, char **argv, char **environment)
 	save_stdin = dup(STDIN_FILENO);
 	save_stdout = dup(STDOUT_FILENO);
 	env = get_env(environment, env);
+	env->read = TRUE;
 	/* signal(SIGQUIT, SIG_IGN);
 	signal(SIGINT, ignore_sigint); */
 	set_signal_action();

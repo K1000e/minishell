@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/12 08:31:05 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/12 11:40:30 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,7 +206,7 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 			while (cmd_tokens[i] && cmd_tokens[i] == token)
 				i++;
 			args[nb_args] = ft_strndup(&cmd_str[start],  i - start);
-				nb_args++;
+			nb_args++;
 		}
 	}
 	args[nb_args] = NULL;

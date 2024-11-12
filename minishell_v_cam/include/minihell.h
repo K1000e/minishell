@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/12 10:40:11 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/12 11:48:29 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ typedef struct s_env
 	char			*key;		// Nom de la clé
 	char			*value;		// Valeur
 	struct s_env	*next;		// Pointeur vers la clé suivante
+	t_bool			read;
 }	t_env;
 
 typedef struct s_pipex
@@ -161,4 +162,6 @@ t_cmd *	handle_redirection_(t_cmd *new_cmd);
 void	ft_cmd_add_back(t_cmd **lst, t_cmd *new);
 int	handle_output_redirection(t_cmd *cmd, char **args, int i, int *out);
 int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in);
+void	single_command(t_cmd *cmd ,t_env *env);
+
 #endif
