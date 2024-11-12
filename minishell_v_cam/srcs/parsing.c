@@ -59,6 +59,7 @@ void free_cmd_list(t_cmd *cmd_list)
 			free(current->append);
 		current = current->next;
 	}
+		//printf("here\n");
 	free(cmd_list);
 }
 /* 

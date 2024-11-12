@@ -35,6 +35,8 @@ zsh: parse error near `|'
 	return (TRUE);
 } */
 
+
+
 t_bool count_redir(const char *line)
 {
 	int j;

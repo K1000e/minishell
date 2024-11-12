@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/11 17:29:19 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/11 19:01:37 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ void	error(t_pipex *pipex, char *message, int error_code);
 //pipex_execute.c
 void	exec_pipe(t_pipex *pipex, t_cmd *cmd, t_env *env);
 char	*get_path_variable(t_env *env);
-t_bool is_valid_command_format(const char *cmd);
+t_bool is_valid_command_format(t_cmd *cmd);
 void execute_builtin(t_cmd *cmd, t_env *env);
 
 void	execute_builtin_redirection(t_cmd *cmd, t_env *env);

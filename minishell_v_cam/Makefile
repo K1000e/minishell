@@ -6,11 +6,11 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/11/11 15:42:35 by cgorin           ###   ########.fr        #
+#    Updated: 2024/11/12 08:28:45 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME		:=	minihell
+NAME		:=	minishell
 
 CC			:=	cc
 CFLAGS		:= -Wall -Wextra -Werror -ggdb #-g3 -fsanitize=address 

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/11 16:16:58 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/12 08:31:05 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ t_cmd *parse_command(char *line)
 			}
 			else
 				cmd_list->is_pipe = FALSE;
-			printf("pipe ? %d\n", cmd_list->is_pipe);
+			//printf("pipe ? %d\n", cmd_list->is_pipe);
 			j = i;
 		}
 		if (!token_line[i])
@@ -95,7 +95,7 @@ int count_redirection(char *cmd, char type)
 	}
 	return (count);
 }
-            
+
 char	**clear_redir(t_cmd *cmd)
 {
 	char **new_args;
@@ -148,6 +148,7 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 		cmd->in_file = NULL;
 	cmd->args = make_argument(cmd_str, cmd_tokens, cmd);
 	cmd = handle_redirection_(cmd);
+	//("here\n");
 	cmd->args = clear_redir(cmd);
 	free(cmd_str);
 	free(cmd_tokens);
@@ -190,7 +191,7 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 	int nb_args;
 	char token;
 
-	printf("Parsing arguments\n");
+	//printf("Parsing arguments\n");
 	i = 0;
 	start = 0;
 	nb_args = 0;
@@ -257,6 +258,7 @@ int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)
 	}
 	else
 	{
+		//printf("here\n");
 		free_cmd_list(cmd);
 		return (-1);
 	}
@@ -267,7 +269,7 @@ int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
 	if (args[i + 1])
 	{
 		cmd->redirection = TRUE;
-		printf("%s\n", args[i + 1]);
+		//printf("%s\n", args[i + 1]);
 		cmd->out_file[*out] = ft_strdup(args[i + 1]);
 		cmd->append[*out] = (ft_strcmp(args[i], ">>") == 0);
 		return (i);
@@ -275,6 +277,7 @@ int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
 	else
 	{
 		free_cmd_list(cmd);
+		//printf("here\n");
 		return (-1);
 	}
 }
@@ -295,9 +298,10 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 		{
 			i = handle_output_redirection_(new_cmd, new_cmd->args, i, &out);
 			out++;
-			i++;
 			if (i == -1)
 				return NULL;
+			i++;
+			//printf("here\n");
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)
 		{
@@ -308,6 +312,7 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 			i++;
 		}
 	}
+	//printf("here\n");
 	return (new_cmd);
 }
 

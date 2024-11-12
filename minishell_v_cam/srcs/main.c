@@ -1,17 +1,45 @@
 #include "minihell.h"
 
-t_bool is_valid_command_format(const char *cmd)
+t_bool is_valid_command_format(t_cmd *cmd)
 {
-	int i = 0;
+	int i = -1;
+	t_cmd *current;
 
-	// Skip the first word (the command name)
-	while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\'' &&
-		   cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
-		i++;
-
-	if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>' 
-		&& cmd[i] != '<' && cmd[i] != '\0')
+	current = cmd;
+	printf("here?\n");
+	if (!current)
 		return FALSE;
+	while(current)
+	{
+		if (!current->args)
+			return TRUE;
+		if (ft_strcmp(current->args[0], "|") == 0 || ft_strcmp(current->args[0], "||") == 0)
+		{
+			printf("bash: syntax error near unexpected token `%s'\n", current->args[0]);
+			return FALSE;
+		}
+		while (current->args[++i])
+		{
+			if (ft_strcmp(current->args[i], ">") == 0 || ft_strcmp(current->args[i], ">>") == 0
+			|| ft_strcmp(current->args[i], "<") == 0 || ft_strcmp(current->args[i], "<<") == 0)
+			{
+				if (!current->args[i + 1])
+				{
+					printf("bash: syntax error near unexpected token `newline'\n");
+					return FALSE;
+				}
+			}
+		}
+		/* // Skip the first word (the command name)
+		while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\'' &&
+			cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
+			i++;
+
+		if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>' 
+			&& cmd[i] != '<' && cmd[i] != '\0')
+			return FALSE; */
+		current = current->next;
+	}
 	return TRUE;
 }
 /* 
@@ -97,7 +125,7 @@ void	is_pipe(t_cmd *cmd)
 	{
 		if (current->next)
 		{
-			printf("Pipe %s\n", current->cmd);
+			//printf("Pipe %s\n", current->cmd);
 			current->is_pipe = TRUE;
 		}
 		else
@@ -113,26 +141,35 @@ void	ft_command(char *line, t_env *env)
 
 	commands = parse_command(line);
 	(void) env;
-	if (commands == NULL)
-	{
-		printf("Error: No commands were parsed.\n");
+	if (commands->cmd[0] == '\0')
 		return;
-	}
 	is_pipe(commands);
 	print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
-	while (waitpid(-1, NULL, 0) > 0); 
+	//while (waitpid(-1, NULL, 0) > 0); 
 	free_cmd_list(commands);
 }
 
-void ignore_sigint(int sig)
+void sigint_handler(int sig)
 {
-	(void)sig;
-	printf("\n");
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	if (sig == SIGINT)
+	{
+		printf("\n");
+		rl_on_new_line();
+		rl_replace_line("", 1);
+		rl_redisplay();
+	}
+}
+
+void	set_signal_action(void)
+{
+	struct sigaction	act;
+
+	ft_bzero(&act, sizeof(act));
+	act.sa_handler = &sigint_handler;
+	sigaction(SIGINT, &act, NULL);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void explosion()
@@ -157,7 +194,7 @@ void explosion()
 
 void minihell(t_env *env, int save_stdin, int save_stdout)
 {
-	char	*prompt_hell_e;
+	//char	*prompt_hell_e;
 	char	*line;
 	int		i;
 
@@ -166,10 +203,11 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 	{
 		dup2(save_stdin, STDIN_FILENO);
 		dup2(save_stdout, STDOUT_FILENO);
-		prompt_hell_e = prompt_hell(i);
-		if (i > 100) 
-			explosion();
-		line = readline(prompt_hell_e);
+		//prompt_hell_e = prompt_hell(i);
+		/* if (i > 100) 
+			explosion(); */
+		//line = readline(prompt_hell_e);
+		line = readline("\001\033[1;31m\002🔥 HellShell 🔥 \001\033[0m\002");
 		if (line == NULL)
 			break;
 		add_history(line);
@@ -180,7 +218,7 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 			continue ;
 		}
 		ft_command(line, env);
-		free(prompt_hell_e);
+		//free(prompt_hell_e);
 		free(line);
 		i++;
 	}
@@ -199,8 +237,9 @@ int main(int argc, char **argv, char **environment)
 	save_stdin = dup(STDIN_FILENO);
 	save_stdout = dup(STDOUT_FILENO);
 	env = get_env(environment, env);
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, ignore_sigint);
+	/* signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, ignore_sigint); */
+	set_signal_action();
 	minihell(env, save_stdin, save_stdout);
 	return (0);
 }

@@ -184,7 +184,7 @@ void	pipeline(t_cmd *cmd, t_env *env, t_pipex *pipex, int i)
 			dup2(pipex->pipe_fd[1], STDOUT_FILENO);
 		close(pipex->prev_pipe_fd[1]);
 	}
-	printf("exit\n");
+	//printf("exit\n");
 	close(pipex->pipe_fd[0]);
 	exec_pipe(pipex, cmd, env);
 }

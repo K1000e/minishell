@@ -132,7 +132,7 @@ void	redirection_exec(t_cmd *cmd)
 	pipex.file_i = -1;
 	pipex.file_o = -1;
 	pipe(pipex.pipe_fd);
-	printf("redirect\n");
+	//printf("redirect\n");
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
 	if (cmd->in_file)
@@ -160,7 +160,7 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
 
-	printf("exec_builtins\n");
+	//printf("exec_builtins\n");
 	current = env;
 	if (cmd->redirection)
 		redirection_exec(cmd);
@@ -219,7 +219,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	pipex.file_o = -1;
 	pid = -1;
 
-	printf("exec_non_builtins\n");
+	printf("exec_non_builtins (%s)\n", cmd->cmd);
 	if (pipe(pipex.pipe_fd) == -1)
 		fake_error(&pipex, "Couldn't open pipe", 1);
 	pid = fork();
@@ -232,7 +232,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	else if (pid == -1)
 		fake_error(&pipex, "Invalid fork()", 1);
 	fake_free_all(&pipex);
-	waitpid(pid, &pipex.status, 0);
+	//waitpid(pid, &pipex.status, 0);
 }
 
 t_bool is_builtin(char *cmd)
@@ -253,10 +253,11 @@ t_bool is_builtin(char *cmd)
 
 void	parse_exec(t_cmd *cmd, t_env *env)
 {
-	if (!is_valid_command_format(cmd->cmd))
+	printf("cmd = %s (parse_exec) -> pid : %d\n", cmd->cmd, getpid());
+	if (!is_valid_command_format(cmd))
 	{
 		printf("Error: Invalid command format.\n");
-		return;
+		return ;
 	}
 	if (cmd->args[0] && is_builtin(cmd->args[0]))
 		execute_builtin(cmd, env);
@@ -265,19 +266,71 @@ void	parse_exec(t_cmd *cmd, t_env *env)
 }
 
 
-void	execute_command(t_cmd *cmd ,t_env *env)
+/*void	execute_command(t_cmd *cmd ,t_env *env)
 {
 	pid_t child1;
 	int pipefd[2];
 
+	printf("cmd = %s (execute_command)\n", cmd->cmd);
 	if (!cmd->is_pipe)
 	{
-		printf("Enter in no pipe mode, %d\n", getpid());
+		printf("Enter in no pipe mode for %s\n", cmd->cmd);
 		parse_exec(cmd, env);
 	}
 	else
 	{
-		printf("Enter in pipe mode\n");
+		printf("Enter in pipe mode for %s\n", cmd->cmd);
+		if (pipe(pipefd) == -1)
+			perror("Pipe failed");
+		child1 = fork();
+		if (child1 == -1)
+			perror("Fork failed");
+		if (child1 == 0)
+		{
+			printf("Child process for %s -> pid: %d\n", cmd->cmd, getpid());
+			close(pipefd[0]);
+			if (dup2(pipefd[1], STDOUT_FILENO) == -1)
+			{
+				perror("Duplication to STDOUT failed");
+				exit(1);
+			}
+			close(pipefd[1]);
+			parse_exec(cmd, env);
+			printf("Child exiting for %s -> pid: %d\n", cmd->cmd, getpid());
+			exit(0);
+		}
+		else
+		{
+			printf("Parent process waiting -> pid: %d, child pid: %d\n", getpid(), child1);
+			close(pipefd[1]);
+			if (dup2(pipefd[0], STDIN_FILENO) == -1)
+			{
+				perror("Duplication to STDOUT failed");
+				exit(1);
+			}
+			close(pipefd[0]);
+			waitpid(child1, NULL, 0);
+			if (cmd->next)
+				execute_command(cmd->next, env);
+		}
+	}
+} */
+
+void	execute_command(t_cmd *cmd ,t_env *env)
+{
+	pid_t child1;
+	pid_t child2;
+	int pipefd[2];
+
+	printf("cmd = %s (execute_command)\n", cmd->cmd);
+	if (!cmd->is_pipe)
+	{
+		printf("Enter in no pipe mode for %s\n", cmd->cmd);
+		parse_exec(cmd, env);
+	}
+	else
+	{
+		printf("Enter in pipe mode for %s\n", cmd->cmd);
 		if (pipe(pipefd) == -1)
 			perror("Pipe failed");
 		child1 = fork();
@@ -288,16 +341,23 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 			dup2(pipefd[1], STDOUT_FILENO);
 			close(pipefd[0]);
 			close(pipefd[1]);
+			///cmd->is_pipe = FALSE;
 			parse_exec(cmd, env);
 			exit(0);
 		}
-		else
+		child2 = fork();
+		if (child2 == 0)
 		{
-			close(pipefd[1]);
 			dup2(pipefd[0], STDIN_FILENO);
 			close(pipefd[0]);
-			execute_command(cmd->next, env);
-			waitpid(child1, NULL, 0);
+			close(pipefd[1]);
+			cmd = cmd->next;
+			execute_command(cmd, env);
+			exit(0);
 		}
+		close(pipefd[0]);
+		close(pipefd[1]);
+		waitpid(child1, NULL, 0);
+		waitpid(child2, NULL, 0);
 	}
 }
