@@ -1,12 +1,27 @@
 #include "minihell.h"
 
+t_bool is_valid_command_format(const char *cmd)
+{
+	int i = 0;
+
+	// Skip the first word (the command name)
+	while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\'' &&
+		   cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
+		i++;
+
+	if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>' 
+		&& cmd[i] != '<' && cmd[i] != '\0')
+		return FALSE;
+	return TRUE;
+}
+/*
+
 t_bool is_valid_command_format(t_cmd *cmd)
 {
 	int i = -1;
 	t_cmd *current;
 
 	current = cmd;
-	printf("here?\n");
 	if (!current)
 		return FALSE;
 	while(current)
@@ -30,18 +45,11 @@ t_bool is_valid_command_format(t_cmd *cmd)
 				}
 			}
 		}
-		/* // Skip the first word (the command name)
-		while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\'' &&
-			cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
-			i++;
-
-		if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>' 
-			&& cmd[i] != '<' && cmd[i] != '\0')
-			return FALSE; */
 		current = current->next;
 	}
 	return TRUE;
 }
+*/
 /* 
 void execute_non_builtin(t_cmd *cmd, t_env *env)
 {

@@ -232,7 +232,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	else if (pid == -1)
 		fake_error(&pipex, "Invalid fork()", 1);
 	fake_free_all(&pipex);
-	//waitpid(pid, &pipex.status, 0);
+	waitpid(pid, NULL, 0);
 }
 
 t_bool is_builtin(char *cmd)
@@ -254,7 +254,7 @@ t_bool is_builtin(char *cmd)
 void	parse_exec(t_cmd *cmd, t_env *env)
 {
 	printf("cmd = %s (parse_exec) -> pid : %d\n", cmd->cmd, getpid());
-	if (!is_valid_command_format(cmd))
+	if (!is_valid_command_format(cmd->cmd))
 	{
 		printf("Error: Invalid command format.\n");
 		return ;
@@ -334,14 +334,13 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 		if (pipe(pipefd) == -1)
 			perror("Pipe failed");
 		child1 = fork();
-		if (child1 == -1)
-			perror("Fork failed");
+		/* if (child1 == -1)
+			perror("Fork failed"); */
 		if (child1 == 0)
 		{
 			dup2(pipefd[1], STDOUT_FILENO);
 			close(pipefd[0]);
 			close(pipefd[1]);
-			///cmd->is_pipe = FALSE;
 			parse_exec(cmd, env);
 			exit(0);
 		}
