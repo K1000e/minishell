@@ -144,32 +144,42 @@ void	ft_command(char *line, t_env *env)
 	if (commands->cmd[0] == '\0')
 		return;
 	is_pipe(commands);
-	//print_cmd_list(commands);
+	print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
 	//while (waitpid(-1, NULL, 0) > 0); 
 	free_cmd_list(commands);
 }
 
-void sigint_handler(int sig)
+void	sigint_handler(int signal)
 {
-	if (sig == SIGINT)
+	if (signal == SIGINT)
 	{
 		printf("\n");
-		rl_on_new_line();
 		rl_replace_line("", 1);
+		rl_on_new_line();
 		rl_redisplay();
 	}
 }
 
-void	set_signal_action(void)
+void	sigint_heredoc_handler(int signal)
+{
+	if (signal == SIGINT)
+	{
+		printf("\n");
+		close(STDIN_FILENO);
+	}
+}
+
+void	set_signal_action(void (*handler)(int))
 {
 	struct sigaction	act;
 
 	ft_bzero(&act, sizeof(act));
-	act.sa_handler = &sigint_handler;
+	act.sa_handler = handler;
 	sigaction(SIGINT, &act, NULL);
-	signal(SIGQUIT, SIG_IGN);
+	act.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &act, NULL);
 }
 
 void explosion()
@@ -246,7 +256,7 @@ int main(int argc, char **argv, char **environment)
 	env->read = TRUE;
 	/* signal(SIGQUIT, SIG_IGN);
 	signal(SIGINT, ignore_sigint); */
-	set_signal_action();
+	set_signal_action(sigint_handler);
 	minihell(env, save_stdin, save_stdout);
 	return (0);
 }

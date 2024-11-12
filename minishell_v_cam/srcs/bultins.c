@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/11 15:20:06 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/12 16:40:20 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,6 @@ void	ft_pwd(t_env *env)
 {
 	t_env	*current;
 	char	*path;
-	
-	printf("there\n");
 
 	current = ft_find_key(env, "PWD");
 	path = current->value + 1;

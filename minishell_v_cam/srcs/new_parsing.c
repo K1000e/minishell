@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/12 11:40:30 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/12 16:25:47 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,6 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 		cmd->in_file = NULL;
 	cmd->args = make_argument(cmd_str, cmd_tokens, cmd);
 	cmd = handle_redirection_(cmd);
-	//("here\n");
 	cmd->args = clear_redir(cmd);
 	free(cmd_str);
 	free(cmd_tokens);
@@ -158,7 +157,6 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 char **make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
 	char **args;
-	//int nb_args;
 
 	cmd->nb_token = count_tokens_(cmd_tokens);
 	args = malloc(sizeof(char *) * (cmd->nb_token + 1));
@@ -206,6 +204,7 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 			while (cmd_tokens[i] && cmd_tokens[i] == token)
 				i++;
 			args[nb_args] = ft_strndup(&cmd_str[start],  i - start);
+			//printf("")
 			nb_args++;
 		}
 	}
@@ -228,15 +227,17 @@ char* check_char(char *cmd)
 			cmd[i] = '<';
 		else if (cmd[i] == '"')
 		{
-			while(cmd[i] && cmd[++i] != '"')
+			cmd[i] = ' ';
+			while(cmd[++i] && cmd[i] != '"')
 				cmd[i] = '"';
-			i++;
+			cmd[i] = ' ';
 		}
 		else if (cmd[i] == '\'')
 		{
-			while(cmd[i] && cmd[++i] != '\'')
+			cmd[i] = ' ';
+			while(cmd[++i] && cmd[i] != '\'')
 				cmd[i] = '\'';
-			i++;
+			cmd[i] = ' ';
 		}
 		else if (cmd[i] == '$')
 			cmd[i] = 'a'; // Arguments $ARG pas bien traité ... !!
@@ -258,7 +259,6 @@ int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)
 	}
 	else
 	{
-		//printf("here\n");
 		free_cmd_list(cmd);
 		return (-1);
 	}
@@ -277,7 +277,6 @@ int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
 	else
 	{
 		free_cmd_list(cmd);
-		//printf("here\n");
 		return (-1);
 	}
 }
