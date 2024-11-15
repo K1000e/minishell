@@ -125,7 +125,6 @@ void	is_pipe(t_cmd *cmd)
 	{
 		if (current->next)
 		{
-			//printf("Pipe %s\n", current->cmd);
 			current->is_pipe = TRUE;
 		}
 		else
@@ -134,20 +133,151 @@ void	is_pipe(t_cmd *cmd)
 	}
 }
 
+char	*get_env_var_value(const char *var_name, t_env *env)
+{
+	t_env	*current;
+
+	current = env->next;
+	while (current)
+	{
+		if (ft_strcmp(current->key, var_name) == 0)
+			return (current->value);
+		current = current->next;
+	}
+	return (NULL);
+}
+
+char	*expand_env_vars(const char *input, t_env *env)
+{
+	char		*result;
+	char		*res_ptr;
+	const char	*ptr;
+	int			i;
+	char		*value;
+	char 		*var_name;
+
+	result = malloc(sizeof(char) * (ft_strlen(input) + 1));
+	res_ptr = result;
+	ptr = input;
+	var_name = ft_calloc(sizeof(char), ft_strlen(input) + 1);
+	while (*ptr)
+	{
+		if (*ptr == '$' && (ft_isalpha(ptr[1]) || ptr[1] == '_'))
+		{
+			i = 0;
+			++ptr;
+			while (ft_isalnum(*ptr) || *ptr == '_')
+			{
+				var_name[i] = *ptr;
+				++i;
+				++ptr;
+			}
+			var_name[i] = '\0';
+			value = get_env_var_value(var_name, env);
+			if (value)
+			{
+				value++;
+				ft_strcpy(res_ptr, value);
+				res_ptr += strlen(value);
+			}
+			++ptr;
+		}
+		else if (*ptr == '$' && (ft_isdigit(ptr[1])))
+		{
+			++ptr;
+			if (*ptr == '0')
+			{
+				ft_strcpy(res_ptr, "executable");
+				res_ptr += 4;
+			}
+			++ptr;
+		}
+		else if (*ptr == '$' && ptr[1] == '?')
+		{
+			++ptr;
+			if (*ptr == '0')
+			{
+				ft_strcpy(res_ptr, "exit_code");
+				res_ptr += 4;
+			}
+			++ptr;
+		}
+		else
+		{
+			*res_ptr = *ptr;
+			++res_ptr;
+			++ptr;
+		}
+	}
+	*res_ptr = '\0';
+	free(var_name);
+	return (result);
+}
+
+/* char	*expand_env_vars(const char *input, t_env *env)
+{
+	char		*result;
+	char		*res_ptr;
+	//const char	*ptr;
+	int			i;
+	int			j;
+	char		*value;
+	char 		*var_name;
+
+	result = malloc(sizeof(char) * (ft_strlen(input) + 1));
+	res_ptr = result;
+	//ptr = input;
+	var_name = ft_calloc(sizeof(char), ft_strlen(input) + 1);
+	i = -1;
+	while (input[i])
+	{
+		if (input[i] == '$' && (ft_isalpha(input[i + 1]) || input[i + 1] == '_'))
+		{
+			j = 0;
+			while (ft_isalnum(input[j]) || input[j] == '_')
+			{
+				var_name[j] = input[i];
+				++j;
+				++i;
+			}
+			var_name[j] = '\0';
+			value = get_env_var_value(var_name, env);
+			printf("var_name = %s & value = %s\n", var_name, value);
+			if (value)
+			{
+				ft_strcpy(res_ptr, value);
+				res_ptr += strlen(value);
+			}
+			++i;
+		}
+		else
+		{
+			*res_ptr = input[i];
+			++res_ptr;
+			++i;
+		}
+	}
+	*res_ptr = '\0';
+	free(var_name);
+	return (result);
+} */
+
 void	ft_command(char *line, t_env *env)
 {
+	char	*expanded_line;
 	t_cmd	*commands;
 	t_cmd	*tmp;
 
-	commands = parse_command(line);
+	expanded_line = expand_env_vars(line, env);
+	commands = parse_command(expanded_line);
 	(void) env;
+	free(expanded_line);
 	if (commands->cmd[0] == '\0')
 		return;
 	is_pipe(commands);
 	print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
-	//while (waitpid(-1, NULL, 0) > 0); 
 	free_cmd_list(commands);
 }
 
@@ -211,8 +341,6 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 	//i = 0;
 	while (1)
 	{		
-		//if (env->read)
-		//{
 			dup2(save_stdin, STDIN_FILENO);
 			dup2(save_stdout, STDOUT_FILENO);
 			//prompt_hell_e = prompt_hell(i);
@@ -233,29 +361,24 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 			ft_command(line, env);
 			//free(prompt_hell_e);
 			free(line);
-			//i++;
-			//usleep(2000);
-		//}
 	}
 	exit(0);
 }
 
+int g_exit_code = 0;
 
-int main(int argc, char **argv, char **environment)
+int	main(int argc, char **argv, char **environment)
 {
-	t_env	*env = NULL;
-
+	t_env	*env;
 	int save_stdin;
 	int save_stdout;
 
+	env = NULL;
 	(void)argc;
 	(void)argv;
 	save_stdin = dup(STDIN_FILENO);
 	save_stdout = dup(STDOUT_FILENO);
 	env = get_env(environment, env);
-	env->read = TRUE;
-	/* signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, ignore_sigint); */
 	set_signal_action(sigint_handler);
 	minihell(env, save_stdin, save_stdout);
 	return (0);

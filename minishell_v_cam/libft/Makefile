@@ -40,6 +40,7 @@ LST_SRCS	:= 	libft/ft_atoi.c			\
 				libft/ft_split.c		\
 				libft/ft_strchr.c		\
 				libft/ft_strcmp.c		\
+				libft/ft_strcpy.c		\
 				libft/ft_strdup.c		\
 				libft/ft_striteri.c 	\
 				libft/ft_strjoin.c 		\

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/12 16:25:47 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/15 18:00:33 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,25 @@ t_cmd *parse_command(char *line)
 {
 	t_cmd	*cmd_list = NULL;
 	t_cmd	*new_cmd = NULL;
-	char	*token_line;
+	t_parse	parse;
 	int		i;
 	int		j;
 
-	token_line = ft_strdup(line);
-	if (!token_line)
+	parse.token_line = ft_strdup(line);
+	parse.command_line = ft_strdup(line);
+	if (!parse.token_line)
 		return NULL;
-	token_line = check_char(token_line);
+	check_char(&parse);
 	i = 0;
 	j = 0;
 	while (TRUE)
 	{
-		if (token_line[i] == '\0'
-			|| (token_line[i] == '|' && check_pipe_validity(line, i)))
+		if (parse.token_line[i] == '\0'
+			|| (parse.token_line[i] == '|' && check_pipe_validity(line, i)))
 		{
-			new_cmd = create_commands(line, token_line, j, i, new_cmd);
+			new_cmd = create_commands(&parse, j, i, new_cmd);
 			ft_cmd_add_back(&cmd_list, new_cmd);
-			if (token_line[i] == '|')
+			if (parse.token_line[i] == '|')
 			{
 				cmd_list->is_pipe = TRUE;
 				i++;
@@ -43,11 +44,12 @@ t_cmd *parse_command(char *line)
 			//printf("pipe ? %d\n", cmd_list->is_pipe);
 			j = i;
 		}
-		if (!token_line[i])
+		if (!parse.token_line[i])
 			break;
 		i++;
 	}
-	free(token_line);
+	free(parse.token_line);
+	free(parse.command_line);
 	return(cmd_list);
 }
 
@@ -64,13 +66,13 @@ t_bool check_pipe_validity(char *line, int i)
 	return TRUE;
 }
 
-t_cmd *create_commands(char *line, char *token_line, int start, int end, t_cmd *cmd)
+t_cmd *create_commands(t_parse *parse, int start, int end, t_cmd *cmd)
 {
 	char	*command;
 	char	*tokens;
 
-	command = ft_strndup(&line[start], end - start);
-	tokens = ft_strndup(&token_line[start], end - start);
+	command = ft_strndup(&parse->command_line[start], end - start);
+	tokens = ft_strndup(&parse->token_line[start], end - start);
 	cmd = create_cmd_node_(command, tokens, cmd);
 	return (cmd);
 }
@@ -203,8 +205,7 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 			start = i;
 			while (cmd_tokens[i] && cmd_tokens[i] == token)
 				i++;
-			args[nb_args] = ft_strndup(&cmd_str[start],  i - start);
-			//printf("")
+			args[nb_args] = ft_strndup(&cmd_str[start], i - start);
 			nb_args++;
 		}
 	}
@@ -212,41 +213,73 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 	return (args);
 }
 
-char* check_char(char *cmd)
+void	clear_quotes(t_parse *parse)
+{
+	int		i;
+	int		x;
+	char	*res_token;
+	char	*res_command;
+
+	res_token = ft_calloc(sizeof(char), ft_strlen(parse->token_line) + 1);
+	res_command = ft_calloc(sizeof(char), ft_strlen(parse->token_line) + 1);
+	i = -1;
+	x = 0;
+	while (parse->token_line[++i])
+	{
+		if (parse->token_line[i] == 'e')
+			continue ;
+		else
+		{
+			res_token[x] = parse->token_line[i];
+			res_command[x] = parse->command_line[i];
+			x++;
+		}
+	}
+	free(parse->token_line);
+	free(parse->command_line);
+	parse->token_line = ft_strdup(res_token);
+	parse->command_line = ft_strdup(res_command);
+	free(res_token);
+	free(res_command);
+	printf("%s\n", parse->token_line);
+	printf("%s\n", parse->command_line);
+}
+
+void check_char(t_parse *parse)
 {
 	int i;
 
 	i = -1;
-	while(cmd[++i])
+	while(parse->token_line[++i])
 	{
-		if (cmd[i] == '|') // Pipe
-			cmd[i] = '|';
-		else if (cmd[i] == '>') // Redirection (a voir comment on fait pour >>)
-			cmd[i] = '>';
-		else if (cmd[i] == '<') // Redirection (a voir comment on fait pour <<)
-			cmd[i] = '<';
-		else if (cmd[i] == '"')
+		if (parse->token_line[i] == '|') // Pipe
+			parse->token_line[i] = '|';
+		else if (parse->token_line[i] == '>') // Redirection (a voir comment on fait pour >>)
+			parse->token_line[i] = '>';
+		else if (parse->token_line[i] == '<') // Redirection (a voir comment on fait pour <<)
+			parse->token_line[i] = '<';
+ 		else if (parse->token_line[i] == '"')
 		{
-			cmd[i] = ' ';
-			while(cmd[++i] && cmd[i] != '"')
-				cmd[i] = '"';
-			cmd[i] = ' ';
+			parse->token_line[i] = 'e';
+			while(parse->token_line[++i] && parse->token_line[i] != '"')
+				parse->token_line[i] = 'c';
+			parse->token_line[i] = 'e';
 		}
-		else if (cmd[i] == '\'')
+		else if (parse->token_line[i] == '\'')
 		{
-			cmd[i] = ' ';
-			while(cmd[++i] && cmd[i] != '\'')
-				cmd[i] = '\'';
-			cmd[i] = ' ';
+			parse->token_line[i] = 'e';
+			while(parse->token_line[++i] && parse->token_line[i] != '\'')
+				parse->token_line[i] = 'c';
+			parse->token_line[i] = 'e';
 		}
-		else if (cmd[i] == '$')
-			cmd[i] = 'a'; // Arguments $ARG pas bien traité ... !!
-		else if (!ft_isspace(cmd[i]))
-			cmd[i] = 'c';  // Command
+		/* else if (parse->token_line[i] == '$')
+			parse->token_line[i] = 'a'; // Arguments $ARG pas bien traité ... !! */
+		else if (!ft_isspace(parse->token_line[i]))
+			parse->token_line[i] = 'c';  // Command
 		else 
-			cmd[i] = ' '; // Pour les espaces
+			parse->token_line[i] = ' '; // Pour les espaces
 	}
-	return (cmd);
+	clear_quotes(parse);
 }
 
 int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)

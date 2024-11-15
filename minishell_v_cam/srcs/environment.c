@@ -39,6 +39,39 @@ void	ft_env_add_back_(t_env **lst, t_env *new)
 	ptr->next = new;
 }
 
+
+int	ft_envsize(t_env *lst)
+{
+	int	i;
+
+	i = 0;
+	while (lst != NULL)
+	{
+		i++;
+		lst = lst -> next;
+	}
+	return (i);
+}
+
+char **base_env(t_env *env)
+{
+	t_env *current;
+	char **environment;
+	int i;
+
+	//char **
+	current = env;
+	environment = ft_calloc(ft_envsize(env) + 1, sizeof(char *));
+	//printf("size %d\n", ft_envsize(env));
+	i = 0;
+	while (current)
+	{
+		environment[i++] = ft_strjoin(env->key, env->value);
+		current = current->next;
+	}
+	return (environment);
+}
+
 t_env	*get_env(char **env, t_env *new_env)
 {
 	int i;
@@ -53,7 +86,7 @@ t_env	*get_env(char **env, t_env *new_env)
 		j = -1;
 		while (env[i][++j])
 		{
-			if (new_env == NULL)
+			/* if (new_env == NULL)
 			{
 				new_env = malloc(sizeof(t_env));
 				if (!new_env)
@@ -62,7 +95,7 @@ t_env	*get_env(char **env, t_env *new_env)
 				new_env->key = NULL;
 				new_env->value = NULL;
 				new_env->next = NULL;
-			}
+			} */
 			if (env[i][j] == '=')
 			{
 				key = ft_strndup(env[i], j);

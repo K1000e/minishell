@@ -157,7 +157,7 @@ void	redirection_exec(t_cmd *cmd)
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
-	//printf("exec_builtins\n");
+
 	current = env;
 	if (cmd->redirection)
 		redirection_exec(cmd);
@@ -177,16 +177,15 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 		ft_env(cmd, current);
 }
 
-void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env)
+void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 {
 	int i;
-	//printf("enter in execute_non_builtins\n");
 
 	if (access(cmd->args[0], X_OK) != 0)
 		cmd->args[0] = find_executable(cmd->args[0], env);
 	if (!cmd->args[0])
 		fake_error(pipex, "command not found: no path", 0);
-	if (execve(cmd->args[0] , cmd->args, env->all) == -1)
+	if (execve(cmd->args[0] , cmd->args, env_) == -1)
 	{
 		if (cmd->args)
 		{
@@ -207,13 +206,13 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 {
 	t_pipex pipex;
 	pid_t pid;
+	char **b_env;
 
+	b_env = base_env(env);
 	pipex.status = 0;
 	pipex.file_i = -1;
 	pipex.file_o = -1;
 	pid = -1;
-
-   // printf("exec_non_builtins\n");
 	if (pipe(pipex.pipe_fd) == -1)
 		fake_error(&pipex, "Couldn't open pipe", 1);
 	pid = fork();
@@ -221,10 +220,18 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	{
 		if (cmd->redirection)
 			redirection_exec(cmd);
-		execute_non_builtins(&pipex, cmd, env);
+		execute_non_builtins(&pipex, cmd, env, b_env);
 	}
 	else if (pid == -1)
+	{
+		for (int i = 0; b_env[i]; i++)
+			free(b_env[i]);
+		free(b_env);
 		fake_error(&pipex, "Invalid fork()", 1);
+	}
+	for (int i = 0; b_env[i]; i++)
+			free(b_env[i]);
+		free(b_env);
 	fake_free_all(&pipex);
 	waitpid(pid, &pipex.status, 0);
 }
