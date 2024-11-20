@@ -6,7 +6,7 @@
 /*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 21:19:03 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/14 16:23:56 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/20 19:06:17 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,11 +114,11 @@ void	ft_command(char *line, t_env *env)
 }
 
 // tests to do
-// echo $USER
-// echo $sgdsthsdj
-// echo hello $USER
-// echo $USER $PATH $HOME
+// echo $USER				//everytime i do it, cc is added at the end
+// echo $sgdsthsdj			//seems to work fine
+// echo hello $USER			//everytime i do it, cc is added at the end
+// echo $USER $PATH $HOME	//does not work, a lot of problems
 
-// ls $HOME
-// cat $PATH
-// cd $HOME
+// ls $HOME					//seems to work fine
+// cat $PATH				//segfaults
+// cd $HOME					//seems to work fine
