@@ -6,7 +6,7 @@
 /*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 21:19:03 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/20 19:06:17 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/20 21:11:20 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,11 +114,14 @@ void	ft_command(char *line, t_env *env)
 }
 
 // tests to do
-// echo $USER				//everytime i do it, cc is added at the end
+// echo $USER				//seems to work fine
 // echo $sgdsthsdj			//seems to work fine
-// echo hello $USER			//everytime i do it, cc is added at the end
+// echo hello $USER			//everytime i do it, cc is added at the end and eventually segfaults
+							//only happens if the word before the $var is 4 characters or more
 // echo $USER $PATH $HOME	//does not work, a lot of problems
 
 // ls $HOME					//seems to work fine
 // cat $PATH				//segfaults
 // cd $HOME					//seems to work fine
+
+//JE COMPRENDS PAS D'OU CA VIENT LES CCCCCC AAAAAAAAAAAAAAAAAAAAAA
