@@ -44,7 +44,7 @@ void ft_print_declare_env(t_env *env)
 	current = env->next;
 	while (current)
 	{
-		printf("declare -x %s%s\n", current->key, current->value);
+		printf("declare -x %s=%s\n", current->key, current->value);
 		current = current->next;
 	}
 }
@@ -89,7 +89,7 @@ void	ft_env(t_cmd *cmd, t_env *env)
 	current = env->next;
 	while (current)
 	{
-		printf("%s%s\n", current->key, current->value);
+		printf("%s=%s\n", current->key, current->value);
 		current = current->next;
 	}
 }

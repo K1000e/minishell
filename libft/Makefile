@@ -63,6 +63,10 @@ LST_SRCS	:= 	libft/ft_atoi.c			\
 				ft_printf/ft_print_p.c 		\
 				ft_printf/ft_print_u.c	 	\
 				ft_printf/ft_putnbr_base.c	\
+				ft_printf/ft_fprintf.c		\
+				ft_printf/ft_fprint_char.c 	\
+				ft_printf/ft_fprint_num.c 	\
+				ft_printf/ft_fprint_base.c 	\
 				get_next_line/get_next_line.c		
 
 

@@ -20,7 +20,7 @@ t_env	*ft_lstlast_env(t_env *lst)
 	if (!lst)
 		return (NULL);
 	while (lst->next)
-		lst = lst -> next;
+		lst = lst->next;
 	return (lst);
 }
 
@@ -48,7 +48,7 @@ int	ft_envsize(t_env *lst)
 	while (lst != NULL)
 	{
 		i++;
-		lst = lst -> next;
+		lst = lst->next;
 	}
 	return (i);
 }
@@ -70,13 +70,13 @@ char **base_env(t_env *env)
 	return (environment);
 }
 
-t_env	*get_env(char **env, t_env *new_env)
+t_env	*get_env(char **env, t_env *new_env, char *executable)
 {
-	int i;
-	int j;
+	int		i;
+	int		j;
 	t_env	*env_node;
-	char *value;
-	char *key;
+	char	*value;
+	char	*key;
 
 	i = -1;
 	new_env = malloc(sizeof(t_env));
@@ -85,6 +85,7 @@ t_env	*get_env(char **env, t_env *new_env)
 	new_env->key = NULL;
 	new_env->value = NULL;
 	new_env->next = NULL;
+	new_env->executable = executable;
 	while (env[++i])
 	{
 		j = -1;
@@ -93,7 +94,7 @@ t_env	*get_env(char **env, t_env *new_env)
 			if (env[i][j] == '=')
 			{
 				key = ft_strndup(env[i], j);
-				value = ft_strdup(env[i] + j);
+				value = ft_strdup(env[i] + j + 1);
 				env_node = create_env_node(key, value);
 				ft_env_add_back_(&new_env, env_node);
 				free(key);

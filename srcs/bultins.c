@@ -47,6 +47,7 @@ void	ft_exit(t_cmd *cmd)
 		exit(exit_code);
 	}
 	printf("exit: too many arguments\n");
+	g_exit_code = 1;
 }
 
 t_bool ft_check_option_echo(t_cmd *cmd, int j)
@@ -89,7 +90,7 @@ void	ft_echo(t_cmd *cmd)
 	}
 	if (!option)
 		printf("\n");
-	
+	g_exit_code = 0;
 }
 
 void	ft_pwd(t_env *env)
@@ -105,6 +106,7 @@ void	ft_pwd(t_env *env)
 		return ;
 	}
 	printf("%s\n", path);
+	g_exit_code = 0;
 }
 
 void ft_cd(t_cmd *cmd, t_env *env)
@@ -119,17 +121,19 @@ void ft_cd(t_cmd *cmd, t_env *env)
 		current = ft_find_key(env, "HOME");
 		if (current && current->value)
 		{
+			g_exit_code = 0;
 			directory = current->value + 1;
-		printf("directory =%s!\n", directory);
 		}
 		else
 		{
+			g_exit_code = 1;
 			printf("cd: HOME not set\n");
 			return ;
 		}
 	}
 	else if (cmd->args[1] && cmd->args[2] != NULL)
 	{
+		g_exit_code = 1;
 		printf("cd: too many arguments\n");
 		return ;
 	}
@@ -137,6 +141,7 @@ void ft_cd(t_cmd *cmd, t_env *env)
 		directory = cmd->args[1];
 	if (chdir(directory) != 0)
 	{
+		g_exit_code = 1;
 		perror("cd");
 		return ;
 	}
@@ -149,9 +154,11 @@ void ft_cd(t_cmd *cmd, t_env *env)
 			char *value = current->value;
 			ft_update_key(env, "OLDPWD", value);
 			ft_update_key(env, "PWD", cwd);
+			g_exit_code = 0;
 		}
 		else
 		{
+			g_exit_code = 1;
 			perror("getcwd");
 			return ;
 		}

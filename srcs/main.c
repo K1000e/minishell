@@ -122,7 +122,7 @@ static char	*handle_env_variable(const char *input, int *i, t_env *env)
 	return (ft_strdup(value));
 }
 
-static char	*handle_special_cases(const char *input, int *i)
+static char	*handle_special_cases(const char *input, int *i, t_env *env)
 {
 	if (input[*i] == '?')
 	{
@@ -132,7 +132,12 @@ static char	*handle_special_cases(const char *input, int *i)
 	else if (input[*i] == '0')
 	{
 		(*i)++;
-		return (ft_strdup("executable"));
+		return (ft_strdup(env->executable));
+	}
+	else
+	{
+		(*i)++;
+		return (NULL);
 	}
 	return (NULL);
 }
@@ -165,7 +170,7 @@ static char	*process_input(const char *input, t_env *env)
 			if (ft_isalpha(input[i]) || input[i] == '_')
 				to_append = handle_env_variable(input, &i, env);
 			else
-				to_append = handle_special_cases(input, &i);
+				to_append = handle_special_cases(input, &i, env);
 			if (!to_append)
 				to_append = append_char(ft_strdup(""), '$');
 		}
@@ -271,7 +276,10 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 			//line = readline(prompt_hell_e);
 			line = readline("\001\033[1;31m\002🔥 HellShell 🔥 \001\033[0m\002");
 			if (line == NULL)
+			{
+				ft_printf("exit\n");
 				break;
+			}
 			if (ft_strlen(line) > 0)
 				add_history(line);
 			if (!match_quotes(line) || !count_redir(line))
@@ -298,11 +306,14 @@ int	main(int argc, char **argv, char **environment)
 	env = NULL;
 	(void)argc;
 	(void)argv;
-	save_stdin = dup(STDIN_FILENO);
-	save_stdout = dup(STDOUT_FILENO);
-	env = get_env(environment, env);
-	set_signal_action(sigint_handler);
-	minihell(env, save_stdin, save_stdout);
+	if (argc == 1)
+	{
+		save_stdin = dup(STDIN_FILENO);
+		save_stdout = dup(STDOUT_FILENO);
+		env = get_env(environment, env, argv[0]);
+		set_signal_action(sigint_handler);
+		minihell(env, save_stdin, save_stdout);
+	}
 	return (0);
 }
 

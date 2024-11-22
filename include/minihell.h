@@ -55,11 +55,12 @@ typedef struct s_cmd
 	char			*heredoc_exit;
 	t_bool			is_pipe;
 	t_bool			is_bultins;
-	t_bool			functional;
+	t_bool			path;
 }	t_cmd;
 
 typedef struct s_env
 {
+	char			*executable;
 	char			*key;		// Nom de la clé
 	char			*value;		// Valeur
 	struct s_env	*next;		// Pointeur vers la clé suivante
@@ -105,7 +106,7 @@ t_bool	match_quotes(char *line);
 
 /* FUNCTIONS *//* ENVIRONMENT */
 t_env	*create_env_node(char *key, char *value);
-t_env	*get_env(char **env, t_env *new_env);
+t_env	*get_env(char **env, t_env *new_env, char *executable);
 void	ft_env_add_back_(t_env **lst, t_env *new);
 void	ft_export(t_cmd *cmd, t_env *env);
 

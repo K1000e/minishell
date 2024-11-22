@@ -20,7 +20,7 @@ void find_executable(t_cmd *command, t_env *env)
 	path = get_path_variable(env);
 	if (!path)
 	{
-		//command->functional = FALSE;
+		command->path = FALSE;
 		return ;
 	}
 	start = 0;
@@ -34,14 +34,15 @@ void find_executable(t_cmd *command, t_env *env)
 			if (access(full_path, X_OK) == 0)
 			{
 				command->args[0] = ft_strdup(full_path);
-				command->functional = TRUE;
+				command->path = TRUE;
 				return ;
 			}
 			free(full_path);
 			start = i + 1;
 		}
 	}
-	return ;
+	if (command->args[0][0] == '/')
+		command->path = FALSE;
 }
 
 
@@ -60,7 +61,8 @@ void	fake_free_all(t_pipex *pipex)
 void	fake_error(t_pipex *pipex, char *message, int error_code)
 {
 	fake_free_all(pipex);
-	perror(message);
+	ft_fprintf(2, "%s\n", message);
+	//g_exit_code = error_code;
 	exit(error_code);
 }
 
@@ -175,29 +177,32 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 		ft_env(cmd, current);
 }
 
+char	*ft_join(char *buffer, char *buf)
+{
+	char	*tmp;
+
+	tmp = ft_strjoin(buffer, buf);
+	free(buffer);
+	return (tmp);
+}
+
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 {
-	int i;
+	//int i;
 	char *error;
 
 	if (access(cmd->args[0], X_OK) != 0)
 		/* cmd->args[0] =  */find_executable(cmd/* ->args[0] */, env);
-	//if (!cmd->functional/* args[0] */)
-	//	fake_error(pipex, "command not found: no path", 0);
+	if (!cmd->path/* args[0] */)
+	{
+		error = ft_strjoin("bash: ", cmd->args[0]);
+		error = ft_join(error, ": No such file or directory");
+		fake_error(pipex, error, 127);
+	}
 	if (execve(cmd->args[0] , cmd->args, env_) == -1)
 	{
 		error = ft_strjoin("bash: ", cmd->args[0]);
-		if (cmd->args)
-		{
-			i = -1;
-			while (cmd->args[++i])
-				free(cmd->args[i]);
-			free(cmd->args);
-		}
-		if (cmd->out_file)
-			free(cmd->out_file);
-		else if (cmd->out_file)
-			free(cmd->out_file);
+		error = ft_join(error, ": command not found");
 		fake_error(pipex, error, 127);
 		//fake_error(pipex, "command not found", 127);
 	}
@@ -234,7 +239,8 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 			free(b_env[i]);
 		free(b_env);
 	fake_free_all(&pipex);
-	waitpid(pid, &pipex.status, 0);
+	waitpid(pid, &g_exit_code, 0);
+	g_exit_code = WEXITSTATUS(g_exit_code);
 }
 
 t_bool is_builtin(char *cmd)
@@ -306,7 +312,8 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 		}
 		close(pipefd[0]);
 		close(pipefd[1]);
-		waitpid(child1, NULL, 0);
-		waitpid(child2, NULL, 0);
+		waitpid(child1, &g_exit_code, 0);
+		waitpid(child2, &g_exit_code, 0);
+		g_exit_code = WEXITSTATUS(g_exit_code);
 	}
 }
