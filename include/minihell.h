@@ -23,6 +23,7 @@
 #include <pwd.h>
 #include <time.h>
 #include <string.h>
+
 // Définir la couleur du texte
 #define RED "\001\033[1;31m\002"
 #define YELLOW "\001\033[1;33m\002"
@@ -49,37 +50,28 @@ typedef struct s_cmd
 	char			**in_file;		// Fichier pour l'entrée redirigée
 	struct s_cmd	*next;			// Pointeur vers la commande suivante
 	int				*append;			// Pour savoir si on doit append ou trunk
-	t_bool			pipe_in;        // Pour savoir si on doit lire depuis un pipe
-	t_bool			pipe_out;       // Pour savoir si on doit écrire dans un pipe
 	t_bool 			heredoc;
 	t_bool			redirection;
 	char			*heredoc_exit;
 	t_bool			is_pipe;
 	t_bool			is_bultins;
+	t_bool			functional;
 }	t_cmd;
 
 typedef struct s_env
 {
-	char **all;
 	char			*key;		// Nom de la clé
 	char			*value;		// Valeur
 	struct s_env	*next;		// Pointeur vers la clé suivante
-	t_bool			read;
 }	t_env;
 
 typedef struct s_pipex
 {
-	pid_t	*pid;
-	int		n_cmd;
+	//pid_t	*pid;
 	int		pipe_fd[2];
-	int		prev_pipe_fd[2];
-	char	*file_in_name;
 	int		file_i;
 	int		file_o;
 	int		status;
-	int		test;
-	int		argc;
-	char	**argv;
 	char	*limiter;
 	char	*outfile;
 }	t_pipex;
@@ -133,7 +125,7 @@ char	*prompt_hell(int i);
 
 //t_list	*create_cmd_list(char *all, char *tmp, int i, int j);
 
-char	*find_executable(char *command, t_env *env);
+void	find_executable(t_cmd *command, t_env *env);
 t_env	*ft_find_key(t_env *env, char *key);
 
 int		ft_pipex_start(t_cmd *cmd, t_env *env);
@@ -141,7 +133,6 @@ void	init_ft_pipex_start(t_pipex *pipex, t_cmd *cmd);
 void	ft_ft_pipex_start(t_cmd *cmd, t_env *env, t_pipex *pipex);
 void	pipeline(t_cmd *cmd, t_env *env, t_pipex *pipex, int i);
 
-// pipex_open_free.c
 void	open_infile(t_pipex *pipex);
 void	open_outfile(t_pipex *pipex);
 void	free_all(t_pipex *pipex);

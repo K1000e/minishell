@@ -41,7 +41,6 @@ t_cmd *parse_command(char *line)
 			}
 			else
 				cmd_list->is_pipe = FALSE;
-			//printf("pipe ? %d\n", cmd_list->is_pipe);
 			j = i;
 		}
 		if (!parse.token_line[i])
@@ -297,7 +296,6 @@ int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
 	if (args[i + 1])
 	{
 		cmd->redirection = TRUE;
-		//printf("%s\n", args[i + 1]);
 		cmd->out_file[*out] = ft_strdup(args[i + 1]);
 		cmd->append[*out] = (ft_strcmp(args[i], ">>") == 0);
 		return (i);
@@ -328,7 +326,6 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 			if (i == -1)
 				return NULL;
 			i++;
-			//printf("here\n");
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)
 		{
@@ -339,7 +336,6 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 			i++;
 		}
 	}
-	//printf("here\n");
 	return (new_cmd);
 }
 

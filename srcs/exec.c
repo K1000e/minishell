@@ -7,18 +7,9 @@ char	*get_path_variable(t_env *env)
 	current = env->next;
 	current = ft_find_key(current, "PATH");
 	return(current->value + 1);
-	/* while (current != NULL)
-	{
-		//if (env->key == NULL)
-		if (ft_strcmp(current->key, "PATH") == 0)
-		{
-			return (current->value);
-		}
-		current = current->next;
-	} */
 }
 
-char	*find_executable(char *command, t_env *env)
+void find_executable(t_cmd *command, t_env *env)
 {
 	size_t	i;
 	char	*path;
@@ -28,7 +19,10 @@ char	*find_executable(char *command, t_env *env)
 
 	path = get_path_variable(env);
 	if (!path)
-		return (NULL);
+	{
+		//command->functional = FALSE;
+		return ;
+	}
 	start = 0;
 	i = -1;
 	while (++i <= ft_strlen(path))
@@ -36,14 +30,18 @@ char	*find_executable(char *command, t_env *env)
 		if (path[i] == ':' || path[i] == '\0')
 		{
 			dir = ft_substr(path, start, i - start);
-			full_path = ft_join(ft_join(dir, "/"), command);
+			full_path = ft_join(ft_join(dir, "/"), command->args[0]);
 			if (access(full_path, X_OK) == 0)
-				return (full_path);
+			{
+				command->args[0] = ft_strdup(full_path);
+				command->functional = TRUE;
+				return ;
+			}
 			free(full_path);
 			start = i + 1;
 		}
 	}
-	return (command);
+	return ;
 }
 
 
@@ -180,13 +178,15 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 {
 	int i;
+	char *error;
 
 	if (access(cmd->args[0], X_OK) != 0)
-		cmd->args[0] = find_executable(cmd->args[0], env);
-	if (!cmd->args[0])
-		fake_error(pipex, "command not found: no path", 0);
+		/* cmd->args[0] =  */find_executable(cmd/* ->args[0] */, env);
+	//if (!cmd->functional/* args[0] */)
+	//	fake_error(pipex, "command not found: no path", 0);
 	if (execve(cmd->args[0] , cmd->args, env_) == -1)
 	{
+		error = ft_strjoin("bash: ", cmd->args[0]);
 		if (cmd->args)
 		{
 			i = -1;
@@ -198,7 +198,8 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 			free(cmd->out_file);
 		else if (cmd->out_file)
 			free(cmd->out_file);
-		fake_error(pipex, "command not found", 127);
+		fake_error(pipex, error, 127);
+		//fake_error(pipex, "command not found", 127);
 	}
 }
 
@@ -254,7 +255,6 @@ t_bool is_builtin(char *cmd)
 
 void	parse_exec(t_cmd *cmd, t_env *env)
 {
-	//printf("cmd = %s (parse_exec) -> pid : %d\n", cmd->cmd, getpid());
 	if (!is_valid_command_format(cmd->cmd))
 	{
 		printf("Error: Invalid command format.\n");
@@ -276,7 +276,6 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 
 	if (!cmd->is_pipe)
 	{
-		//printf("Enter in no pipe mode\n");
 		if (is_builtin(cmd->args[0]))
 			execute_builtin(cmd, env);
 		else 

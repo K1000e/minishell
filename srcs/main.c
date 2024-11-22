@@ -14,62 +14,6 @@ t_bool is_valid_command_format(const char *cmd)
 		return FALSE;
 	return TRUE;
 }
-/*
-
-t_bool is_valid_command_format(t_cmd *cmd)
-{
-	int i = -1;
-	t_cmd *current;
-
-	current = cmd;
-	if (!current)
-		return FALSE;
-	while(current)
-	{
-		if (!current->args)
-			return TRUE;
-		if (ft_strcmp(current->args[0], "|") == 0 || ft_strcmp(current->args[0], "||") == 0)
-		{
-			printf("bash: syntax error near unexpected token `%s'\n", current->args[0]);
-			return FALSE;
-		}
-		while (current->args[++i])
-		{
-			if (ft_strcmp(current->args[i], ">") == 0 || ft_strcmp(current->args[i], ">>") == 0
-			|| ft_strcmp(current->args[i], "<") == 0 || ft_strcmp(current->args[i], "<<") == 0)
-			{
-				if (!current->args[i + 1])
-				{
-					printf("bash: syntax error near unexpected token `newline'\n");
-					return FALSE;
-				}
-			}
-		}
-		current = current->next;
-	}
-	return TRUE;
-}
-*/
-/* 
-void execute_non_builtin(t_cmd *cmd, t_env *env)
-{
-	pid_t	pid;🔥 HellShell 🔥
-		{
-			perror("command not found: no path");
-			exit(0);
-		}
-		if (execve(cmd->args[0], cmd->args, env->all) == -1)
-		{
-			i = -1;
-			while (cmd->args[++i])
-				free(cmd->args[i]);
-			free(cmd->args);
-			perror("command not found: no path");
-			exit(127);
-		}
-	}
-	waitpid(pid, 0, 0);
-} */
 
 void	print_cmd_list(t_cmd *cmd_lst)
 {
@@ -183,7 +127,7 @@ static char	*handle_special_cases(const char *input, int *i)
 	if (input[*i] == '?')
 	{
 		(*i)++;
-		return (ft_strdup("exit_code"));
+		return (ft_itoa(g_exit_code));
 	}
 	else if (input[*i] == '0')
 	{
@@ -238,54 +182,6 @@ char	*expand_env_vars(const char *input, t_env *env)
 		return (NULL);
 	return (process_input(input, env));
 }
-
-/* char	*expand_env_vars(const char *input, t_env *env)
-{
-	char		*result;
-	char		*res_ptr;
-	//const char	*ptr;
-	int			i;
-	int			j;
-	char		*value;
-	char 		*var_name;
-
-	result = malloc(sizeof(char) * (ft_strlen(input) + 1));
-	res_ptr = result;
-	//ptr = input;
-	var_name = ft_calloc(sizeof(char), ft_strlen(input) + 1);
-	i = -1;
-	while (input[i])
-	{
-		if (input[i] == '$' && (ft_isalpha(input[i + 1]) || input[i + 1] == '_'))
-		{
-			j = 0;
-			while (ft_isalnum(input[j]) || input[j] == '_')
-			{
-				var_name[j] = input[i];
-				++j;
-				++i;
-			}
-			var_name[j] = '\0';
-			value = get_env_var_value(var_name, env);
-			printf("var_name = %s & value = %s\n", var_name, value);
-			if (value)
-			{
-				ft_strcpy(res_ptr, value);
-				res_ptr += strlen(value);
-			}
-			++i;
-		}
-		else
-		{
-			*res_ptr = input[i];
-			++res_ptr;
-			++i;
-		}
-	}
-	*res_ptr = '\0';
-	free(var_name);
-	return (result);
-} */
 
 void	ft_command(char *line, t_env *env)
 {

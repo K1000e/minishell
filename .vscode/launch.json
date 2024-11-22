@@ -5,8 +5,11 @@
       "name": "Déboguer mon programme",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/minishell",
-      "args": [],
+      "program": "/usr/bin/env",
+      "args": [
+        "-i",
+        "${workspaceFolder}/minishell"
+      ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
@@ -28,8 +31,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/theo/Documents/cursus/Minishell",
-      "program": "/home/theo/Documents/cursus/Minishell/build/Debug/outDebug",
+      "cwd": "/workspaces/minishell/srcs",
+      "program": "/workspaces/minishell/srcs/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
