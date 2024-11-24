@@ -85,7 +85,7 @@ char	*get_env_var_value(const char *var_name, t_env *env)
 	while (current)
 	{
 		if (ft_strcmp(current->key, var_name) == 0)
-			return (current->value +1);
+			return (current->value);
 		current = current->next;
 	}
 	return (NULL);
@@ -202,7 +202,7 @@ void	ft_command(char *line, t_env *env)
 	if (commands->cmd[0] == '\0')
 		return;
 	is_pipe(commands);
-	print_cmd_list(commands);
+	//print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
 	free_cmd_list(commands);

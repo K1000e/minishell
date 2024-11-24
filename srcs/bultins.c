@@ -34,7 +34,7 @@ void	ft_exit(t_cmd *cmd)
 	{
 		if (!ft_isdigit(cmd->args[1][i]))
 		{
-			printf("exit: %s: numeric argument required\n", cmd->args[1]);
+			ft_fprintf(2, "exit: %s: numeric argument required\n", cmd->args[1]);
 			exit(2);
 		}
 	}
@@ -99,7 +99,7 @@ void	ft_pwd(t_env *env)
 	char	*path;
 
 	current = ft_find_key(env, "PWD");
-	path = current->value + 1;
+	path = current->value;
 	if (!path)
 	{
 		perror("getenv");
@@ -117,7 +117,7 @@ void ft_cd(t_cmd *cmd, t_env *env)
 
 	if (cmd->args[1] == NULL)
 	{
-		printf("got to home \n");
+		ft_fprintf(2, "got to home \n");
 		current = ft_find_key(env, "HOME");
 		if (current && current->value)
 		{
@@ -127,14 +127,14 @@ void ft_cd(t_cmd *cmd, t_env *env)
 		else
 		{
 			g_exit_code = 1;
-			printf("cd: HOME not set\n");
+			ft_fprintf(2, "cd: HOME not set\n");
 			return ;
 		}
 	}
 	else if (cmd->args[1] && cmd->args[2] != NULL)
 	{
 		g_exit_code = 1;
-		printf("cd: too many arguments\n");
+		ft_fprintf(2, "cd: too many arguments\n");
 		return ;
 	}
 	else 

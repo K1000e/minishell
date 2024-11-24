@@ -28,7 +28,7 @@ void	ft_exit(t_cmd *cmd)
 		{
 			if (!ft_isalnum(cmd->args[1][i]))
 			{
-				printf("exit: %s: numeric argument required\n", cmd->args[1]);
+				ft_fprintf(2, "exit: %s: numeric argument required\n", cmd->args[1]);
 				exit(2);
 			}
 		}
@@ -38,5 +38,5 @@ void	ft_exit(t_cmd *cmd)
 		printf("exit\n");
 		exit(exit_code);
 	}
-	printf("exit: too many arguments\n");
+	ft_fprintf(2, "exit: too many arguments\n");
 }
