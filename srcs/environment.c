@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   environment.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/25 14:35:42 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/25 19:37:20 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,8 @@ char **base_env(t_env *env) //printenv
 	i = 0;
 	while (current)
 	{
-		environment[i] = ft_strjoin(env->key, "=");
-		environment[i] = ft_strjoin(environment[i], env->value);
+		environment[i] = ft_strjoin(current->key, "=");
+		environment[i] = ft_strjoin(environment[i], current->value);
 		i++;
 		current = current->next;
 	}

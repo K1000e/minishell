@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/15 18:08:05 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/25 19:27:02 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct s_cmd
 	t_bool			is_pipe;
 	t_bool			is_bultins;
 	t_bool			path;
+	int				pid;
 }	t_cmd;
 
 typedef struct s_env

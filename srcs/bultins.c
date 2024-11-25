@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bultins.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/25 09:58:13 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/25 16:00:06 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ void	ft_exit(t_cmd *cmd)
 	while (cmd->args[nb_args] != NULL)
 		nb_args++;
 	i = -1;
+	if (cmd->args[1][0] == '-' || cmd->args[1][0] == '+')
+		i++;
 	while (cmd->args[1] != NULL && cmd->args[1][++i])
 	{
 		if (!ft_isdigit(cmd->args[1][i]))
@@ -46,7 +48,7 @@ void	ft_exit(t_cmd *cmd)
 		printf("exit\n");
 		exit(exit_code);
 	}
-	printf("exit: too many arguments\n");
+	ft_fprintf(2, "exit: too many arguments\n");
 	g_exit_code = 1;
 }
 
@@ -102,7 +104,7 @@ void	ft_pwd(t_env *env)
 	path = current->value;
 	if (!path)
 	{
-		perror("getenv");
+		//perror("getenv");
 		return ;
 	}
 	printf("%s\n", path);
@@ -158,7 +160,7 @@ void ft_cd(t_cmd *cmd, t_env *env)
 		}
 		else
 		{
-			g_exit_code = 1;
+			g_exit_code = 1; 
 			perror("getcwd");
 			return ;
 		}

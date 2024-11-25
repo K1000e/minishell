@@ -206,6 +206,7 @@ void	ft_command(char *line, t_env *env)
 	//print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
+	//printf("exit code : %d\n", g_exit_code);
 	free_cmd_list(commands);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/25 09:57:24 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/25 19:36:07 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,8 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 		fake_error(pipex, error, 127);
 		//fake_error(pipex, "command not found", 127);
 	}
+	exit(1);
+	//g_exit_code = 1;
 }
 
 void	exec_non_builtins(t_cmd *cmd, t_env *env)
@@ -253,6 +255,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	fake_free_all(&pipex);
 	waitpid(pid, &g_exit_code, 0);
 	g_exit_code = WEXITSTATUS(g_exit_code);
+	//printf("%s : in exec exit code : %d\n",cmd->cmd, g_exit_code);
 }
 
 t_bool is_builtin(char *cmd)
@@ -292,11 +295,12 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 	pid_t child2;
 	int pipefd[2];
 
+	//printf("cmd = %s\n", cmd->cmd);
 	if (!cmd->is_pipe)
 	{
 		if (is_builtin(cmd->args[0]))
 			execute_builtin(cmd, env);
-		else 
+		else
 			exec_non_builtins(cmd, env);
 	}
 	else
@@ -310,7 +314,7 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 			close(pipefd[1]);
 			cmd->is_pipe = FALSE;
 			execute_command(cmd, env);
-			exit(0);
+			exit(g_exit_code);
 		}
 		child2 = fork();
 		if (child2 == 0)
@@ -320,12 +324,14 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 			close(pipefd[1]);
 			cmd = cmd->next;
 			execute_command(cmd, env);
-			exit(0);
+			exit(g_exit_code);
 		}
 		close(pipefd[0]);
 		close(pipefd[1]);
 		waitpid(child1, &g_exit_code, 0);
+		//g_exit_code = WEXITSTATUS(g_exit_code);
 		waitpid(child2, &g_exit_code, 0);
 		g_exit_code = WEXITSTATUS(g_exit_code);
+		//printf("%s : end exit code : %d\n",cmd->cmd, g_exit_code);
 	}
 }
