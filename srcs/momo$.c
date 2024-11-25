@@ -6,7 +6,7 @@
 /*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 21:19:03 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/20 21:11:20 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/25 09:55:24 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 // it replaces it with the variable's value from the environment or leaves it blank
 // if the variable isn't defined.
 
-#include "minihell.h"
+#include "../include/minihell.h"
 
 t_env	*ft_find_key(t_env *env, char *key)
 {

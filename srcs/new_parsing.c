@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   new_parsing.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/15 18:00:33 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/25 09:47:26 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minihell.h"
+#include "../include/minihell.h"
 
 t_cmd *parse_command(char *line)
 {

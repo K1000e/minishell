@@ -1,4 +1,4 @@
-#include "minihell.h"
+#include "../include/minihell.h"
 
 /* 
 ** Fonction : get_current_path

@@ -1,4 +1,4 @@
-#include "minihell.h"
+#include "../include/minihell.h"
 
 char	*ft_strndup(char *str, size_t len)
 {

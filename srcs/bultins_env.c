@@ -1,4 +1,4 @@
-#include "minihell.h"
+#include "../include/minihell.h"
 
 t_env *ft_find_key(t_env *env, char *key)
 {

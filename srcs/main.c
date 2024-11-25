@@ -1,4 +1,4 @@
-#include "minihell.h"
+#include "../include/minihell.h"
 
 t_bool is_valid_command_format(const char *cmd)
 {
@@ -194,6 +194,7 @@ void	ft_command(char *line, t_env *env)
 	t_cmd	*commands;
 	t_cmd	*tmp;
 
+	commands = NULL;
 	expanded_line = expand_env_vars(line, env);
 	if (expanded_line != NULL)
 		commands = parse_command(expanded_line);
