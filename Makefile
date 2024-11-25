@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
+#    By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/11/15 14:44:36 by cgorin           ###   ########.fr        #
+#    Updated: 2024/11/25 14:51:14 by mabdessm         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -133,5 +133,5 @@ hell:
 	@echo "    | __ || _| | |__ | |__ \__ \ | __ || _| | |__ | |__ "
 	@echo "    |_||_||___||____||____||___/ |_||_||___||____||____|$(END)"
 
-.PHONY:	all clean fclean re
+.PHONY:	all clean fclean re hell
 .SILENT: 

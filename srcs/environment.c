@@ -6,7 +6,7 @@
 /*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/25 09:57:12 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/25 14:35:42 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,18 +65,37 @@ int	ft_envsize(t_env *lst)
 	return (i);
 }
 
-char **base_env(t_env *env)
+// char **base_env(t_env *env) //printenv
+// {
+// 	t_env *current;
+// 	char **environment;
+// 	int i;
+
+// 	current = env;
+// 	environment = ft_calloc(ft_envsize(env) + 1, sizeof(char *));
+// 	i = 0;
+// 	while (current)
+// 	{
+// 		environment[i++] = ft_strjoin(env->key, env->value);
+// 		current = current->next;
+// 	}
+// 	return (environment);
+// }
+
+char **base_env(t_env *env) //printenv
 {
 	t_env *current;
 	char **environment;
 	int i;
 
-	current = env;
+	current = env->next;
 	environment = ft_calloc(ft_envsize(env) + 1, sizeof(char *));
 	i = 0;
 	while (current)
 	{
-		environment[i++] = ft_strjoin(env->key, env->value);
+		environment[i] = ft_strjoin(env->key, "=");
+		environment[i] = ft_strjoin(environment[i], env->value);
+		i++;
 		current = current->next;
 	}
 	return (environment);
