@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/25 19:37:20 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/27 15:52:53 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ t_env	*get_env(char **env, t_env *new_env, char *executable)
 	t_env	*env_node;
 	char	*value;
 	char	*key;
+	char	*exe;
 
 	i = -1;
 	new_env = malloc(sizeof(t_env));
@@ -116,7 +117,11 @@ t_env	*get_env(char **env, t_env *new_env, char *executable)
 	new_env->key = NULL;
 	new_env->value = NULL;
 	new_env->next = NULL;
-	new_env->executable = executable;
+	exe = ft_strrchr(executable, '/') + 1;
+	if (exe)
+		new_env->executable = ft_strdup(exe);
+	else
+		new_env->executable = ft_strdup(executable + 1);
 	while (env[++i])
 	{
 		j = -1;

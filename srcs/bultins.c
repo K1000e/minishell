@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/25 16:00:06 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/27 15:35:23 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	ft_exit(t_cmd *cmd)
 	while (cmd->args[nb_args] != NULL)
 		nb_args++;
 	i = -1;
-	if (cmd->args[1][0] == '-' || cmd->args[1][0] == '+')
+	if (cmd->args[1] && (cmd->args[1][0] == '-' || cmd->args[1][0] == '+'))
 		i++;
 	while (cmd->args[1] != NULL && cmd->args[1][++i])
 	{

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/25 19:36:07 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/27 15:51:17 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void find_executable(t_cmd *command, t_env *env)
 			start = i + 1;
 		}
 	}
-	if (command->args[0][0] == '/')
+	//if (command->args[0][0] == '/')
 		command->path = FALSE;
 }
 
@@ -203,9 +203,14 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 	//int i;
 	char *error;
 
+	cmd->path = TRUE;
+	printf("?\n");	
 	if (access(cmd->args[0], X_OK) != 0)
-		/* cmd->args[0] =  */find_executable(cmd/* ->args[0] */, env);
-	if (!cmd->path/* args[0] */)
+	{
+		printf("no\n");	
+		find_executable(cmd, env);
+	}
+	if (!cmd->path)
 	{
 		error = ft_strjoin("bash: ", cmd->args[0]);
 		error = ft_join(error, ": No such file or directory");
@@ -218,6 +223,7 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 		fake_error(pipex, error, 127);
 		//fake_error(pipex, "command not found", 127);
 	}
+	printf("??????????\n");
 	exit(1);
 	//g_exit_code = 1;
 }
@@ -285,7 +291,7 @@ void	parse_exec(t_cmd *cmd, t_env *env)
 		redirection_exec(cmd);
 	if (cmd->args[0] && is_builtin(cmd->args[0]))
 		execute_builtin(cmd, env);
-	else
+	else 
 		exec_non_builtins(cmd, env);
 }
 

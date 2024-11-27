@@ -4,7 +4,6 @@ t_bool is_valid_command_format(const char *cmd)
 {
 	int i = 0;
 
-	// Skip the first word (the command name)
 	while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\'' &&
 		   cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
 		i++;
@@ -96,8 +95,10 @@ char	*ft_strjoin_free(char *s1, char *s2)
 	char	*result;
 
 	result = ft_strjoin(s1, s2);
-	free(s1);
-	free(s2);
+	if (s1)
+		free(s1);
+	if (s2) 
+		free(s2);
 	return (result);
 }
 
@@ -134,7 +135,7 @@ static char	*handle_special_cases(const char *input, int *i, t_env *env)
 		(*i)++;
 		return (ft_strdup(env->executable));
 	}
-	else
+	else if (ft_isdigit(input[*i]))
 	{
 		(*i)++;
 		return (NULL);
@@ -166,13 +167,18 @@ static char	*process_input(const char *input, t_env *env)
 	{
 		if (input[i] == '$' && input[i + 1])
 		{
+			if (i > 0 && (input[i - 1] == '\''))
+			{
+				result = append_char(result, input[i++]);
+				continue;
+			}
 			i++;
 			if (ft_isalpha(input[i]) || input[i] == '_')
 				to_append = handle_env_variable(input, &i, env);
 			else
 				to_append = handle_special_cases(input, &i, env);
-			if (!to_append)
-				to_append = append_char(ft_strdup(""), '$');
+			/* if (!to_append)
+				to_append = append_char(ft_strdup(""), '$'); */
 		}
 		else
 			to_append = append_char(ft_strdup(""), input[i++]);
@@ -181,11 +187,14 @@ static char	*process_input(const char *input, t_env *env)
 	return (result);
 }
 
-char	*expand_env_vars(const char *input, t_env *env)
+char	*expand_env_vars(char *input, t_env *env)
 {
+	//char *res;
 	if (!input)
 		return (NULL);
-	return (process_input(input, env));
+	input = process_input(input, env);
+	//free(input);
+	return (input);
 }
 
 void	ft_command(char *line, t_env *env)
@@ -196,7 +205,7 @@ void	ft_command(char *line, t_env *env)
 
 	commands = NULL;
 	expanded_line = expand_env_vars(line, env);
-	if (expanded_line != NULL)
+	if (expanded_line != NULL /* && expanded_line[0] */)
 		commands = parse_command(expanded_line);
 	(void) env;
 	free(expanded_line);
@@ -206,7 +215,6 @@ void	ft_command(char *line, t_env *env)
 	//print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
-	//printf("exit code : %d\n", g_exit_code);
 	free_cmd_list(commands);
 }
 
@@ -313,6 +321,11 @@ int	main(int argc, char **argv, char **environment)
 		save_stdin = dup(STDIN_FILENO);
 		save_stdout = dup(STDOUT_FILENO);
 		env = get_env(environment, env, argv[0]);
+		//env->executable = ft_strdup(executable);
+		//exe = ft_strrchr(executable, '/') + 1;
+	//if (exe)
+	//	new_env->executable = ft_strdup(exe);
+	//else
 		set_signal_action(sigint_handler);
 		minihell(env, save_stdin, save_stdout);
 	}
