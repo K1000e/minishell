@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/25 19:27:02 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/27 16:57:32 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,5 +164,7 @@ int	handle_output_redirection(t_cmd *cmd, char **args, int i, int *out);
 int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in);
 void	single_command(t_cmd *cmd ,t_env *env);
 char	**base_env(t_env *env);
+
+char	*ft_strjoin_free(char *s1, char *s2, int is_free);
 
 #endif

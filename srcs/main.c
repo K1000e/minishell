@@ -90,14 +90,14 @@ char	*get_env_var_value(const char *var_name, t_env *env)
 	return (NULL);
 }
 
-char	*ft_strjoin_free(char *s1, char *s2)
+char	*ft_strjoin_free(char *s1, char *s2, int is_free)
 {
 	char	*result;
 
 	result = ft_strjoin(s1, s2);
-	if (s1)
+	if (s1 && (is_free == 1 || is_free == 3))
 		free(s1);
-	if (s2) 
+	if (s2 && (is_free >= 2))
 		free(s2);
 	return (result);
 }
@@ -155,6 +155,23 @@ static char	*append_char(char *result, char c)
 	return (new_result);
 }
 
+t_bool is_within_single_quotes(const char *input, int index)
+{
+    int i = 0;
+    t_bool single_quote = FALSE;
+
+    while (i < index)
+    {
+        if (input[i] == '\'' && !single_quote)
+            single_quote = TRUE;
+        else if (input[i] == '\'' && single_quote)
+            single_quote = FALSE;
+        i++;
+    }
+    return single_quote;
+}
+
+
 static char	*process_input(const char *input, t_env *env)
 {
 	char	*result;
@@ -167,7 +184,7 @@ static char	*process_input(const char *input, t_env *env)
 	{
 		if (input[i] == '$' && input[i + 1])
 		{
-			if (i > 0 && (input[i - 1] == '\''))
+			if (is_within_single_quotes(input, i) || input[i + 1] == '"')
 			{
 				result = append_char(result, input[i++]);
 				continue;
@@ -182,7 +199,7 @@ static char	*process_input(const char *input, t_env *env)
 		}
 		else
 			to_append = append_char(ft_strdup(""), input[i++]);
-		result = ft_strjoin_free(result, to_append);
+		result = ft_strjoin_free(result, to_append, 3);
 	}
 	return (result);
 }

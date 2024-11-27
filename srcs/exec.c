@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/27 15:51:17 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/27 17:28:59 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void find_executable(t_cmd *command, t_env *env)
 	path = get_path_variable(env);
 	if (!path)
 	{
+		//if ()
 		command->path = FALSE;
 		return ;
 	}
@@ -81,7 +82,7 @@ void	fake_error(t_pipex *pipex, char *message, int error_code)
 void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 {
 	int i;
-	char	*error;
+	//char	*error;
 
 	i = -1;
 	while (cmd->in_file && cmd->in_file[++i])
@@ -111,9 +112,10 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 	if (pipex->file_i < 0)
 	{
 		//error = ft_strdup("bash: ");
-		error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]);
-		fake_error(pipex, error, 1);
-		free(error);
+		/* error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]); */
+		perror(cmd->in_file[cmd->nb_infile - 1]);
+		fake_error(pipex, "", 1);
+		//free(error);
 	}
 }
 
@@ -134,7 +136,11 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 			close(pipex->file_o);
 	}
 	if (pipex->file_o < 0)
-		fake_error(pipex, "Couldn't open output file", 1);
+	{
+		perror(cmd->out_file[cmd->nb_outfile - 1]); // Use perror for matching error
+		fake_error(pipex, "", 1);
+	}
+		//fake_error(pipex, "Couldn't open output file", 1);
 }
 
 void	redirection_exec(t_cmd *cmd)
@@ -198,24 +204,27 @@ char	*ft_join(char *buffer, char *buf)
 	return (tmp);
 }
 
+t_bool is_directory(const char *path)
+{
+    struct stat statbuf;
+    if (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode))
+        return TRUE;
+    return FALSE;
+}
+
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 {
 	//int i;
 	char *error;
 
 	cmd->path = TRUE;
-	printf("?\n");	
+	if (access(cmd->args[0], F_OK) == 0 && is_directory(cmd->args[0]))
+	{
+		ft_fprintf(2, "%s: Is a directory\n", cmd->args[0]);
+		fake_error(pipex, "", 126);
+	}
 	if (access(cmd->args[0], X_OK) != 0)
-	{
-		printf("no\n");	
 		find_executable(cmd, env);
-	}
-	if (!cmd->path)
-	{
-		error = ft_strjoin("bash: ", cmd->args[0]);
-		error = ft_join(error, ": No such file or directory");
-		fake_error(pipex, error, 127);
-	}
 	if (execve(cmd->args[0] , cmd->args, env_) == -1)
 	{
 		error = ft_strjoin("bash: ", cmd->args[0]);
@@ -223,7 +232,12 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 		fake_error(pipex, error, 127);
 		//fake_error(pipex, "command not found", 127);
 	}
-	printf("??????????\n");
+	if (!cmd->path)
+	{
+		error = ft_strjoin("bash: ", cmd->args[0]);
+		error = ft_join(error, ": No such file or directory");
+		fake_error(pipex, error, 127);
+	}
 	exit(1);
 	//g_exit_code = 1;
 }

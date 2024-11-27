@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/27 15:52:53 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/27 16:57:38 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ char **base_env(t_env *env) //printenv
 	while (current)
 	{
 		environment[i] = ft_strjoin(current->key, "=");
-		environment[i] = ft_strjoin(environment[i], current->value);
+		environment[i] = ft_strjoin_free(environment[i], current->value, 1);
 		i++;
 		current = current->next;
 	}

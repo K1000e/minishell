@@ -52,15 +52,16 @@ void ft_print_declare_env(t_env *env)
 
 t_bool check_validity_export(char *key)
 {
-	int i;
+    int i = 0;
 
-	i = -1;
-	while (key[++i])
-	{
-		if (!ft_isalpha(key[i]))
-			return FALSE;
-	}
-	return TRUE;
+    if (!ft_isalpha(key[i]) && key[i] != '_') // Must start with a letter or _
+        return FALSE;
+    while (key[++i])
+    {
+        if (!ft_isalnum(key[i]) && key[i] != '_') // Allow only alphanumerics or _
+            return FALSE;
+    }
+    return TRUE;
 }
 
 void	ft_export(t_cmd *cmd, t_env *env)
@@ -108,6 +109,7 @@ void	ft_export(t_cmd *cmd, t_env *env)
 		{
 			g_exit_code = 1;
 			ft_fprintf(2, "3bash: %s: %s: not a valid identifier\n", cmd->args[0], cmd->args[1]);
+			return ;
 		}
 		g_exit_code = 0;
 	}
