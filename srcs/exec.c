@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/27 17:28:59 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 00:37:26 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,22 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 	while (cmd->in_file && cmd->in_file[++i])
 	{
 		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
+		if (pipex->file_i < 0)
+		{
+			perror(cmd->in_file[cmd->nb_infile - 1]); // Use perror for matching error
+			fake_error(pipex, "", 1);
+		}
 		if (i < cmd->nb_infile - 1)
 			close(pipex->file_i);
 	}
+	// if (pipex->file_i < 0)
+	// {
+	// 	//error = ft_strdup("bash: ");
+	// 	/* error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]); */
+	// 	perror(cmd->in_file[cmd->nb_infile - 1]);
+	// 	fake_error(pipex, "", 1);
+	// 	//free(error);
+	// }
 	/* else
 	{
 		pipex->file_i = open("here_doc", O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -109,14 +122,14 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 		close(pipex->file_i);
 		pipex->file_i = open("here_doc", O_RDONLY);
 	} */
-	if (pipex->file_i < 0)
-	{
-		//error = ft_strdup("bash: ");
-		/* error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]); */
-		perror(cmd->in_file[cmd->nb_infile - 1]);
-		fake_error(pipex, "", 1);
-		//free(error);
-	}
+	// if (pipex->file_i < 0)
+	// {
+	// 	//error = ft_strdup("bash: ");
+	// 	/* error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]); */
+	// 	perror(cmd->in_file[cmd->nb_infile - 1]);
+	// 	fake_error(pipex, "", 1);
+	// 	//free(error);
+	// }
 }
 
 void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
@@ -175,10 +188,21 @@ void	redirection_exec(t_cmd *cmd)
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
+	pid_t pid;
 
 	current = env;
 	if (cmd->redirection)
-		redirection_exec(cmd);
+	{
+		pid = fork();
+		if (pid == 0)
+		{
+			redirection_exec(cmd);
+			exit(0);
+		}
+		else
+			waitpid(pid, &g_exit_code, 0);
+		g_exit_code = WEXITSTATUS(g_exit_code);
+	}
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
 	else if (ft_strcmp(cmd->args[0], "echo") == 0)
@@ -261,6 +285,8 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 		if (cmd->redirection)
 			redirection_exec(cmd);
 		execute_non_builtins(&pipex, cmd, env, b_env);
+		waitpid(pid, &g_exit_code, 0);
+		g_exit_code = WEXITSTATUS(g_exit_code);
 	}
 	else if (pid == -1)
 	{

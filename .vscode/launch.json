@@ -5,10 +5,10 @@
       "name": "Déboguer mon programme",
       "type": "cppdbg",
       "request": "launch",
-      "program": "/usr/bin/env",
+      "program": "${workspaceFolder}/minishell",
       "args": [
-        "-i",
-        "${workspaceFolder}/minishell"
+        // "-i",
+        // "${workspaceFolder}/minishell"
       ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

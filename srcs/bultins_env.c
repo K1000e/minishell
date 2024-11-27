@@ -22,7 +22,6 @@ void ft_update_key(t_env *env, char *key, char *value)
 	current = ft_find_key(env, key);
 	if (current->key != NULL)
 	{
-		printf("%s\n", current->key);
 		free(current->value);
 		current->value = ft_strdup(value);
 	}

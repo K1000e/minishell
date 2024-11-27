@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/27 15:35:23 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 00:35:07 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ void ft_cd(t_cmd *cmd, t_env *env)
 
 	if (cmd->args[1] == NULL)
 	{
-		ft_fprintf(2, "got to home \n");
+		//ft_fprintf(2, "got to home \n");
 		current = ft_find_key(env, "HOME");
 		if (current && current->value)
 		{

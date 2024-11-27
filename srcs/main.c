@@ -182,7 +182,7 @@ static char	*process_input(const char *input, t_env *env)
 	result = ft_strdup("");
 	while (input[i])
 	{
-		if (input[i] == '$' && input[i + 1])
+		if (input[i] == '$' && input[i + 1] && (input[i + 1] == '?' || ft_isalpha(input[i + 1]) || input[i + 1] == '_'))
 		{
 			if (is_within_single_quotes(input, i) || input[i + 1] == '"')
 			{
