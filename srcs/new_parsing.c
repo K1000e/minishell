@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   new_parsing.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/25 09:47:26 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/11/28 04:00:31 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,12 +276,13 @@ void check_char(t_parse *parse)
 	clear_quotes(parse);
 }
 
-int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)
+int	handle_input_redirection(t_cmd *cmd/* , char **args */, int i, int *in)
 {
-	if (args[i + 1])
+	if (cmd->args[i + 1])
 	{
 		cmd->redirection = TRUE;
-		cmd->in_file[*in] = ft_strdup(args[i + 1]);
+		cmd->order_file = ft_join(cmd->order_file, "i");
+		cmd->in_file[*in] = ft_strdup(cmd->args[i + 1]);
 		return (i);
 	}
 	else
@@ -291,13 +292,14 @@ int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in)
 	}
 }
 
-int	handle_output_redirection_(t_cmd *cmd, char **args, int i, int *out)
+int	handle_output_redirection_(t_cmd *cmd, /* char **args, */ int i, int *out/* , int *order */)
 {
-	if (args[i + 1])
+	if (cmd->args[i + 1])
 	{
 		cmd->redirection = TRUE;
-		cmd->out_file[*out] = ft_strdup(args[i + 1]);
-		cmd->append[*out] = (ft_strcmp(args[i], ">>") == 0);
+		cmd->order_file = ft_join(cmd->order_file, "o");
+		cmd->out_file[*out] = ft_strdup(cmd->args[i + 1]);
+		cmd->append[*out] = (ft_strcmp(cmd->args[i], ">>") == 0);
 		return (i);
 	}
 	else
@@ -312,16 +314,19 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	int		i;
 	int		in;
 	int		out;
+	//int		order;
 
 	i = -1;
 	in = 0;
 	out = 0;
+	//order = 0;
+	new_cmd->order_file = ft_strdup("");
 	while (new_cmd->args[++i])
 	{
 		if (ft_strcmp(new_cmd->args[i], ">") == 0
 			|| ft_strcmp(new_cmd->args[i], ">>") == 0)
 		{
-			i = handle_output_redirection_(new_cmd, new_cmd->args, i, &out);
+			i = handle_output_redirection_(new_cmd, i, &out/* , &order */);
 			out++;
 			if (i == -1)
 				return NULL;
@@ -329,7 +334,7 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)
 		{
-			i = handle_input_redirection(new_cmd, new_cmd->args, i, &in);
+			i = handle_input_redirection(new_cmd, i, &in/* , &order */);
 			in++;
 			if (i == -1)
 				return NULL;

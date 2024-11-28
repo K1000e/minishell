@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/28 02:00:13 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 03:58:52 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_cmd
 	int				nb_token;
 	int				nb_outfile;		// Nombre de redirection out
 	int				nb_infile;		// Nombre de redirection in
+	char			*order_file;
 	char			**out_file;		// Fichier pour la sortie redirigée
 	char			**in_file;		// Fichier pour l'entrée redirigée
 	struct s_cmd	*next;			// Pointeur vers la commande suivante
@@ -158,8 +159,8 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args);
 void check_char(t_parse *cmd);
 t_cmd *	handle_redirection_(t_cmd *new_cmd);
 void	ft_cmd_add_back(t_cmd **lst, t_cmd *new);
-int	handle_output_redirection(t_cmd *cmd, char **args, int i, int *out);
-int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in);
+//int	handle_output_redirection(t_cmd *cmd, char **args, int i, int *out);
+//int	handle_input_redirection(t_cmd *cmd, char **args, int i, int *in);
 void	single_command(t_cmd *cmd ,t_env *env);
 char	**base_env(t_env *env);
 
