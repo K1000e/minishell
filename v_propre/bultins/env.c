@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/27 15:45:52 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 01:01:01 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	ft_env(t_cmd *cmd, t_env *env)
 
 	if (cmd->args[1] != NULL)
 	{
-		printf("env: ‘%s’: No such file or directory\n", cmd->args[1]);
+		printf("env: ‘%s’: No such file or directory 3\n", cmd->args[1]);
 		return ;
 	}
 	current = env;

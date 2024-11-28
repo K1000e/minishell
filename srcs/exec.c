@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/28 00:37:26 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 01:16:50 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	fake_error(t_pipex *pipex, char *message, int error_code)
 {
 	fake_free_all(pipex);
 	ft_fprintf(2, "%s\n", message);
-	//g_exit_code = error_code;
+	g_exit_code = error_code;
 	exit(error_code);
 }
 
@@ -189,8 +189,10 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
 	pid_t pid;
+	int exit_code;
 
 	current = env;
+	
 	if (cmd->redirection)
 	{
 		pid = fork();
@@ -200,8 +202,8 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 			exit(0);
 		}
 		else
-			waitpid(pid, &g_exit_code, 0);
-		g_exit_code = WEXITSTATUS(g_exit_code);
+			waitpid(pid, &exit_code, 0);
+		exit_code = WEXITSTATUS(exit_code);
 	}
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
@@ -217,6 +219,8 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
+	if (g_exit_code == 0 && exit_code == 1)
+		g_exit_code = exit_code;
 }
 
 char	*ft_join(char *buffer, char *buf)
@@ -259,7 +263,7 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 	if (!cmd->path)
 	{
 		error = ft_strjoin("bash: ", cmd->args[0]);
-		error = ft_join(error, ": No such file or directory");
+		error = ft_join(error, ": No such file or directory 2");
 		fake_error(pipex, error, 127);
 	}
 	exit(1);
@@ -320,7 +324,7 @@ t_bool is_builtin(char *cmd)
 	return (is_builtin);
 }
 
-void	parse_exec(t_cmd *cmd, t_env *env)
+/* void	parse_exec(t_cmd *cmd, t_env *env)
 {
 	if (!is_valid_command_format(cmd->cmd))
 	{
@@ -333,7 +337,7 @@ void	parse_exec(t_cmd *cmd, t_env *env)
 		execute_builtin(cmd, env);
 	else 
 		exec_non_builtins(cmd, env);
-}
+} */
 
 void	execute_command(t_cmd *cmd ,t_env *env)
 {
@@ -378,6 +382,5 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 		//g_exit_code = WEXITSTATUS(g_exit_code);
 		waitpid(child2, &g_exit_code, 0);
 		g_exit_code = WEXITSTATUS(g_exit_code);
-		//printf("%s : end exit code : %d\n",cmd->cmd, g_exit_code);
 	}
 }
