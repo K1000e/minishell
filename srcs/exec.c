@@ -21,6 +21,15 @@ char	*get_path_variable(t_env *env)
 	return(current->value + 1);
 }
 
+
+t_bool is_directory(const char *path)
+{
+    struct stat statbuf;
+    if (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode))
+        return TRUE;
+    return FALSE;
+}
+
 void find_executable(t_cmd *command, t_env *env)
 {
 	size_t	i;
@@ -90,46 +99,13 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
 		if (pipex->file_i < 0)
 		{
-			perror(cmd->in_file[cmd->nb_infile - 1]); // Use perror for matching error
+			//perror(cmd->in_file[i]); // Use perror for matching error
 			fake_error(pipex, "", 1);
 		}
 		if (i < cmd->nb_infile - 1)
 			close(pipex->file_i);
 	}
-	// if (pipex->file_i < 0)
-	// {
-	// 	//error = ft_strdup("bash: ");
-	// 	/* error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]); */
-	// 	perror(cmd->in_file[cmd->nb_infile - 1]);
-	// 	fake_error(pipex, "", 1);
-	// 	//free(error);
-	// }
-	/* else
-	{
-		pipex->file_i = open("here_doc", O_CREAT | O_WRONLY | O_TRUNC, 0644);
-		if (pipex->file_i < 0)
-			error(pipex, "Couldn't open temporary file", 1);
-		ft_printf(">");
-		line = get_next_line(1);
-		while (ft_strcmp(line, pipex->limiter) != 0)
-		{
-			write(pipex->file_i, line, ft_strlen(line));
-			free(line);
-			ft_printf(">");
-			line = get_next_line(1);
-		}
-		free(line);
-		close(pipex->file_i);
-		pipex->file_i = open("here_doc", O_RDONLY);
-	} */
-	// if (pipex->file_i < 0)
-	// {
-	// 	//error = ft_strdup("bash: ");
-	// 	/* error = ft_strjoin("bash: ", cmd->in_file[cmd->nb_infile - 1]); */
-	// 	perror(cmd->in_file[cmd->nb_infile - 1]);
-	// 	fake_error(pipex, "", 1);
-	// 	//free(error);
-	// }
+
 }
 
 void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
@@ -147,20 +123,69 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 					| O_WRONLY, 0644);
 		if (pipex->file_o < 0)
 		{
-			perror(cmd->out_file[cmd->nb_outfile - 1]); // Use perror for matching error
+			if (access(cmd->out_file[i], F_OK) == 0 && is_directory(cmd->out_file[i]))
+			{
+				ft_fprintf(2, "%s: Is a directory\n", cmd->out_file[i]);
+				fake_error(pipex, "", 126);
+			}
+			else if (access(cmd->out_file[i], X_OK) == 0)
+			{
+				ft_fprintf(2, "%s: Permission denied\n", cmd->out_file[i]);
+				fake_error(pipex, "", 126);
+			}
+			//perror(cmd->out_file[i]); // Use perror for matching error
 			fake_error(pipex, "", 1);
 		}
 		if (i < cmd->nb_outfile - 1)
 			close(pipex->file_o);
 	}
-	/* if (pipex->file_o < 0)
-	{
-		perror(cmd->out_file[cmd->nb_outfile - 1]); // Use perror for matching error
-		 fake_error(pipex, "", 1);
-	}*/
-		//fake_error(pipex, "Couldn't open output file", 1);
 }
 
+
+int	open_outfile(t_pipex *pipex, t_cmd *cmd)
+{
+	int i;
+
+	i = -1;
+	while (cmd->out_file && cmd->out_file[++i])
+	{
+		if (cmd->append[i] == 0)
+			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC
+					| O_WRONLY, 0644);
+		else
+			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_APPEND
+					| O_WRONLY, 0644);
+		if (pipex->file_o < 0)
+		{
+			perror(cmd->out_file[i]); // Use perror for matching error
+			return(1);
+		}
+		if (i < cmd->nb_outfile - 1)
+			close(pipex->file_o);
+	}
+	return (0);
+}
+
+int	open_infile(t_pipex *pipex, t_cmd *cmd)
+{
+	int i;
+
+	i = -1;
+	while (cmd->in_file && cmd->in_file[++i])
+	{
+		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
+		if (pipex->file_i < 0)
+		{
+			perror(cmd->in_file[i]); // Use perror for matching error
+			return(1);
+		}
+		if (i < cmd->nb_infile - 1)
+			close(pipex->file_i);
+	}
+	return (0);
+}
+
+/* 
 void	redirection_exec(t_cmd *cmd)
 {
 	t_pipex pipex;
@@ -189,52 +214,7 @@ void	redirection_exec(t_cmd *cmd)
 	if (pipex.pipe_fd[0] != -1)
 		close(pipex.pipe_fd[0]);
 	return ;
-}
-
-
-int	open_outfile(t_pipex *pipex, t_cmd *cmd)
-{
-	int i;
-
-	i = -1;
-	while (cmd->out_file && cmd->out_file[++i])
-	{
-		if (cmd->append[i] == 0)
-			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC
-					| O_WRONLY, 0644);
-		else
-			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_APPEND
-					| O_WRONLY, 0644);
-		if (pipex->file_o < 0)
-		{
-			perror(cmd->out_file[cmd->nb_outfile - 1]); // Use perror for matching error
-			return(1);
-		}
-		if (i < cmd->nb_outfile - 1)
-			close(pipex->file_o);
-	}
-	return (0);
-}
-
-int	open_infile(t_pipex *pipex, t_cmd *cmd)
-{
-	int i;
-
-	i = -1;
-	while (cmd->in_file && cmd->in_file[++i])
-	{
-		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
-		if (pipex->file_i < 0)
-		{
-			perror(cmd->in_file[cmd->nb_infile - 1]); // Use perror for matching error
-			return(1);
-		}
-		if (i < cmd->nb_infile - 1)
-			close(pipex->file_i);
-	}
-	return (0);
-}
-
+} */
 int	redirection_exec_bultins(t_cmd *cmd)
 {
 	t_pipex pipex;
@@ -250,20 +230,21 @@ int	redirection_exec_bultins(t_cmd *cmd)
  		dup2(pipex.pipe_fd[0], STDIN_FILENO);
  	else
 	{
-		exit_code = open_infile(&pipex, cmd);
+		exit_code += open_infile(&pipex, cmd);
 		dup2(pipex.file_i, STDIN_FILENO);
 	}
 	if (cmd->nb_outfile == 0)
 		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
 	else
 	{
-		exit_code = open_outfile(&pipex, cmd);
+		exit_code += open_outfile(&pipex, cmd);
 		dup2(pipex.file_o, STDOUT_FILENO);
 	}
 	if (pipex.pipe_fd[1] != -1)
 		close(pipex.pipe_fd[1]);
 	if (pipex.pipe_fd[0] != -1)
 		close(pipex.pipe_fd[0]);
+	//printf("exit code = %d\n", exit_code);
 	return exit_code;
 }
 
@@ -271,12 +252,16 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
 	//pid_t pid;
-	int exit_code;
 
 	current = env;
-	
+	g_exit_code = 0;
 	if (cmd->redirection)
-		exit_code = redirection_exec_bultins(cmd);
+		g_exit_code = redirection_exec_bultins(cmd);
+	if (g_exit_code >= 1)
+	{
+		g_exit_code = 1;
+		return ;
+	}
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
 	else if (ft_strcmp(cmd->args[0], "echo") == 0)
@@ -291,8 +276,6 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
-	if (g_exit_code == 0 && exit_code == 1)
-		g_exit_code = exit_code;
 }
 
 char	*ft_join(char *buffer, char *buf)
@@ -304,29 +287,21 @@ char	*ft_join(char *buffer, char *buf)
 	return (tmp);
 }
 
-t_bool is_directory(const char *path)
-{
-    struct stat statbuf;
-    if (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode))
-        return TRUE;
-    return FALSE;
-}
-
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 {
 	//int i;
 	char *error;
 
 	cmd->path = TRUE;
-	if (access(cmd->args[0], F_OK) == 0 && is_directory(cmd->args[0]))
-	{
-		ft_fprintf(2, "%s: Is a directory\n", cmd->args[0]);
-		fake_error(pipex, "", 126);
-	}
 	if (access(cmd->args[0], X_OK) != 0)
 		find_executable(cmd, env);
 	if (execve(cmd->args[0] , cmd->args, env_) == -1)
 	{
+		if (access(cmd->args[0], F_OK) == 0 && is_directory(cmd->args[0]))
+		{
+			ft_fprintf(2, "%s: Is a directory\n", cmd->args[0]);
+			fake_error(pipex, "", 126);
+		}
 		error = ft_strjoin("bash: ", cmd->args[0]);
 		error = ft_join(error, ": command not found");
 		fake_error(pipex, error, 127);
@@ -359,7 +334,9 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	if (pid == 0)
 	{
 		if (cmd->redirection)
-			redirection_exec(cmd);
+			g_exit_code = redirection_exec_bultins(cmd);
+		if (g_exit_code >= 1)
+			exit(1);
 		execute_non_builtins(&pipex, cmd, env, b_env);
 		waitpid(pid, &g_exit_code, 0);
 		g_exit_code = WEXITSTATUS(g_exit_code);
