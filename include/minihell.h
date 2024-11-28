@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/27 16:57:32 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 02:00:13 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,8 +135,6 @@ void	init_ft_pipex_start(t_pipex *pipex, t_cmd *cmd);
 void	ft_ft_pipex_start(t_cmd *cmd, t_env *env, t_pipex *pipex);
 void	pipeline(t_cmd *cmd, t_env *env, t_pipex *pipex, int i);
 
-void	open_infile(t_pipex *pipex);
-void	open_outfile(t_pipex *pipex);
 void	free_all(t_pipex *pipex);
 void	error(t_pipex *pipex, char *message, int error_code);
 

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/28 01:16:50 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 02:01:58 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,14 +145,19 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 		else
 			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_APPEND
 					| O_WRONLY, 0644);
+		if (pipex->file_o < 0)
+		{
+			perror(cmd->out_file[cmd->nb_outfile - 1]); // Use perror for matching error
+			fake_error(pipex, "", 1);
+		}
 		if (i < cmd->nb_outfile - 1)
 			close(pipex->file_o);
 	}
-	if (pipex->file_o < 0)
+	/* if (pipex->file_o < 0)
 	{
 		perror(cmd->out_file[cmd->nb_outfile - 1]); // Use perror for matching error
-		fake_error(pipex, "", 1);
-	}
+		 fake_error(pipex, "", 1);
+	}*/
 		//fake_error(pipex, "Couldn't open output file", 1);
 }
 
@@ -162,22 +167,23 @@ void	redirection_exec(t_cmd *cmd)
 
 	pipex.file_i = -1;
 	pipex.file_o = -1;
+
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
-	if (cmd->in_file)
+	if (cmd->nb_infile == 0)
+ 		dup2(pipex.pipe_fd[0], STDIN_FILENO);
+ 	else
 	{
 		fake_open_infile(&pipex, cmd);
 		dup2(pipex.file_i, STDIN_FILENO);
 	}
- 	else 
- 		dup2(pipex.pipe_fd[0], STDIN_FILENO);
-	if (cmd->out_file)
+	if (cmd->nb_outfile == 0)
+		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
+	else
 	{
 		fake_open_outfile(&pipex, cmd);
 		dup2(pipex.file_o, STDOUT_FILENO);
 	}
-	else
-		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
 	if (pipex.pipe_fd[1] != -1)
 		close(pipex.pipe_fd[1]);
 	if (pipex.pipe_fd[0] != -1)
@@ -185,26 +191,92 @@ void	redirection_exec(t_cmd *cmd)
 	return ;
 }
 
+
+int	open_outfile(t_pipex *pipex, t_cmd *cmd)
+{
+	int i;
+
+	i = -1;
+	while (cmd->out_file && cmd->out_file[++i])
+	{
+		if (cmd->append[i] == 0)
+			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC
+					| O_WRONLY, 0644);
+		else
+			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_APPEND
+					| O_WRONLY, 0644);
+		if (pipex->file_o < 0)
+		{
+			perror(cmd->out_file[cmd->nb_outfile - 1]); // Use perror for matching error
+			return(1);
+		}
+		if (i < cmd->nb_outfile - 1)
+			close(pipex->file_o);
+	}
+	return (0);
+}
+
+int	open_infile(t_pipex *pipex, t_cmd *cmd)
+{
+	int i;
+
+	i = -1;
+	while (cmd->in_file && cmd->in_file[++i])
+	{
+		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
+		if (pipex->file_i < 0)
+		{
+			perror(cmd->in_file[cmd->nb_infile - 1]); // Use perror for matching error
+			return(1);
+		}
+		if (i < cmd->nb_infile - 1)
+			close(pipex->file_i);
+	}
+	return (0);
+}
+
+int	redirection_exec_bultins(t_cmd *cmd)
+{
+	t_pipex pipex;
+	int exit_code;
+
+	pipex.file_i = -1;
+	pipex.file_o = -1;
+	
+	exit_code = 0;
+	if (!cmd || !cmd->cmd)
+		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
+	if (cmd->nb_infile == 0)
+ 		dup2(pipex.pipe_fd[0], STDIN_FILENO);
+ 	else
+	{
+		exit_code = open_infile(&pipex, cmd);
+		dup2(pipex.file_i, STDIN_FILENO);
+	}
+	if (cmd->nb_outfile == 0)
+		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
+	else
+	{
+		exit_code = open_outfile(&pipex, cmd);
+		dup2(pipex.file_o, STDOUT_FILENO);
+	}
+	if (pipex.pipe_fd[1] != -1)
+		close(pipex.pipe_fd[1]);
+	if (pipex.pipe_fd[0] != -1)
+		close(pipex.pipe_fd[0]);
+	return exit_code;
+}
+
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
-	pid_t pid;
+	//pid_t pid;
 	int exit_code;
 
 	current = env;
 	
 	if (cmd->redirection)
-	{
-		pid = fork();
-		if (pid == 0)
-		{
-			redirection_exec(cmd);
-			exit(0);
-		}
-		else
-			waitpid(pid, &exit_code, 0);
-		exit_code = WEXITSTATUS(exit_code);
-	}
+		exit_code = redirection_exec_bultins(cmd);
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
 	else if (ft_strcmp(cmd->args[0], "echo") == 0)
