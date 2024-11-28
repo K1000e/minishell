@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/28 02:01:58 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 04:41:42 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,8 +141,107 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 	}
 }
 
+int	open_outfile(t_pipex *pipex, t_cmd *cmd, int i)
+{
+	if (cmd->append[i] == 0)
+		pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC
+				| O_WRONLY, 0644);
+	else
+		pipex->file_o = open(cmd->out_file[i], O_CREAT | O_APPEND
+				| O_WRONLY, 0644);
+	if (pipex->file_o < 0)
+	{
+		perror(cmd->out_file[i]); // Use perror for matching error
+		return(1);
+	}
+	if (i < cmd->nb_outfile - 1)
+		close(pipex->file_o);
+	i++;
+	return (0);
+}
 
-int	open_outfile(t_pipex *pipex, t_cmd *cmd)
+int	open_infile(t_pipex *pipex, t_cmd *cmd, int i)
+{
+	pipex->file_i = open(cmd->in_file[i], O_RDONLY);
+	if (pipex->file_i < 0)
+	{
+		perror(cmd->in_file[i]); // Use perror for matching error
+		return(1);
+	}
+	if (i < cmd->nb_infile - 1)
+		close(pipex->file_i);
+	i++;
+	return (0);
+}
+
+int	redirection_exec_bultins(t_cmd *cmd)
+{
+	t_pipex pipex;
+	int exit_code;
+	int i;
+	int x;
+	int y;
+
+	pipex.file_i = -1;
+	pipex.file_o = -1;
+	
+	exit_code = 0;
+	if (!cmd || !cmd->cmd)
+		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
+	i = -1;
+	x = 0;
+	y = 0;
+	while (cmd->order_file[++i])
+	{
+		if (cmd->order_file[i] == 'i')
+		{
+			exit_code = open_infile(&pipex, cmd, x);
+			x++;
+		}
+		else if (cmd->order_file[i] == 'o')
+		{
+			exit_code = open_outfile(&pipex, cmd, y);
+			y++;
+		}
+		if (exit_code)
+			return exit_code;
+	}
+	if (cmd->nb_infile == 0) {
+		if (pipex.pipe_fd[0] != -1) {
+			dup2(pipex.pipe_fd[0], STDIN_FILENO);
+		} else {
+			fake_error(&pipex, "Invalid pipe input file descriptor", 1);
+		}
+	} else {
+		if (pipex.file_i != -1) {
+			dup2(pipex.file_i, STDIN_FILENO);
+		} else {
+			fake_error(&pipex, "Invalid input file descriptor", 1);
+		}
+	}
+
+	if (cmd->nb_outfile == 0) {
+		if (pipex.pipe_fd[1] != -1) {
+			dup2(pipex.pipe_fd[1], STDOUT_FILENO);
+		} else {
+			fake_error(&pipex, "Invalid pipe output file descriptor", 1);
+		}
+	} else {
+		if (pipex.file_o != -1) {
+			dup2(pipex.file_o, STDOUT_FILENO);
+		} else {
+			fake_error(&pipex, "Invalid output file descriptor", 1);
+		}
+	}
+	if (pipex.pipe_fd[1] != -1)
+		close(pipex.pipe_fd[1]);
+	if (pipex.pipe_fd[0] != -1)
+		close(pipex.pipe_fd[0]);
+	//printf("exit code = %d\n", exit_code);
+	return exit_code;
+}
+
+/* int	open_outfile(t_pipex *pipex, t_cmd *cmd)
 {
 	int i;
 
@@ -183,7 +282,7 @@ int	open_infile(t_pipex *pipex, t_cmd *cmd)
 			close(pipex->file_i);
 	}
 	return (0);
-}
+} */
 
 /* 
 void	redirection_exec(t_cmd *cmd)
@@ -215,7 +314,7 @@ void	redirection_exec(t_cmd *cmd)
 		close(pipex.pipe_fd[0]);
 	return ;
 } */
-int	redirection_exec_bultins(t_cmd *cmd)
+/* int	redirection_exec_bultins(t_cmd *cmd)
 {
 	t_pipex pipex;
 	int exit_code;
@@ -246,7 +345,7 @@ int	redirection_exec_bultins(t_cmd *cmd)
 		close(pipex.pipe_fd[0]);
 	//printf("exit code = %d\n", exit_code);
 	return exit_code;
-}
+} */
 
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
