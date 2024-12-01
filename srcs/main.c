@@ -226,7 +226,7 @@ void	ft_command(char *line, t_env *env)
 		commands = parse_command(expanded_line);
 	(void) env;
 	free(expanded_line);
-	if (commands->cmd[0] == '\0')
+	if (commands == NULL || commands->cmd[0] == '\0' /* &&  */)
 		return;
 	is_pipe(commands);
 	//print_cmd_list(commands);
@@ -286,6 +286,31 @@ void explosion()
 	exit(1);
 }
 
+/* t_bool check_pipe(char *line)
+{
+	int i;
+	t_bool char_found;
+
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != '|' && line[i] != ' ')
+			char_found = TRUE;
+		if (line[i] == '|')
+		{
+			if (line[i + 1] == '|' || line[i + 1] == '\0'
+				|| i == 0 || !char_found)
+			{
+				ft_fprintf(2, "bash: syntax error near unexpected token `|'\n");
+				g_exit_code = 2;
+				return FALSE;
+			}
+		}
+		i++;
+	}
+	return TRUE;
+} */
+
 void minihell(t_env *env, int save_stdin, int save_stdout)
 {
 	//char	*prompt_hell_e;
@@ -309,9 +334,8 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 			}
 			if (ft_strlen(line) > 0)
 				add_history(line);
-			if (!match_quotes(line) || !count_redir(line))
+			if (!match_quotes(line) || !count_redir(line)/*  || !check_pipe(line) */)
 			{
-				printf("Error\n");
 				free(line);
 				continue ;
 			}

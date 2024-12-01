@@ -1,0 +1,18 @@
+> file1		X
+
+echo 1 | echo 2 | echo 3 | echo 4 | echo 42 | grep 2		X
+
+🔥 HellShell 🔥 ./not_executable_file
+🔥 HellShell 🔥 echo $?
+1
+🔥 HellShell 🔥 ./not_executable_file
+bash: ./not_executable_file: command not found
+
+| echo 1
+
+ls / | grep home | wc -l | < file1 > file2 | cat   ????
+
+
+echo '42 $USER' ">" file.txt
+
+$0

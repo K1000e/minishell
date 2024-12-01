@@ -49,7 +49,10 @@ t_bool count_redir(const char *line)
 			if (line[j + 1] && line[j + 1] == '>')
 			{
 				if (line[j + 2] && line[j + 2] == '>')
+				{
+					ft_fprintf(2, "syntax error near unexpected token `>'\n");
 					return FALSE;
+				}
 				j += 2;
 			}
 			else
@@ -60,7 +63,10 @@ t_bool count_redir(const char *line)
 			if (line[j + 1] && line[j + 1] == '<')
 			{
 				if (line[j + 2] && line[j + 2] == '<')
+				{
+					ft_fprintf(2, "bash: syntax error near unexpected token `<'\n");
 					return FALSE;
+				}
 				j += 2;
 			}
 			else
@@ -94,7 +100,7 @@ t_bool match_quotes(char *line)
 	}
 	if (d_q == TRUE || s_q == TRUE)
 	{
-		printf("Error: Unmatched quote\n");
+		ft_fprintf(2, "bash: unmatched quote\n");
 		return FALSE;
 	}
 	return TRUE;

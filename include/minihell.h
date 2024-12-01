@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/28 03:58:52 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/01 22:12:14 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_cmd
 {
 	char			*cmd;			// Commande entiere
 	char			**args;			// Tableau d'arguments
+	char			**args_token;	// Tableau d'arguments tokenisés
 	char			*token;
 	int				nb_token;
 	int				nb_outfile;		// Nombre de redirection out
@@ -153,9 +154,10 @@ t_cmd *parse_command(char *line);
 t_bool check_pipe_validity(char *line, int i);
 t_cmd * create_commands(t_parse *parse, int start, int end, t_cmd *list_commands);
 t_cmd *	create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd);
-char **make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd);
+void make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd);
+
 int count_tokens_(const char *cmd_tokens);
-char **parse_args(char *cmd_str, char *cmd_tokens, char **args);
+void parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd);
 void check_char(t_parse *cmd);
 t_cmd *	handle_redirection_(t_cmd *new_cmd);
 void	ft_cmd_add_back(t_cmd **lst, t_cmd *new);

@@ -6,11 +6,37 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/28 04:00:31 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/01 22:32:34 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
+
+t_bool check_pipe(char *token)
+{
+	int i;
+	t_bool char_found;
+
+	i = 0;
+	while (token[i])
+	{
+		if (token[i] != '|' && token[i] != ' ')
+			char_found = TRUE;
+		if (token[i] == '|')
+		{
+			if (token[i + 1] == '|' || token[i + 1] == '\0'
+				|| i == 0 || !char_found)
+			{
+				ft_fprintf(2, "bash: syntax error near unexpected token `|'\n");
+				g_exit_code = 2;
+				return FALSE;
+			}
+			char_found = FALSE;
+		}
+		i++;
+	}
+	return TRUE;
+}
 
 t_cmd *parse_command(char *line)
 {
@@ -25,6 +51,9 @@ t_cmd *parse_command(char *line)
 	if (!parse.token_line)
 		return NULL;
 	check_char(&parse);
+//	printf("token_line = %s\n", parse.token_line);
+	if (!check_pipe(parse.token_line))
+		return NULL;
 	i = 0;
 	j = 0;
 	while (TRUE)
@@ -43,6 +72,8 @@ t_cmd *parse_command(char *line)
 				cmd_list->is_pipe = FALSE;
 			j = i;
 		}
+		/* else if (parse.token_line[i] == '|')
+			break; */
 		if (!parse.token_line[i])
 			break;
 		i++;
@@ -54,13 +85,33 @@ t_cmd *parse_command(char *line)
 
 t_bool check_pipe_validity(char *line, int i)
 {
+	int y;
+
+	y = 0;
+	if (i == 0)
+	{
+		ft_fprintf(2, "syntax error near unexpected token `|'\n");
+		return FALSE;
+	}
+	while (y < i)
+	{
+		if (line[i] == '\0')
+		{
+			ft_fprintf(2, "syntax error near unexpected token `|'\n");
+			return FALSE;
+		}
+		y++;
+	} 
 	if (line[i] == '|')
 	{
 		i++;
 		while (line[i] && ft_isspace(line[i]))
 			i++;
 		if (line[i] == '\0' || line[i] == '|')
+		{
+			ft_fprintf(2, "syntax error near unexpected token `|'\n");
 			return FALSE;
+		}
 	}
 	return TRUE;
 }
@@ -109,10 +160,10 @@ char	**clear_redir(t_cmd *cmd)
 	x = 0;
 	while (cmd->args[++i])
 	{
-		if (ft_strcmp(cmd->args[i], ">") == 0
-			|| ft_strcmp(cmd->args[i], ">>") == 0
-			|| ft_strcmp(cmd->args[i], "<") == 0
-			|| ft_strcmp(cmd->args[i], "<<") == 0)
+		if (ft_strcmp(cmd->args_token[i], ">") == 0
+			|| ft_strcmp(cmd->args_token[i], ">>") == 0
+			|| ft_strcmp(cmd->args_token[i], "<") == 0
+			|| ft_strcmp(cmd->args_token[i], "<<") == 0)
 			i++;
 		else
 		{
@@ -122,8 +173,13 @@ char	**clear_redir(t_cmd *cmd)
 	}
 	i = -1;
 	while (cmd->args[++i])
-				free(cmd->args[i]);
+	{
+		free(cmd->args[i]);
+		if (cmd->args_token[i])
+			free(cmd->args_token[i]);	
+	}
 	free(cmd->args);
+	free(cmd->args_token);
 	return(new_args);
 }
 
@@ -131,6 +187,7 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
 	cmd = malloc(sizeof(t_cmd));
 	cmd->cmd = ft_strdup(cmd_str);
+	cmd->token = ft_strdup(cmd_tokens);
 	cmd->next = NULL;
 	cmd->append = 0;
 	cmd->redirection = FALSE;
@@ -147,22 +204,23 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 		cmd->in_file = ft_calloc(sizeof(char *), (cmd->nb_infile + 1));
 	else
 		cmd->in_file = NULL;
-	cmd->args = make_argument(cmd_str, cmd_tokens, cmd);
-	cmd = handle_redirection_(cmd);
-	cmd->args = clear_redir(cmd);
+	/* cmd->args =  */make_argument(cmd_str, cmd_tokens, cmd);
+	if (cmd->nb_infile || cmd->nb_outfile)
+	{
+		cmd = handle_redirection_(cmd);
+		cmd->args = clear_redir(cmd);
+	}
 	free(cmd_str);
 	free(cmd_tokens);
 	return (cmd);
 }
 
-char **make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
+void make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
-	char **args;
-
 	cmd->nb_token = count_tokens_(cmd_tokens);
-	args = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	args = parse_args(cmd_str, cmd_tokens, args);
-	return (args);
+	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
+	cmd->args_token = malloc(sizeof(char *) * (cmd->nb_token + 1));
+	parse_args(cmd_str, cmd_tokens/* , args */, cmd);
 }
 
 int count_tokens_(const char *cmd_tokens)
@@ -183,7 +241,7 @@ int count_tokens_(const char *cmd_tokens)
 	return (count);
 }
 
-char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
+void parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd )
 {
 	int start;
 	int i;
@@ -203,12 +261,13 @@ char **parse_args(char *cmd_str, char *cmd_tokens, char **args)
 			start = i;
 			while (cmd_tokens[i] && cmd_tokens[i] == token)
 				i++;
-			args[nb_args] = ft_strndup(&cmd_str[start], i - start);
+			cmd->args[nb_args] = ft_strndup(&cmd_str[start], i - start);
+			cmd->args_token[nb_args] = ft_strndup(&cmd_tokens[start], i - start);
 			nb_args++;
 		}
 	}
-	args[nb_args] = NULL;
-	return (args);
+	cmd->args[nb_args] = NULL;
+	cmd->args_token[nb_args] = NULL;
 }
 
 void	clear_quotes(t_parse *parse)
