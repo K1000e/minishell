@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/28 04:41:42 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/11/28 05:47:08 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,16 +68,16 @@ void find_executable(t_cmd *command, t_env *env)
 }
 
 
-void	fake_free_all(t_pipex *pipex)
+void	fake_free_all(t_pipex *minishell)
 {
-	if (pipex->pipe_fd[0] != -1)
-		close(pipex->pipe_fd[0]);
-	if (pipex->pipe_fd[1] != -1)
-		close(pipex->pipe_fd[1]);
-	if (pipex->file_i != -1)
-		close(pipex->file_i);
-	if (pipex->file_o != -1)
-		close(pipex->file_o);
+	if (minishell->pipe_fd[0] != -1)
+		close(minishell->pipe_fd[0]);
+	if (minishell->pipe_fd[1] != -1)
+		close(minishell->pipe_fd[1]);
+	if (minishell->file_i != -1)
+		close(minishell->file_i);
+	if (minishell->file_o != -1)
+		close(minishell->file_o);
 }
 
 void	fake_error(t_pipex *pipex, char *message, int error_code)
@@ -154,8 +154,6 @@ int	open_outfile(t_pipex *pipex, t_cmd *cmd, int i)
 		perror(cmd->out_file[i]); // Use perror for matching error
 		return(1);
 	}
-	if (i < cmd->nb_outfile - 1)
-		close(pipex->file_o);
 	i++;
 	return (0);
 }
@@ -165,79 +163,54 @@ int	open_infile(t_pipex *pipex, t_cmd *cmd, int i)
 	pipex->file_i = open(cmd->in_file[i], O_RDONLY);
 	if (pipex->file_i < 0)
 	{
-		perror(cmd->in_file[i]); // Use perror for matching error
+		perror(cmd->in_file[i]);
 		return(1);
 	}
-	if (i < cmd->nb_infile - 1)
-		close(pipex->file_i);
-	i++;
 	return (0);
 }
 
-int	redirection_exec_bultins(t_cmd *cmd)
+int	redirection_exec_bultins(t_cmd *cmd, t_pipex *pipex)
 {
-	t_pipex pipex;
+	//t_pipex pipex;
 	int exit_code;
 	int i;
 	int x;
 	int y;
 
-	pipex.file_i = -1;
-	pipex.file_o = -1;
-	
-	exit_code = 0;
 	if (!cmd || !cmd->cmd)
-		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
+		fake_error(pipex, "Invalid command: command is empty or NULL", 1);
 	i = -1;
 	x = 0;
 	y = 0;
+	exit_code = 0;
 	while (cmd->order_file[++i])
 	{
 		if (cmd->order_file[i] == 'i')
-		{
-			exit_code = open_infile(&pipex, cmd, x);
-			x++;
-		}
+			exit_code = open_infile(pipex, cmd, x++);
 		else if (cmd->order_file[i] == 'o')
-		{
-			exit_code = open_outfile(&pipex, cmd, y);
-			y++;
-		}
+			exit_code = open_outfile(pipex, cmd, y++);
 		if (exit_code)
+		{
+			fake_free_all(pipex);
 			return exit_code;
-	}
-	if (cmd->nb_infile == 0) {
-		if (pipex.pipe_fd[0] != -1) {
-			dup2(pipex.pipe_fd[0], STDIN_FILENO);
-		} else {
-			fake_error(&pipex, "Invalid pipe input file descriptor", 1);
-		}
-	} else {
-		if (pipex.file_i != -1) {
-			dup2(pipex.file_i, STDIN_FILENO);
-		} else {
-			fake_error(&pipex, "Invalid input file descriptor", 1);
 		}
 	}
-
-	if (cmd->nb_outfile == 0) {
-		if (pipex.pipe_fd[1] != -1) {
-			dup2(pipex.pipe_fd[1], STDOUT_FILENO);
-		} else {
-			fake_error(&pipex, "Invalid pipe output file descriptor", 1);
-		}
-	} else {
-		if (pipex.file_o != -1) {
-			dup2(pipex.file_o, STDOUT_FILENO);
-		} else {
-			fake_error(&pipex, "Invalid output file descriptor", 1);
-		}
-	}
-	if (pipex.pipe_fd[1] != -1)
-		close(pipex.pipe_fd[1]);
-	if (pipex.pipe_fd[0] != -1)
-		close(pipex.pipe_fd[0]);
-	//printf("exit code = %d\n", exit_code);
+	if (cmd->nb_infile == 0 && pipex->pipe_fd[0] != -1)
+		dup2(pipex->pipe_fd[0], STDIN_FILENO);
+	else if (cmd->nb_infile == 0 && pipex->pipe_fd[0] != -1)
+		dup2(pipex->file_i, STDIN_FILENO);
+	if (cmd->nb_outfile > 0 && pipex->file_o != -1)
+		dup2(pipex->file_o, STDOUT_FILENO);
+	else if (cmd->nb_outfile == 0 && pipex->pipe_fd[1] != -1)
+		dup2(pipex->pipe_fd[1], STDOUT_FILENO);
+	if (pipex->file_i != -1)
+		close(pipex->file_i);
+	if (pipex->file_o != -1)
+		close(pipex->file_o);
+	if (pipex->pipe_fd[1] != -1)
+		close(pipex->pipe_fd[1]);
+	if (pipex->pipe_fd[0] != -1)
+		close(pipex->pipe_fd[0]);
 	return exit_code;
 }
 
@@ -289,8 +262,8 @@ void	redirection_exec(t_cmd *cmd)
 {
 	t_pipex pipex;
 
-	pipex.file_i = -1;
-	pipex.file_o = -1;
+	pipex->file_i = -1;
+	pipex->file_o = -1;
 
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
@@ -350,12 +323,12 @@ void	redirection_exec(t_cmd *cmd)
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
-	//pid_t pid;
+	t_pipex pipex;
 
 	current = env;
 	g_exit_code = 0;
 	if (cmd->redirection)
-		g_exit_code = redirection_exec_bultins(cmd);
+		g_exit_code = redirection_exec_bultins(cmd, &pipex);
 	if (g_exit_code >= 1)
 	{
 		g_exit_code = 1;
@@ -375,6 +348,7 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
+	fake_free_all(&pipex);
 }
 
 char	*ft_join(char *buffer, char *buf)
@@ -388,7 +362,6 @@ char	*ft_join(char *buffer, char *buf)
 
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 {
-	//int i;
 	char *error;
 
 	cmd->path = TRUE;
@@ -404,7 +377,6 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 		error = ft_strjoin("bash: ", cmd->args[0]);
 		error = ft_join(error, ": command not found");
 		fake_error(pipex, error, 127);
-		//fake_error(pipex, "command not found", 127);
 	}
 	if (!cmd->path)
 	{
@@ -413,7 +385,6 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 		fake_error(pipex, error, 127);
 	}
 	exit(1);
-	//g_exit_code = 1;
 }
 
 void	exec_non_builtins(t_cmd *cmd, t_env *env)
@@ -423,9 +394,6 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	char **b_env;
 
 	b_env = base_env(env);
-	pipex.status = 0;
-	pipex.file_i = -1;
-	pipex.file_o = -1;
 	pid = -1;
 	if (pipe(pipex.pipe_fd) == -1)
 		fake_error(&pipex, "Couldn't open pipe", 1);
@@ -433,7 +401,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	if (pid == 0)
 	{
 		if (cmd->redirection)
-			g_exit_code = redirection_exec_bultins(cmd);
+			g_exit_code = redirection_exec_bultins(cmd, &pipex);
 		if (g_exit_code >= 1)
 			exit(1);
 		execute_non_builtins(&pipex, cmd, env, b_env);
@@ -453,7 +421,6 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	fake_free_all(&pipex);
 	waitpid(pid, &g_exit_code, 0);
 	g_exit_code = WEXITSTATUS(g_exit_code);
-	//printf("%s : in exec exit code : %d\n",cmd->cmd, g_exit_code);
 }
 
 t_bool is_builtin(char *cmd)
