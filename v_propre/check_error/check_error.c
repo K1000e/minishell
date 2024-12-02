@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check_error                                        :+:      :+:    :+:   */
+/*   check_error.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:26:21 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/19 23:27:29 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/02 03:15:28 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,8 @@ t_bool is_valid_command_format(const char *cmd)
 {
 	int i = 0;
 
-	// Skip the first word (the command name)
 	while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\'' &&
-		   cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
+			cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
 		i++;
 
 	if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>' 

@@ -51,16 +51,16 @@ void ft_print_declare_env(t_env *env)
 
 t_bool check_validity_export(char *key)
 {
-    int i = 0;
+	int i = 0;
 
-    if (!ft_isalpha(key[i]) && key[i] != '_') // Must start with a letter or _
-        return FALSE;
-    while (key[++i])
-    {
-        if (!ft_isalnum(key[i]) && key[i] != '_') // Allow only alphanumerics or _
-            return FALSE;
-    }
-    return TRUE;
+	if (!ft_isalpha(key[i]) && key[i] != '_')
+		return (FALSE);
+	while (key[++i])
+	{
+		if (!ft_isalnum(key[i]) && key[i] != '_')
+			return (FALSE);
+	}
+	return (TRUE);
 }
 
 void	ft_export(t_cmd *cmd, t_env *env)
@@ -75,22 +75,15 @@ void	ft_export(t_cmd *cmd, t_env *env)
 	{
 		while (cmd->args[1][++i])
 		{
-			//printf("cmd->args[1][i] = %c\n", cmd->args[1][i]);
 			if (cmd->args[1][i] == '=')
 			{
 				key = ft_strndup(cmd->args[1], i);
-				if (!check_validity_export(key))
-				{
-					g_exit_code = 1;
-					ft_fprintf(2, "1bash: %s: '%s': not a valid identifier\n", cmd->args[0], cmd->args[1]);
-					return ;
-				}
 				value = ft_strdup(cmd->args[1] + i + 1);
-				//printf("%s\n", cmd->args[1]);
-				if (!key || !value || !key[0] || !value[0])
+				if (!check_validity_export(key) || !key || !value 
+					|| !key[0] || !value[0])
 				{
 					g_exit_code = 1;
-					ft_fprintf(2, "2bash: %s: '%s': not a valid identifier\n", cmd->args[0], cmd->args[1]);
+					ft_fprintf(2, "bash: %s: '%s': not a valid identifier\n", cmd->args[0], cmd->args[1]);
 					return ;
 				}
 				else if (!env)
@@ -104,10 +97,10 @@ void	ft_export(t_cmd *cmd, t_env *env)
 			}
 
 		}
-		if (!check_validity_export(cmd->args[1])) // ici args[1] est a 0 je comprends pas pourquoi !!!!
+		if (!check_validity_export(cmd->args[1]))
 		{
 			g_exit_code = 1;
-			ft_fprintf(2, "3bash: %s: %s: not a valid identifier\n", cmd->args[0], cmd->args[1]);
+			ft_fprintf(2, "bash: %s: %s: not a valid identifier\n", cmd->args[0], cmd->args[1]);
 			return ;
 		}
 		g_exit_code = 0;
@@ -131,6 +124,32 @@ void	ft_env(t_cmd *cmd, t_env *env)
 	}
 }
 
+void supress_env(t_env *env, char *search)
+{
+	t_env	*current;
+	t_env	*previous;
+
+	current = env->next;
+	previous = env;
+	while (current)
+	{
+		if (current->key && ft_strcmp(current->key, search) == 0)
+		{
+			if (previous)
+				previous->next = current->next;
+			else if (current->next)
+				env = current->next;
+			free(current->key);
+			free(current->value);
+			free(current);
+			break;
+		}
+		previous = current;
+		current = current->next;
+	}
+	current = env;
+}
+
 void	ft_unset(t_cmd *cmd, t_env *env)
 {
 	t_env	*current;
@@ -143,23 +162,5 @@ void	ft_unset(t_cmd *cmd, t_env *env)
 	previous = env;
 	i = 0;
 	while (cmd->args[++i])
-	{
-		while (current)
-		{
-			if (current->key && ft_strcmp(current->key, cmd->args[i]) == 0)
-			{
-				if (previous)
-					previous->next = current->next;
-				else if (current->next)
-					env = current->next;
-				free(current->key);
-				free(current->value);
-				free(current);
-				break;
-			}
-			previous = current;
-			current = current->next;
-		}
-		current = env;
-	}
+		supress_env(env, cmd->args[i]);
 }

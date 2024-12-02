@@ -1,26 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pwd.c                                              :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/19 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/02 03:11:26 by cgorin           ###   ########.fr       */
+/*   Created: 2024/12/02 03:22:30 by cgorin            #+#    #+#             */
+/*   Updated: 2024/12/02 03:24:02 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minihell.h"
 
-void	ft_pwd(t_env *env)
+char	*ft_strjoin_free(char *s1, char *s2, int is_free)
 {
-	t_env	*current;
-	char	*path;
+	char	*result;
 
-	current = ft_find_key(env, "PWD");
-	path = current->value;
-	if (!path)
-		return ;
-	printf("%s\n", path);
-	g_exit_code = 0;
+	result = ft_strjoin(s1, s2);
+	if (s1 && (is_free == 1 || is_free == 3))
+		free(s1);
+	if (s2 && (is_free >= 2))
+		free(s2);
+	return (result);
+}
+
+void	is_pipe(t_cmd *cmd)
+{
+	t_cmd *current;
+
+	current = cmd;
+	while (current)
+	{
+		if (current->next)
+		{
+			current->is_pipe = TRUE;
+		}
+		else
+			current->is_pipe = FALSE;
+		current = current->next;
+	}
 }

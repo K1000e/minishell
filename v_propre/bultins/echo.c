@@ -6,25 +6,25 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/19 22:42:22 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/02 03:09:31 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minihell.h"
 
-t_bool ft_check_option_echo(t_cmd *cmd)
+t_bool ft_check_option_echo(t_cmd *cmd, int j)
 {
 	int		i;
 	t_bool	option;
 	
 	i = 0;
 	option = FALSE;
-	if (ft_strncmp(cmd->args[1], "-n", 2) == 0)
+	if (ft_strncmp(cmd->args[j], "-n", 2) == 0)
 	{
 		option = TRUE;
-		while (cmd->args[1][++i])
+		while (cmd->args[j][++i])
 		{
-			if (cmd->args[1][i] != 'n')
+			if (cmd->args[j][i] != 'n')
 				option = FALSE;
 		}
 	}
@@ -37,11 +37,12 @@ void	ft_echo(t_cmd *cmd)
 	t_bool	option;
 
 	option = FALSE;
-	i = 0;
-	if (cmd->args[1] != NULL)
+	if (cmd->args[1])
 	{
-		option = ft_check_option_echo(cmd);
+		option = ft_check_option_echo(cmd, 1);
 		i = option;
+		while (cmd->args[i + 1] && ft_check_option_echo(cmd, i + 1) == 1)
+			i++;
 		while (cmd->args[++i])
 		{
 			printf("%s",cmd->args[i]);
@@ -51,4 +52,5 @@ void	ft_echo(t_cmd *cmd)
 	}
 	if (!option)
 		printf("\n");
+	g_exit_code = 0;
 }

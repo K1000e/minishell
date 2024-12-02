@@ -6,20 +6,12 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/11/28 00:35:07 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/02 03:05:39 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
-/*
-echo X
-cd
-pwd X
-export X
-unset X
-env X
-exit X
-*/
+
 void	ft_exit(t_cmd *cmd)
 {
 	int exit_code;

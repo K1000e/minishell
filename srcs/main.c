@@ -157,18 +157,18 @@ static char	*append_char(char *result, char c)
 
 t_bool is_within_single_quotes(const char *input, int index)
 {
-    int i = 0;
-    t_bool single_quote = FALSE;
+	int i = 0;
+	t_bool single_quote = FALSE;
 
-    while (i < index)
-    {
-        if (input[i] == '\'' && !single_quote)
-            single_quote = TRUE;
-        else if (input[i] == '\'' && single_quote)
-            single_quote = FALSE;
-        i++;
-    }
-    return single_quote;
+	while (i < index)
+	{
+		if (input[i] == '\'' && !single_quote)
+			single_quote = TRUE;
+		else if (input[i] == '\'' && single_quote)
+			single_quote = FALSE;
+		i++;
+	}
+	return single_quote;
 }
 
 
@@ -194,8 +194,6 @@ static char	*process_input(const char *input, t_env *env)
 				to_append = handle_env_variable(input, &i, env);
 			else
 				to_append = handle_special_cases(input, &i, env);
-			/* if (!to_append)
-				to_append = append_char(ft_strdup(""), '$'); */
 		}
 		else
 			to_append = append_char(ft_strdup(""), input[i++]);
@@ -206,11 +204,9 @@ static char	*process_input(const char *input, t_env *env)
 
 char	*expand_env_vars(char *input, t_env *env)
 {
-	//char *res;
 	if (!input)
 		return (NULL);
 	input = process_input(input, env);
-	//free(input);
 	return (input);
 }
 
@@ -222,14 +218,13 @@ void	ft_command(char *line, t_env *env)
 
 	commands = NULL;
 	expanded_line = expand_env_vars(line, env);
-	if (expanded_line != NULL /* && expanded_line[0] */)
+	if (expanded_line != NULL)
 		commands = parse_command(expanded_line);
 	(void) env;
 	free(expanded_line);
-	if (commands == NULL || commands->cmd[0] == '\0' /* &&  */)
+	if (commands == NULL || commands->cmd[0] == '\0')
 		return;
 	is_pipe(commands);
-	//print_cmd_list(commands);
 	tmp = commands;
 	execute_command(tmp, env);
 	free_cmd_list(commands);
@@ -266,66 +261,14 @@ void	set_signal_action(void (*handler)(int))
 	sigaction(SIGQUIT, &act, NULL);
 }
 
-void explosion()
-{
-	printf(YELLOW "      ______________________________       . \\  | / .\n");
-	printf("     /                              / \\     \\ \\ / /\n");
-	printf("    |                              | ==========  - -\n");
-	printf("     \\_____________________________\\_/     / / \\ \\ \n");
-	printf("  _______________________________       \\  | / | \\ \n");
-	printf(" /                               / \\     \\ \\ / /.   .\n");
-	printf("|                               | ==========  - -\n");
-	printf(" \\______________________________\\_/     / / \\ \\    /\n");
-	printf("      ______________________________     / |\\  | /  .\n");
-	printf("     /                              / \\     \\ \\ / /\n");
-	printf("    |                               | ==========  -  - -\n");
-	printf("     \\______________________________\\_/     / / \\ \\ \n");
-	printf("                                         .  / | \\  .\n");
-	printf( "🔥 Oh no ! The HellShell explodes! 🔥\n" RESET);
-	rl_clear_history();
-	exit(1);
-}
-
-/* t_bool check_pipe(char *line)
-{
-	int i;
-	t_bool char_found;
-
-	i = 0;
-	while (line[i])
-	{
-		if (line[i] != '|' && line[i] != ' ')
-			char_found = TRUE;
-		if (line[i] == '|')
-		{
-			if (line[i + 1] == '|' || line[i + 1] == '\0'
-				|| i == 0 || !char_found)
-			{
-				ft_fprintf(2, "bash: syntax error near unexpected token `|'\n");
-				g_exit_code = 2;
-				return FALSE;
-			}
-		}
-		i++;
-	}
-	return TRUE;
-} */
-
 void minihell(t_env *env, int save_stdin, int save_stdout)
 {
-	//char	*prompt_hell_e;
 	char	*line;
-	//int		i;
 
-	//i = 0;
 	while (1)
 	{		
 			dup2(save_stdin, STDIN_FILENO);
 			dup2(save_stdout, STDOUT_FILENO);
-			//prompt_hell_e = prompt_hell(i);
-			/* if (i > 100) 
-				explosion(); */
-			//line = readline(prompt_hell_e);
 			line = readline("\001\033[1;31m\002🔥 HellShell 🔥 \001\033[0m\002");
 			if (line == NULL)
 			{
@@ -334,13 +277,12 @@ void minihell(t_env *env, int save_stdin, int save_stdout)
 			}
 			if (ft_strlen(line) > 0)
 				add_history(line);
-			if (!match_quotes(line) || !count_redir(line)/*  || !check_pipe(line) */)
+			if (!match_quotes(line) || !count_redir(line))
 			{
 				free(line);
 				continue ;
 			}
 			ft_command(line, env);
-			//free(prompt_hell_e);
 			free(line);
 	}
 	exit(0);
@@ -362,19 +304,8 @@ int	main(int argc, char **argv, char **environment)
 		save_stdin = dup(STDIN_FILENO);
 		save_stdout = dup(STDOUT_FILENO);
 		env = get_env(environment, env, argv[0]);
-		//env->executable = ft_strdup(executable);
-		//exe = ft_strrchr(executable, '/') + 1;
-	//if (exe)
-	//	new_env->executable = ft_strdup(exe);
-	//else
 		set_signal_action(sigint_handler);
 		minihell(env, save_stdin, save_stdout);
 	}
 	return (0);
 }
-
-/*
-** TODO :
-** - Handle errors during command execution.
-** - Improve error handling.
-*/

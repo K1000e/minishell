@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/01 22:32:34 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/01 23:43:36 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ t_cmd *parse_command(char *line)
 	if (!parse.token_line)
 		return NULL;
 	check_char(&parse);
-//	printf("token_line = %s\n", parse.token_line);
 	if (!check_pipe(parse.token_line))
 		return NULL;
 	i = 0;
@@ -72,8 +71,6 @@ t_cmd *parse_command(char *line)
 				cmd_list->is_pipe = FALSE;
 			j = i;
 		}
-		/* else if (parse.token_line[i] == '|')
-			break; */
 		if (!parse.token_line[i])
 			break;
 		i++;
@@ -204,7 +201,7 @@ t_cmd *create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 		cmd->in_file = ft_calloc(sizeof(char *), (cmd->nb_infile + 1));
 	else
 		cmd->in_file = NULL;
-	/* cmd->args =  */make_argument(cmd_str, cmd_tokens, cmd);
+	make_argument(cmd_str, cmd_tokens, cmd);
 	if (cmd->nb_infile || cmd->nb_outfile)
 	{
 		cmd = handle_redirection_(cmd);
@@ -220,7 +217,7 @@ void make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->nb_token = count_tokens_(cmd_tokens);
 	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
 	cmd->args_token = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	parse_args(cmd_str, cmd_tokens/* , args */, cmd);
+	parse_args(cmd_str, cmd_tokens, cmd);
 }
 
 int count_tokens_(const char *cmd_tokens)
@@ -307,11 +304,11 @@ void check_char(t_parse *parse)
 	i = -1;
 	while(parse->token_line[++i])
 	{
-		if (parse->token_line[i] == '|') // Pipe
+		if (parse->token_line[i] == '|')
 			parse->token_line[i] = '|';
-		else if (parse->token_line[i] == '>') // Redirection (a voir comment on fait pour >>)
+		else if (parse->token_line[i] == '>')
 			parse->token_line[i] = '>';
-		else if (parse->token_line[i] == '<') // Redirection (a voir comment on fait pour <<)
+		else if (parse->token_line[i] == '<')
 			parse->token_line[i] = '<';
  		else if (parse->token_line[i] == '"')
 		{
@@ -328,14 +325,14 @@ void check_char(t_parse *parse)
 			parse->token_line[i] = 'e';
 		}
 		else if (!ft_isspace(parse->token_line[i]))
-			parse->token_line[i] = 'c';  // Command
+			parse->token_line[i] = 'c';
 		else 
-			parse->token_line[i] = ' '; // Pour les espaces
+			parse->token_line[i] = ' ';
 	}
 	clear_quotes(parse);
 }
 
-int	handle_input_redirection(t_cmd *cmd/* , char **args */, int i, int *in)
+int	handle_input_redirection(t_cmd *cmd, int i, int *in)
 {
 	if (cmd->args[i + 1])
 	{
@@ -351,7 +348,7 @@ int	handle_input_redirection(t_cmd *cmd/* , char **args */, int i, int *in)
 	}
 }
 
-int	handle_output_redirection_(t_cmd *cmd, /* char **args, */ int i, int *out/* , int *order */)
+int	handle_output_redirection_(t_cmd *cmd, int i, int *out)
 {
 	if (cmd->args[i + 1])
 	{
@@ -373,7 +370,6 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	int		i;
 	int		in;
 	int		out;
-	//int		order;
 
 	i = -1;
 	in = 0;
@@ -385,7 +381,7 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 		if (ft_strcmp(new_cmd->args[i], ">") == 0
 			|| ft_strcmp(new_cmd->args[i], ">>") == 0)
 		{
-			i = handle_output_redirection_(new_cmd, i, &out/* , &order */);
+			i = handle_output_redirection_(new_cmd, i, &out);
 			out++;
 			if (i == -1)
 				return NULL;
@@ -393,7 +389,7 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)
 		{
-			i = handle_input_redirection(new_cmd, i, &in/* , &order */);
+			i = handle_input_redirection(new_cmd, i, &in);
 			in++;
 			if (i == -1)
 				return NULL;

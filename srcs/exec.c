@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/01 21:49:02 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/01 23:40:58 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,10 +96,7 @@ void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
 	{
 		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
 		if (pipex->file_i < 0)
-		{
-			//perror(cmd->in_file[i]); // Use perror for matching error
-			fake_error(pipex, "??", 1);
-		}
+			fake_error(pipex, "", 1);
 		if (i < cmd->nb_infile - 1)
 			close(pipex->file_i);
 	}
@@ -131,7 +128,6 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 				ft_fprintf(2, "%s: Permission denied\n", cmd->out_file[i]);
 				fake_error(pipex, "", 126);
 			}
-			//perror(cmd->out_file[i]); // Use perror for matching error
 			fake_error(pipex, "", 1);
 		}
 		if (i < cmd->nb_outfile - 1)
@@ -155,7 +151,7 @@ int	open_outfile(t_pipex *pipex, t_cmd *cmd)
 					| O_WRONLY, 0644);
 		if (pipex->file_o < 0)
 		{
-			perror(cmd->out_file[i]); // Use perror for matching error
+			perror(cmd->out_file[i]);
 			return(1);
 		}
 		if (i < cmd->nb_outfile - 1)
@@ -174,7 +170,7 @@ int	open_infile(t_pipex *pipex, t_cmd *cmd)
 		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
 		if (pipex->file_i < 0)
 		{
-			perror(cmd->in_file[i]); // Use perror for matching error
+			perror(cmd->in_file[i]);
 			return(1);
 		}
 		if (i < cmd->nb_infile - 1)
@@ -183,36 +179,6 @@ int	open_infile(t_pipex *pipex, t_cmd *cmd)
 	return (0);
 }
 
-/* 
-void	redirection_exec(t_cmd *cmd)
-{
-	t_pipex pipex;
-
-	pipex.file_i = -1;
-	pipex.file_o = -1;
-
-	if (!cmd || !cmd->cmd)
-		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
-	if (cmd->nb_infile == 0)
- 		dup2(pipex.pipe_fd[0], STDIN_FILENO);
- 	else
-	{
-		fake_open_infile(&pipex, cmd);
-		dup2(pipex.file_i, STDIN_FILENO);
-	}
-	if (cmd->nb_outfile == 0)
-		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
-	else
-	{
-		fake_open_outfile(&pipex, cmd);
-		dup2(pipex.file_o, STDOUT_FILENO);
-	}
-	if (pipex.pipe_fd[1] != -1)
-		close(pipex.pipe_fd[1]);
-	if (pipex.pipe_fd[0] != -1)
-		close(pipex.pipe_fd[0]);
-	return ;
-} */
 int	redirection_exec_bultins(t_cmd *cmd)
 {
 	t_pipex pipex;
@@ -242,14 +208,12 @@ int	redirection_exec_bultins(t_cmd *cmd)
 		close(pipex.pipe_fd[1]);
 	if (pipex.pipe_fd[0] != -1)
 		close(pipex.pipe_fd[0]);
-	//printf("exit code = %d\n", exit_code);
 	return exit_code;
 }
 
 void execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env *current;
-	//pid_t pid;
 
 	current = env;
 	g_exit_code = 0;
@@ -294,7 +258,7 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 		find_executable(cmd, env);
 	if (execve(cmd->args[0] , cmd->args, env_) == -1)
 	{
-		if (/* access(cmd->args[0], F_OK) == 0 &&  */ ft_strchr(cmd->args[0], '/') && is_directory(cmd->args[0]))
+		if (ft_strchr(cmd->args[0], '/') && is_directory(cmd->args[0]))
 		{
 			ft_fprintf(2, "%s: Is a directory", cmd->args[0]);
 			fake_error(pipex, "", 126);
@@ -405,7 +369,6 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 	pid_t child2;
 	int pipefd[2];
 
-	//printf("cmd = %s\n", cmd->cmd);
 	if (!cmd->is_pipe)
 	{
 		if (!cmd->args[0] || is_builtin(cmd->args[0]))
@@ -439,7 +402,6 @@ void	execute_command(t_cmd *cmd ,t_env *env)
 		close(pipefd[0]);
 		close(pipefd[1]);
 		waitpid(child1, &g_exit_code, 0);
-		//g_exit_code = WEXITSTATUS(g_exit_code);
 		waitpid(child2, &g_exit_code, 0);
 		g_exit_code = WEXITSTATUS(g_exit_code);
 	}
