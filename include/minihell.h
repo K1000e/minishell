@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/01 23:31:01 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 00:45:19 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ typedef struct s_pipex
 	int		pipe_fd[2];
 	int		file_i;
 	int		file_o;
-	int		status;
+	//int		status;
 	char	*limiter;
 	char	*outfile;
 }	t_pipex;
@@ -144,5 +144,8 @@ void	ft_cmd_add_back(t_cmd **lst, t_cmd *new);
 char	**base_env(t_env *env);
 
 char	*ft_strjoin_free(char *s1, char *s2, int is_free);
-
+t_bool is_builtin(char *cmd);
+void single_builtin(t_cmd *cmd, t_env *env);
+int	redirection_exec_bultins(t_cmd *cmd);
+int redirection_exec_bultins_single(t_cmd *cmd);
 #endif

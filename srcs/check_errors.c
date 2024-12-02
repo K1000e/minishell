@@ -25,21 +25,20 @@ zsh: parse error near `|'
 
 */
 
-
 /* t_bool check_error(char *line)
 {
+	int	j;
+	int	j;
+
 	if ()
 	{
 		return (FALSE);
 	}
 	return (TRUE);
 } */
-
-
-
-t_bool count_redir(const char *line)
+t_bool	count_redir(const char *line)
 {
-	int j;
+	int	j;
 
 	j = 0;
 	while (line[j])
@@ -51,7 +50,7 @@ t_bool count_redir(const char *line)
 				if (line[j + 2] && line[j + 2] == '>')
 				{
 					ft_fprintf(2, "syntax error near unexpected token `>'\n");
-					return FALSE;
+					return (FALSE);
 				}
 				j += 2;
 			}
@@ -64,8 +63,9 @@ t_bool count_redir(const char *line)
 			{
 				if (line[j + 2] && line[j + 2] == '<')
 				{
-					ft_fprintf(2, "bash: syntax error near unexpected token `<'\n");
-					return FALSE;
+					ft_fprintf(2,
+						"bash: syntax error near unexpected token `<'\n");
+					return (FALSE);
 				}
 				j += 2;
 			}
@@ -75,14 +75,14 @@ t_bool count_redir(const char *line)
 		else
 			j++;
 	}
-	return TRUE;
+	return (TRUE);
 }
 
-t_bool match_quotes(char *line)
+t_bool	match_quotes(char *line)
 {
-	int i;
-	t_bool d_q;
-	t_bool s_q;
+	int		i;
+	t_bool	d_q;
+	t_bool	s_q;
 
 	i = -1;
 	d_q = FALSE;
@@ -92,16 +92,16 @@ t_bool match_quotes(char *line)
 		if (line[i] == '"' && d_q == FALSE && s_q == FALSE)
 			d_q = TRUE;
 		else if (line[i] == '"' && d_q == TRUE && s_q == FALSE)
-		   d_q = FALSE;
+			d_q = FALSE;
 		else if (line[i] == '\'' && d_q == FALSE && s_q == FALSE)
 			s_q = TRUE;
 		else if (line[i] == '\'' && d_q == FALSE && s_q == TRUE)
-		   s_q = FALSE;
+			s_q = FALSE;
 	}
 	if (d_q == TRUE || s_q == TRUE)
 	{
 		ft_fprintf(2, "bash: unmatched quote\n");
-		return FALSE;
+		return (FALSE);
 	}
-	return TRUE;
+	return (TRUE);
 }

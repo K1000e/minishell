@@ -6,20 +6,21 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/27 16:57:38 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 00:12:19 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-t_env *create_env_node(char *key, char *value)
+t_env	*create_env_node(char *key, char *value)
 {
-	t_env *new_env;
+	t_env	*new_env;
 
 	new_env = NULL;
 	new_env = malloc(sizeof(t_env));
-	if (!new_env) {
-		return NULL;
+	if (!new_env)
+	{
+		return (NULL);
 	}
 	new_env->key = ft_strdup(key);
 	new_env->value = ft_strdup(value);
@@ -51,7 +52,6 @@ void	ft_env_add_back_(t_env **lst, t_env *new)
 	ptr->next = new;
 }
 
-
 int	ft_envsize(t_env *lst)
 {
 	int	i;
@@ -82,7 +82,7 @@ int	ft_envsize(t_env *lst)
 // 	return (environment);
 // }
 
-char **base_env(t_env *env) //printenv
+char	**base_env(t_env *env) // printenv
 {
 	t_env *current;
 	char **environment;
@@ -113,7 +113,7 @@ t_env	*get_env(char **env, t_env *new_env, char *executable)
 	i = -1;
 	new_env = malloc(sizeof(t_env));
 	if (!new_env)
-		return NULL;
+		return (NULL);
 	new_env->key = NULL;
 	new_env->value = NULL;
 	new_env->next = NULL;

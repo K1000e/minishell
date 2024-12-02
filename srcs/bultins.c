@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/02 03:05:39 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 00:11:22 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 void	ft_exit(t_cmd *cmd)
 {
-	int exit_code;
-	int nb_args;
-	int i;
+	int	exit_code;
+	int	nb_args;
+	int	i;
 
 	nb_args = 0;
 	while (cmd->args[nb_args] != NULL)
@@ -28,7 +28,8 @@ void	ft_exit(t_cmd *cmd)
 	{
 		if (!ft_isdigit(cmd->args[1][i]))
 		{
-			ft_fprintf(2, "exit: %s: numeric argument required\n", cmd->args[1]);
+			ft_fprintf(2, "exit: %s: numeric argument required\n",
+				cmd->args[1]);
 			exit(2);
 		}
 	}
@@ -44,11 +45,11 @@ void	ft_exit(t_cmd *cmd)
 	g_exit_code = 1;
 }
 
-t_bool ft_check_option_echo(t_cmd *cmd, int j)
+t_bool	ft_check_option_echo(t_cmd *cmd, int j)
 {
 	int		i;
 	t_bool	option;
-	
+
 	i = 0;
 	option = FALSE;
 	if (ft_strncmp(cmd->args[j], "-n", 2) == 0)
@@ -77,7 +78,7 @@ void	ft_echo(t_cmd *cmd)
 			i++;
 		while (cmd->args[++i])
 		{
-			printf("%s",cmd->args[i]);
+			printf("%s", cmd->args[i]);
 			if (cmd->args[i + 1] != NULL)
 				printf(" ");
 		}
@@ -96,22 +97,24 @@ void	ft_pwd(t_env *env)
 	path = current->value;
 	if (!path)
 	{
-		//perror("getenv");
+		// perror("getenv");
 		return ;
 	}
 	printf("%s\n", path);
 	g_exit_code = 0;
 }
 
-void ft_cd(t_cmd *cmd, t_env *env)
+void	ft_cd(t_cmd *cmd, t_env *env)
 {
-	char	*directory = NULL;
+	char	*directory;
 	t_env	*current;
 	char	cwd[1024];
+	char	*value;
 
+	directory = NULL;
 	if (cmd->args[1] == NULL)
 	{
-		//ft_fprintf(2, "got to home \n");
+		// ft_fprintf(2, "got to home \n");
 		current = ft_find_key(env, "HOME");
 		if (current && current->value)
 		{
@@ -131,7 +134,7 @@ void ft_cd(t_cmd *cmd, t_env *env)
 		ft_fprintf(2, "cd: too many arguments\n");
 		return ;
 	}
-	else 
+	else
 		directory = cmd->args[1];
 	if (chdir(directory) != 0)
 	{
@@ -145,14 +148,14 @@ void ft_cd(t_cmd *cmd, t_env *env)
 		current = ft_find_key(env, "PWD");
 		if (current && getcwd(cwd, sizeof(cwd)) != NULL)
 		{
-			char *value = current->value;
+			value = current->value;
 			ft_update_key(env, "OLDPWD", value);
 			ft_update_key(env, "PWD", cwd);
 			g_exit_code = 0;
 		}
 		else
 		{
-			g_exit_code = 1; 
+			g_exit_code = 1;
 			perror("getcwd");
 			return ;
 		}

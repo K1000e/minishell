@@ -1,8 +1,8 @@
 #include "../include/minihell.h"
 
-t_env *ft_find_key(t_env *env, char *key)
+t_env	*ft_find_key(t_env *env, char *key)
 {
-	t_env *current;
+	t_env	*current;
 
 	current = env->next;
 	while (current)
@@ -11,10 +11,10 @@ t_env *ft_find_key(t_env *env, char *key)
 			return (current);
 		current = current->next;
 	}
-	return env;
+	return (env);
 }
 
-void ft_update_key(t_env *env, char *key, char *value)
+void	ft_update_key(t_env *env, char *key, char *value)
 {
 	t_env	*env_node;
 	t_env	*current;
@@ -37,9 +37,9 @@ void ft_update_key(t_env *env, char *key, char *value)
 	}
 }
 
-void ft_print_declare_env(t_env *env)
+void	ft_print_declare_env(t_env *env)
 {
-	t_env *current;
+	t_env	*current;
 
 	current = env->next;
 	while (current)
@@ -49,10 +49,11 @@ void ft_print_declare_env(t_env *env)
 	}
 }
 
-t_bool check_validity_export(char *key)
+t_bool	check_validity_export(char *key)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	if (!ft_isalpha(key[i]) && key[i] != '_')
 		return (FALSE);
 	while (key[++i])
@@ -67,11 +68,12 @@ void	ft_export(t_cmd *cmd, t_env *env)
 {
 	char	*value;
 	char	*key;
-	int		i = -1;
+	int		i;
 
+	i = -1;
 	if (cmd->args[1] == NULL)
 		ft_print_declare_env(env);
-	else 
+	else
 	{
 		while (cmd->args[1][++i])
 		{
@@ -79,11 +81,12 @@ void	ft_export(t_cmd *cmd, t_env *env)
 			{
 				key = ft_strndup(cmd->args[1], i);
 				value = ft_strdup(cmd->args[1] + i + 1);
-				if (!check_validity_export(key) || !key || !value 
-					|| !key[0] || !value[0])
+				if (!check_validity_export(key) || !key || !value || !key[0]
+					|| !value[0])
 				{
 					g_exit_code = 1;
-					ft_fprintf(2, "bash: %s: '%s': not a valid identifier\n", cmd->args[0], cmd->args[1]);
+					ft_fprintf(2, "bash: %s: '%s': not a valid identifier\n",
+						cmd->args[0], cmd->args[1]);
 					return ;
 				}
 				else if (!env)
@@ -95,12 +98,12 @@ void	ft_export(t_cmd *cmd, t_env *env)
 				g_exit_code = 0;
 				return ;
 			}
-
 		}
 		if (!check_validity_export(cmd->args[1]))
 		{
 			g_exit_code = 1;
-			ft_fprintf(2, "bash: %s: %s: not a valid identifier\n", cmd->args[0], cmd->args[1]);
+			ft_fprintf(2, "bash: %s: %s: not a valid identifier\n",
+				cmd->args[0], cmd->args[1]);
 			return ;
 		}
 		g_exit_code = 0;
@@ -124,7 +127,7 @@ void	ft_env(t_cmd *cmd, t_env *env)
 	}
 }
 
-void supress_env(t_env *env, char *search)
+void	supress_env(t_env *env, char *search)
 {
 	t_env	*current;
 	t_env	*previous;
@@ -142,7 +145,7 @@ void supress_env(t_env *env, char *search)
 			free(current->key);
 			free(current->value);
 			free(current);
-			break;
+			break ;
 		}
 		previous = current;
 		current = current->next;

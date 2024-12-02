@@ -10,15 +10,16 @@ char	*ft_strndup(char *str, size_t len)
 		len_dup = len;
 	dup = ft_calloc((len_dup + 1), sizeof(char));
 	if (!dup)
-		return NULL;
+		return (NULL);
 	ft_strlcpy(dup, str, len_dup + 1);
 	return (dup);
 }
 
-void free_cmd_list(t_cmd *cmd_list)
+void	free_cmd_list(t_cmd *cmd_list)
 {
-	t_cmd *current;
-	int i;
+	t_cmd	*current;
+	int		i;
+
 	current = cmd_list;
 	while (current)
 	{
@@ -69,22 +70,24 @@ void	ft_cmd_add_back(t_cmd **lst, t_cmd *new)
 	ptr->next = new;
 }
 
-void free_cmd_node(t_cmd *cmd_node)
+void	free_cmd_node(t_cmd *cmd_node)
 {
+	int	i;
+
 	if (cmd_node)
 	{
 		if (cmd_node->cmd)
-			free(cmd_node->cmd);  // Free the command string
+			free(cmd_node->cmd); // Free the command string
 		if (cmd_node->args)
 		{
-			int i = 0;
+			i = 0;
 			while (cmd_node->args[i])
 			{
-				free(cmd_node->args[i]);  // Free each argument
+				free(cmd_node->args[i]); // Free each argument
 				i++;
 			}
-			free(cmd_node->args);  // Free the args array
+			free(cmd_node->args); // Free the args array
 		}
-		free(cmd_node);  // Finally, free the command node itself
+		free(cmd_node); // Finally, free the command node itself
 	}
 }
