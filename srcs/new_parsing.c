@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/03 02:23:10 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 22:56:36 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,8 @@ t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->redirection = FALSE;
 	cmd->nb_infile = count_redirection(cmd_tokens, '<');
 	cmd->nb_outfile = count_redirection(cmd_tokens, '>');
-	//cmd->
+	cmd->nb_heredoc = 0;
+	cmd->heredoc_delimiter = NULL;
 	if (cmd->nb_outfile)
 	{
 		cmd->out_file = ft_calloc(sizeof(char *), (cmd->nb_outfile + 1));
@@ -259,6 +260,11 @@ void	parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 			i++;
 		if (cmd_tokens[i])
 		{
+			/* if (ft_strcmp(cmd->args[nb_args]) == "<<" && ft_strncmp(cmd_str, """", 2) == 0)
+			{
+				
+			} */
+				//i++;
 			token = cmd_tokens[i];
 			start = i;
 			while (cmd_tokens[i] && cmd_tokens[i] == token)
@@ -284,16 +290,35 @@ void	clear_quotes(t_parse *parse)
 	res_command = ft_calloc(sizeof(char), ft_strlen(parse->token_line) + 1);
 	i = -1;
 	x = 0;
+	t_bool heredoc = FALSE;
 	while (parse->token_line[++i])
 	{
-		if (parse->token_line[i] == 'e')
+		if (parse->token_line[i] == '<' && parse->token_line[i + 1] == '<')
+		{
+			heredoc = TRUE;
+			res_token[x] = parse->token_line[i];
+			res_command[x++] = parse->command_line[i];
+			res_token[x] = parse->token_line[++i];
+			res_command[x++] = parse->command_line[i];
 			continue ;
-		else
+		}
+		if (heredoc && parse->command_line[i] == '"'
+			&& parse->command_line[i + 1] == '"')
 		{
 			res_token[x] = parse->token_line[i];
-			res_command[x] = parse->command_line[i];
-			x++;
+			res_command[x++] = parse->command_line[i++];
+			res_token[x] = parse->token_line[i];
+			res_command[x++] = parse->command_line[i];
+			heredoc = FALSE;
+			continue ;
 		}
+		if (parse->token_line[i] == 'e' && !heredoc)
+			continue ;
+		if (heredoc && parse->token_line[i] != '<' && parse->token_line[i] != 'e' && parse->token_line[i] != ' ')
+			heredoc = FALSE;
+		res_token[x] = parse->token_line[i];
+		res_command[x] = parse->command_line[i];
+		x++;
 	}
 	free(parse->token_line);
 	free(parse->command_line);
@@ -412,6 +437,7 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	in = 0;
 	out = 0;
 	her = 0;
+	//int x = 0;
 	// order = 0;
 	new_cmd->order_file = ft_strdup("");
 	while (new_cmd->args[++i])
@@ -427,8 +453,12 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<<") == 0)
 		{
-			add_to_tab(new_cmd->heredoc_delimiter, new_cmd->args[i + 1]);
-			new_cmd->order_file = ft_join(new_cmd->order_file, "h");
+			new_cmd->redirection = TRUE;
+			if (ft_strcmp(new_cmd->args_token[i + 1], "ee") == 0)
+				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, "\n");
+			else
+				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, new_cmd->args[i + 1]);
+			printf("heredoc_delimiter: %s\n", new_cmd->heredoc_delimiter[her]);
 			new_cmd->nb_heredoc++;
 			her++;
 			i++;

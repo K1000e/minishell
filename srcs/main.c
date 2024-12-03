@@ -220,6 +220,7 @@ void	ft_command(char *line, t_env *env)
 	t_cmd	*commands;
 	t_cmd	*tmp;
 
+	//printf("exit code: %d\n", g_exit_code);
 	commands = NULL;
 	expanded_line = expand_env_vars(line, env);
 	if (expanded_line != NULL)
@@ -230,14 +231,14 @@ void	ft_command(char *line, t_env *env)
 		return ;
 	is_pipe(commands);
 	tmp = commands;
-	// print_cmd_list(commands);
 	if (tmp->args[0] && (commands->is_pipe || !is_builtin(tmp->args[0])))
 		execute_command(tmp, env);
 	else if (tmp->args[0] && (!commands->is_pipe && is_builtin(tmp->args[0])))
 		single_builtin(tmp, env);
-	else if (tmp->args[0] == NULL)
+	else if (tmp->args[0] == NULL )
 		g_exit_code = redirection_exec_bultins_single(tmp);
 	free_cmd_list(commands);
+	//printf("exit code: %d\n", g_exit_code);
 }
 
 void	sigint_handler(int signal)
@@ -285,7 +286,7 @@ void	minihell(t_env *env, int save_stdin, int save_stdout)
 			ft_printf("exit\n");
 			break ;
 		}
-		g_exit_code = 0;
+		//g_exit_code = 0;
 		if (ft_strlen(line) > 0)
 			add_history(line);
 		if (!match_quotes(line) || !count_redir(line))
@@ -294,6 +295,7 @@ void	minihell(t_env *env, int save_stdin, int save_stdout)
 			continue ;
 		}
 		ft_command(line, env);
+		//printf("exit code: %d\n", g_exit_code);
 		free(line);
 	}
 	exit(0);

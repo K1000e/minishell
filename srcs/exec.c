@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/03 02:25:41 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 22:55:23 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,20 @@ int handle_heredoc(const char *delimiter)
 		perror("pipe");
 		return -1;
 	}
-
-	printf("heredoc> ");
-	while ((read = getline(&line, &len, stdin)) != -1) {
-		// Remove newline character
-		if (line[read - 1] == '\n') {
+	printf("> ");
+	while ((read = getline(&line, &len, stdin)) != -1)
+	{
+		if (line[read - 1] == '\n' && read > 1)
 			line[read - 1] = '\0';
-		}
-		// Check if the input matches the delimiter
-		if (strcmp(line, delimiter) == 0) {
+		if (strcmp(line, delimiter) == 0)
 			break;
-		}
-		// Write input to the pipe
 		write(pipefd[1], line, strlen(line));
 		write(pipefd[1], "\n", 1);
-		printf("heredoc> ");
+		printf("> ");
 	}
 	free(line);
-	close(pipefd[1]); // Close the write end of the pipe
-	return pipefd[0]; // Return the read end of the pipe
+	close(pipefd[1]);
+	return pipefd[0];
 }
 
 char	*get_path_variable(t_env *env)
@@ -219,6 +214,8 @@ int	redirection_exec_bultins(t_cmd *cmd)
 
 	pipex.file_i = -1;
 	pipex.file_o = -1;
+	pipex.pipe_fd[0] = -1;
+	pipex.pipe_fd[1] = -1;
 	exit_code = 0;
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
@@ -228,23 +225,27 @@ int	redirection_exec_bultins(t_cmd *cmd)
 	int h = 0;
 	while (++i < (cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc))
 	{
+		if (cmd->order_file[i] == 'h')
+		{
+			pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
+			if (pipex.file_i < 0)
+			{
+				//perror(cmd->in_file[j]);
+				exit(1);
+			}
+			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
+				close(pipex.file_i);
+			h++;
+		}
 		if (cmd->order_file[i] == 'i')
 		{
-			if (cmd->heredoc[h] == TRUE)
+			pipex.file_i = open(cmd->in_file[j], O_RDONLY);
+			if (pipex.file_i < 0)
 			{
-				pipex.file_i = handle_heredoc(cmd->in_file[h]);
-				if (pipex.file_i < 0)
-					exit(1);
+				perror(cmd->in_file[j]);
+				exit(1);
 			}
-			{
-				pipex.file_i = open(cmd->in_file[j], O_RDONLY);
-				if (pipex.file_i < 0)
-				{
-					perror(cmd->in_file[j]);
-					exit(1);
-				}
-			}
-			if (i < cmd->nb_infile - 1)
+			if (i < cmd->nb_infile - 1 + cmd->nb_heredoc - 1)
 				close(pipex.file_i);
 			j++;
 		}
@@ -297,6 +298,8 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 
 	pipex.file_i = -1;
 	pipex.file_o = -1;
+	pipex.pipe_fd[0] = -1;
+	pipex.pipe_fd[1] = -1;
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
 	i = -1;
@@ -307,14 +310,15 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 	{
 		if (cmd->order_file[i] == 'h')
 		{
-			pipex.file_i = handle_heredoc(cmd->in_file[h]);
+			pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
 			if (pipex.file_i < 0)
 			{
 				perror(cmd->in_file[j]);
-				exit(1);
+				return(1);
 			}
-			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
-				close(pipex.file_i);
+			/* if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
+				close(last_input_fd); */
+			h++;
 		}
 		if (cmd->order_file[i] == 'i')
 		{
@@ -322,7 +326,7 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 			if (pipex.file_i < 0)
 			{
 				perror(cmd->in_file[j]);
-				exit(1);
+				return(1);
 			}
 			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
 				close(pipex.file_i);
@@ -346,7 +350,7 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 			k++;
 		}
 	}
-	if (cmd->nb_infile == 0)
+	if (cmd->nb_infile == 0 || cmd->nb_heredoc == 0)
 		dup2(pipex.pipe_fd[0], STDIN_FILENO);
 	else
 	{
@@ -374,8 +378,7 @@ void	single_builtin(t_cmd *cmd, t_env *env)
 
 	current = env;
 	g_exit_code = 0;
-	// if (cmd->redirection)
-	g_exit_code = redirection_exec_bultins_single(cmd);
+		g_exit_code = redirection_exec_bultins_single(cmd);
 	if (g_exit_code >= 1)
 	{
 		g_exit_code = 1;
