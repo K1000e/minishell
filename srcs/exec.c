@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/03 22:55:23 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/04 00:00:48 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 int handle_heredoc(const char *delimiter)
 {
+	pid_t pid;
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
@@ -23,19 +24,38 @@ int handle_heredoc(const char *delimiter)
 		perror("pipe");
 		return -1;
 	}
-	printf("> ");
-	while ((read = getline(&line, &len, stdin)) != -1)
+	pid = fork();
+	if (pid == 0)
 	{
-		if (line[read - 1] == '\n' && read > 1)
-			line[read - 1] = '\0';
-		if (strcmp(line, delimiter) == 0)
-			break;
-		write(pipefd[1], line, strlen(line));
-		write(pipefd[1], "\n", 1);
+		signal(SIGINT, sigint_heredoc_handler);
+		close(pipefd[0]);
 		printf("> ");
+		while ((read = getline(&line, &len, stdin)) != -1)
+		{
+			if (line == NULL)
+				exit(EXIT_FAILURE);
+			if (line[read - 1] == '\n')
+				line[read - 1] = '\0';
+			if (strcmp(line, delimiter) == 0)
+			{
+				free(line);
+				exit(EXIT_SUCCESS);
+			}
+			write(pipefd[1], line, strlen(line));
+			write(pipefd[1], "\n", 1);
+			printf("> ");
+		}
+		free(line);
+		close(pipefd[1]);
+		exit(EXIT_SUCCESS);
 	}
-	free(line);
-	close(pipefd[1]);
+	//set_signal_action(sigint_handler);
+	else {
+		close(pipefd[1]); // Close write end
+		wait(NULL); // Wait for child process to finish
+		dup2(pipefd[0], STDIN_FILENO); // Redirect stdin to read end of the pipe
+		close(pipefd[0]);
+	}
 	return pipefd[0];
 }
 
@@ -316,8 +336,8 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 				perror(cmd->in_file[j]);
 				return(1);
 			}
-			/* if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
-				close(last_input_fd); */
+			if (k + j < cmd->nb_infile + cmd->nb_heredoc - 1)
+				close(pipex.file_i);
 			h++;
 		}
 		if (cmd->order_file[i] == 'i')
@@ -328,7 +348,7 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 				perror(cmd->in_file[j]);
 				return(1);
 			}
-			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
+			if (j + k < cmd->nb_infile + cmd->nb_heredoc - 1)
 				close(pipex.file_i);
 			j++;
 		}
@@ -345,7 +365,7 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 				perror(cmd->out_file[k]);
 				return (1);
 			}
-			if (i < cmd->nb_outfile - 1)
+			if (k < cmd->nb_outfile - 1)
 				close(pipex.file_o);
 			k++;
 		}

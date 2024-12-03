@@ -1,3 +1,10 @@
 herdoc 
 
 $0
+
+env - i -> ls
+
+leaks
+
+export a=
+

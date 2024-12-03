@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/03 22:56:36 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 23:07:52 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -455,10 +455,10 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 		{
 			new_cmd->redirection = TRUE;
 			if (ft_strcmp(new_cmd->args_token[i + 1], "ee") == 0)
-				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, "\n");
+				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, "\0");
 			else
 				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, new_cmd->args[i + 1]);
-			printf("heredoc_delimiter: %s\n", new_cmd->heredoc_delimiter[her]);
+			new_cmd->order_file = ft_join(new_cmd->order_file, "h");
 			new_cmd->nb_heredoc++;
 			her++;
 			i++;
