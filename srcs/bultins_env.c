@@ -116,7 +116,7 @@ void	ft_env(t_cmd *cmd, t_env *env)
 
 	if (cmd->args[1] != NULL)
 	{
-		printf("env: ‘%s’: No such file or directory 1\n", cmd->args[1]);
+		printf("env: ‘%s’: No such file or directory\n", cmd->args[1]);
 		return ;
 	}
 	current = env->next;

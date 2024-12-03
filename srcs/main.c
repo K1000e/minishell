@@ -231,7 +231,6 @@ void	ft_command(char *line, t_env *env)
 	is_pipe(commands);
 	tmp = commands;
 	// print_cmd_list(commands);
-
 	if (tmp->args[0] && (commands->is_pipe || !is_builtin(tmp->args[0])))
 		execute_command(tmp, env);
 	else if (tmp->args[0] && (!commands->is_pipe && is_builtin(tmp->args[0])))
@@ -286,6 +285,7 @@ void	minihell(t_env *env, int save_stdin, int save_stdout)
 			ft_printf("exit\n");
 			break ;
 		}
+		g_exit_code = 0;
 		if (ft_strlen(line) > 0)
 			add_history(line);
 		if (!match_quotes(line) || !count_redir(line))

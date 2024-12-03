@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/03 00:35:52 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 02:23:10 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,7 @@ t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->redirection = FALSE;
 	cmd->nb_infile = count_redirection(cmd_tokens, '<');
 	cmd->nb_outfile = count_redirection(cmd_tokens, '>');
+	//cmd->
 	if (cmd->nb_outfile)
 	{
 		cmd->out_file = ft_calloc(sizeof(char *), (cmd->nb_outfile + 1));
@@ -337,13 +338,43 @@ void	check_char(t_parse *parse)
 	clear_quotes(parse);
 }
 
+char **add_to_tab(char **tab, const char *str)
+{
+	int i;
+	char **new_tab;
+
+	i = 0;
+	if (tab)
+		while (tab[i] != NULL)
+			i++;
+	new_tab = malloc((i + 2) * sizeof(char *));
+	new_tab[i] = strdup(str);
+	if (!new_tab[i])
+	{
+		free(new_tab);
+		return (NULL);
+	}
+	new_tab[i + 1] = NULL;
+	while (--i >= 0)
+		new_tab[i] = tab[i];
+	if (tab)
+		free(tab);
+	return (new_tab);
+}
+
 int	handle_input_redirection(t_cmd *cmd, int i, int *in)
 {
 	if (cmd->args[i + 1])
 	{
 		cmd->redirection = TRUE;
 		cmd->order_file = ft_join(cmd->order_file, "i");
-		cmd->in_file[*in] = ft_strdup(cmd->args[i + 1]);
+		/* if (ft_strcmp(cmd->args[i], "<<") == 0)
+		{
+			
+		} */
+	//	else
+			cmd->in_file[*in] = ft_strdup(cmd->args[i + 1]);
+		//cmd->heredoc[*in] = (ft_strcmp(cmd->args[i], ">>") == 0);
 		return (i);
 	}
 	else
@@ -375,10 +406,12 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	int	i;
 	int	in;
 	int	out;
+	int her;
 
 	i = -1;
 	in = 0;
 	out = 0;
+	her = 0;
 	// order = 0;
 	new_cmd->order_file = ft_strdup("");
 	while (new_cmd->args[++i])
@@ -390,6 +423,14 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 			out++;
 			if (i == -1)
 				return (NULL);
+			i++;
+		}
+		else if (ft_strcmp(new_cmd->args[i], "<<") == 0)
+		{
+			add_to_tab(new_cmd->heredoc_delimiter, new_cmd->args[i + 1]);
+			new_cmd->order_file = ft_join(new_cmd->order_file, "h");
+			new_cmd->nb_heredoc++;
+			her++;
 			i++;
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)

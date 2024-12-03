@@ -6,11 +6,43 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/03 00:46:30 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 02:25:41 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
+
+int handle_heredoc(const char *delimiter)
+{
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	int pipefd[2];
+
+	if (pipe(pipefd) == -1) {
+		perror("pipe");
+		return -1;
+	}
+
+	printf("heredoc> ");
+	while ((read = getline(&line, &len, stdin)) != -1) {
+		// Remove newline character
+		if (line[read - 1] == '\n') {
+			line[read - 1] = '\0';
+		}
+		// Check if the input matches the delimiter
+		if (strcmp(line, delimiter) == 0) {
+			break;
+		}
+		// Write input to the pipe
+		write(pipefd[1], line, strlen(line));
+		write(pipefd[1], "\n", 1);
+		printf("heredoc> ");
+	}
+	free(line);
+	close(pipefd[1]); // Close the write end of the pipe
+	return pipefd[0]; // Return the read end of the pipe
+}
 
 char	*get_path_variable(t_env *env)
 {
@@ -193,15 +225,24 @@ int	redirection_exec_bultins(t_cmd *cmd)
 	i = -1;
 	j = 0;
 	k = 0;
-	while (++i < (cmd->nb_infile + cmd->nb_outfile))
+	int h = 0;
+	while (++i < (cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc))
 	{
 		if (cmd->order_file[i] == 'i')
 		{
-			pipex.file_i = open(cmd->in_file[j], O_RDONLY);
-			if (pipex.file_i < 0)
+			if (cmd->heredoc[h] == TRUE)
 			{
-				perror(cmd->in_file[j]);
-				exit(1);
+				pipex.file_i = handle_heredoc(cmd->in_file[h]);
+				if (pipex.file_i < 0)
+					exit(1);
+			}
+			{
+				pipex.file_i = open(cmd->in_file[j], O_RDONLY);
+				if (pipex.file_i < 0)
+				{
+					perror(cmd->in_file[j]);
+					exit(1);
+				}
 			}
 			if (i < cmd->nb_infile - 1)
 				close(pipex.file_i);
@@ -261,17 +302,29 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 	i = -1;
 	j = 0;
 	k = 0;
-	while (++i < (cmd->nb_infile + cmd->nb_outfile))
+	int h = 0;
+	while (++i < (cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc))
 	{
+		if (cmd->order_file[i] == 'h')
+		{
+			pipex.file_i = handle_heredoc(cmd->in_file[h]);
+			if (pipex.file_i < 0)
+			{
+				perror(cmd->in_file[j]);
+				exit(1);
+			}
+			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
+				close(pipex.file_i);
+		}
 		if (cmd->order_file[i] == 'i')
 		{
 			pipex.file_i = open(cmd->in_file[j], O_RDONLY);
 			if (pipex.file_i < 0)
 			{
 				perror(cmd->in_file[j]);
-				return (1);
+				exit(1);
 			}
-			if (i < cmd->nb_infile - 1)
+			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
 				close(pipex.file_i);
 			j++;
 		}

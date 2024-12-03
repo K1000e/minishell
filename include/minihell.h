@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/03 00:45:19 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/03 02:20:04 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,11 @@ typedef struct s_cmd
 	char			**in_file;		// Fichier pour l'entrée redirigée
 	struct s_cmd	*next;			// Pointeur vers la commande suivante
 	int				*append;			// Pour savoir si on doit append ou trunk
-	t_bool 			heredoc;
+	char 			*heredoc;
 	t_bool			redirection;
-	char			*heredoc_exit;
+	char			**heredoc_delimiter;
+	int 			nb_heredoc;
+	//char			*heredoc_exit;
 	t_bool			is_pipe;
 	t_bool			is_bultins;
 	t_bool			path;
