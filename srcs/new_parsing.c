@@ -179,6 +179,8 @@ char	**clear_redir(t_cmd *cmd)
 	}
 	free(cmd->args);
 	free(cmd->args_token);
+	cmd->args = new_args;
+    cmd->args_token = NULL;
 	return (new_args);
 }
 
@@ -214,6 +216,7 @@ t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 		cmd->in_file = ft_calloc(sizeof(char *), (cmd->nb_infile + 1));
 	else
 		cmd->in_file = NULL;
+	cmd->order_file = NULL;
 	make_argument(cmd_str, cmd_tokens, cmd);
 	if (cmd->nb_infile || cmd->nb_outfile)
 	{
@@ -448,14 +451,10 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	int	i;
 	int	in;
 	int	out;
-	//int her;
 
 	i = -1;
 	in = 0;
 	out = 0;
-	//her = 0;
-	//int x = 0;
-	// order = 0;
 	new_cmd->order_file = ft_strdup("");
 	while (new_cmd->args[++i])
 	{

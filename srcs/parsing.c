@@ -18,7 +18,7 @@ char	*ft_strndup(char *str, size_t len)
 void	free_cmd_list(t_cmd *cmd_list)
 {
 	t_cmd	*current;
-	t_cmd *next;
+	t_cmd	*next;
 	int		i;
 
 	current = cmd_list;
@@ -59,6 +59,8 @@ void	free_cmd_list(t_cmd *cmd_list)
 		}
 		if (current->append)
 			free(current->append);
+		if (current->order_file)
+			free(current->order_file);
 		if (current->heredoc_delimiter)
         {
             i = -1;

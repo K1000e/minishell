@@ -16,6 +16,8 @@ char	*ft_join(char *buffer, char *buf)
 {
 	char	*tmp;
 
+	if (!buffer)
+        return ft_strdup(buf);
 	tmp = ft_strjoin(buffer, buf);
 	free(buffer);
 	return (tmp);

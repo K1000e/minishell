@@ -29,7 +29,16 @@ int handle_heredoc(const char *delimiter)
 	{
 		signal(SIGINT, sigint_heredoc_handler);
 		close(pipefd[0]);
-		printf("> ");
+		/* while (TRUE)
+		{
+			line = readline("> ");
+			if (!line || ft_strcmp(line, delimiter) == 0)
+				break ;
+			write(pipefd[1], line, ft_strlen(line));
+			write(pipefd[1], "\n", 1);
+			free(line);
+		} */
+		write(1, "> ", 2);
 		while ((read = getline(&line, &len, stdin)) != -1)
 		{
 			if (line == NULL)
@@ -43,7 +52,7 @@ int handle_heredoc(const char *delimiter)
 			}
 			write(pipefd[1], line, strlen(line));
 			write(pipefd[1], "\n", 1);
-			printf("> ");
+			write(1, "> ", 2);
 		}
 		free(line);
 		close(pipefd[1]);
@@ -105,6 +114,7 @@ void	find_executable(t_cmd *command, t_env *env)
 			if (access(full_path, X_OK) == 0)
 			{
 				command->args[0] = ft_strdup(full_path);
+				free(full_path);
 				command->path = TRUE;
 				return ;
 			}
@@ -246,21 +256,23 @@ int	redirection_exec_bultins(t_cmd *cmd)
 	j = 0;
 	k = 0;
 	int h = 0;
-	while (++i < (cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc))
+	if (!cmd->order_file || (int)ft_strlen(cmd->order_file) != cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc)
+    {
+        fprintf(stderr, "Error: Invalid redirection metadata\n");
+        return 1;
+    }
+	while ((size_t)++i < ft_strlen(cmd->order_file))
 	{
 		if (cmd->order_file[i] == 'h')
 		{
 			pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
 			if (pipex.file_i < 0)
-			{
-				//perror(cmd->in_file[j]);
 				exit(1);
-			}
 			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
 				close(pipex.file_i);
 			h++;
 		}
-		if (cmd->order_file[i] == 'i')
+		else if (cmd->order_file[i] == 'i')
 		{
 			pipex.file_i = open(cmd->in_file[j], O_RDONLY);
 			if (pipex.file_i < 0)
@@ -318,80 +330,75 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 	int		i;
 	int		j;
 	int		k;
+	int fd;
 
 	pipex.file_i = -1;
 	pipex.file_o = -1;
-	pipex.pipe_fd[0] = -1;
-	pipex.pipe_fd[1] = -1;
 	if (!cmd || !cmd->cmd)
 		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
 	i = -1;
 	j = 0;
 	k = 0;
 	int h = 0;
-	while (++i < (cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc))
+	while ((size_t)++i < ft_strlen(cmd->order_file))
 	{
 		if (cmd->order_file[i] == 'h')
 		{
-			pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
-			if (pipex.file_i < 0)
-			{
-				perror(cmd->in_file[j]);
+			fd = handle_heredoc(cmd->heredoc_delimiter[h]);
+			if (fd < 0)
 				return(1);
-			}
-			if (k + j < cmd->nb_infile + cmd->nb_heredoc - 1)
+			if (pipex.file_i != -1)
 				close(pipex.file_i);
+			pipex.file_i = fd;
 			h++;
 		}
-		if (cmd->order_file[i] == 'i')
+		else if (cmd->order_file[i] == 'i')
 		{
-			pipex.file_i = open(cmd->in_file[j], O_RDONLY);
-			if (pipex.file_i < 0)
+			fd = open(cmd->in_file[j], O_RDONLY);
+			if (fd < 0)
 			{
 				perror(cmd->in_file[j]);
 				return(1);
 			}
-			if (j + k < cmd->nb_infile + cmd->nb_heredoc - 1)
+			if (pipex.file_i != -1)
 				close(pipex.file_i);
+			pipex.file_i = fd;
 			j++;
 		}
 		else if (cmd->order_file[i] == 'o')
 		{
 			if (cmd->append[k] == 0)
-				pipex.file_o = open(cmd->out_file[k],
+				fd = open(cmd->out_file[k],
 						O_CREAT | O_TRUNC | O_WRONLY, 0644);
 			else
-				pipex.file_o = open(cmd->out_file[k],
+				fd = open(cmd->out_file[k],
 						O_CREAT | O_APPEND | O_WRONLY, 0644);
-			if (pipex.file_o < 0)
+			if (fd < 0)
 			{
 				perror(cmd->out_file[k]);
 				return (1);
 			}
-			if (k < cmd->nb_outfile - 1)
+			if (pipex.file_o)
 				close(pipex.file_o);
+			pipex.file_o = fd;
 			k++;
 		}
+		else
+        {
+            fprintf(stderr, "Error: Unknown redirection type '%c'\n", cmd->order_file[i]);
+            return 1;
+        }
 	}
-	if (cmd->nb_infile == 0 || cmd->nb_heredoc == 0)
-		dup2(pipex.pipe_fd[0], STDIN_FILENO);
-	else
+	if (pipex.file_i != -1)
 	{
-		// exit_code += open_infile(&pipex, cmd);
 		dup2(pipex.file_i, STDIN_FILENO);
+		close(pipex.file_i);
 	}
-	if (cmd->nb_outfile == 0)
-		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
-	else
-	{
-		// exit_code += open_outfile(&pipex, cmd);
+	if (pipex.file_o != -1)
+    {
 		dup2(pipex.file_o, STDOUT_FILENO);
+		close(pipex.file_o);
 	}
-	if (pipex.pipe_fd[1] != -1)
-		close(pipex.pipe_fd[1]);
-	if (pipex.pipe_fd[0] != -1)
-		close(pipex.pipe_fd[0]);
-	// return (exit_code);
 	return (0);
 }
 
@@ -460,6 +467,8 @@ char	*ft_join(char *buffer, char *buf)
 {
 	char	*tmp;
 
+	if (!buffer)
+		return (ft_strdup(buf));
 	tmp = ft_strjoin(buffer, buf);
 	free(buffer);
 	return (tmp);
