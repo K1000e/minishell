@@ -18,19 +18,30 @@ char	*ft_strndup(char *str, size_t len)
 void	free_cmd_list(t_cmd *cmd_list)
 {
 	t_cmd	*current;
+	t_cmd *next;
 	int		i;
 
 	current = cmd_list;
 	while (current)
 	{
+		next = current->next;
 		if (current->cmd)
 			free(current->cmd);
+        if (current->token)
+            free(current->token);
 		if (current->args)
 		{
 			i = -1;
 			while (current->args[++i])
 				free(current->args[i]);
 			free(current->args);
+		}
+		if (current->args_token)
+		{
+			i = -1;
+			while (current->args_token[++i])
+				free(current->args_token[i]);
+			free(current->args_token);
 		}
 		if (current->out_file)
 		{
@@ -48,9 +59,16 @@ void	free_cmd_list(t_cmd *cmd_list)
 		}
 		if (current->append)
 			free(current->append);
-		current = current->next;
+		if (current->heredoc_delimiter)
+        {
+            i = -1;
+            while (current->heredoc_delimiter[++i])
+                free(current->heredoc_delimiter[i]);
+            free(current->heredoc_delimiter);
+        }
+		free(current);
+		current = next;
 	}
-	free(cmd_list);
 }
 
 void	ft_cmd_add_back(t_cmd **lst, t_cmd *new)

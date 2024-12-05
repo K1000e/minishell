@@ -187,6 +187,15 @@ t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd = malloc(sizeof(t_cmd));
 	cmd->cmd = ft_strdup(cmd_str);
 	cmd->token = ft_strdup(cmd_tokens);
+	if (!cmd->cmd || !cmd->token)
+    {
+        free(cmd->cmd);
+        free(cmd->token);
+        free(cmd);
+        free(cmd_str);
+        free(cmd_tokens);
+        return NULL;
+    }
 	cmd->next = NULL;
 	cmd->append = 0;
 	cmd->redirection = FALSE;
@@ -221,6 +230,14 @@ void	make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->nb_token = count_tokens_(cmd_tokens);
 	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
 	cmd->args_token = malloc(sizeof(char *) * (cmd->nb_token + 1));
+	if (!cmd->args || !cmd->args_token)
+    {
+        if (cmd->args)
+            free(cmd->args);
+        if (cmd->args_token)
+            free(cmd->args_token);
+        return;
+    }
 	parse_args(cmd_str, cmd_tokens, cmd);
 }
 
