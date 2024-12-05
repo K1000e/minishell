@@ -2,9 +2,8 @@ herdoc
 
 $0
 
-env - i -> ls
+//env - i -> ls
 
 leaks
 
-export a=
 

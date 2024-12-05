@@ -4,14 +4,17 @@ t_env	*ft_find_key(t_env *env, char *key)
 {
 	t_env	*current;
 
+	if (!env || !key)
+        return NULL;
 	current = env->next;
+
 	while (current)
 	{
 		if (ft_strcmp(current->key, key) == 0)
 			return (current);
 		current = current->next;
 	}
-	return (env);
+	return env;
 }
 
 void	ft_update_key(t_env *env, char *key, char *value)
@@ -37,24 +40,60 @@ void	ft_update_key(t_env *env, char *key, char *value)
 	}
 }
 
+void    ft_sort_env(t_env **env)
+{
+    t_env   *current;
+    t_env   *next;
+    char    *tmp_key;
+    char    *tmp_value;
+    int     swapped;
+
+    if (!env || !(*env) || !(*env)->next)
+        return;
+
+    do {
+        swapped = 0;
+        current = *env;
+        while (current->next)
+        {
+            next = current->next;
+            if (strcmp(current->key, next->key) > 0)
+            {
+                tmp_key = current->key;
+                tmp_value = current->value;
+                current->key = next->key;
+                current->value = next->value;
+                next->key = tmp_key;
+                next->value = tmp_value;
+                swapped = 1;
+            }
+            current = current->next;
+        }
+    } while (swapped);
+}
+
 void	ft_print_declare_env(t_env *env)
 {
 	t_env	*current;
 
 	current = env->next;
+	ft_sort_env(&current);
 	while (current)
 	{
-		printf("declare -x %s=%s\n", current->key, current->value);
+		printf("declare -x %s", current->key);
+		if (current->value)
+			printf("=\"%s\"", current->value);
+		printf("\n");
 		current = current->next;
 	}
 }
 
-t_bool	check_validity_export(char *key)
+t_bool	check_validity_export(const char *key)
 {
 	int	i;
 
 	i = 0;
-	if (!ft_isalpha(key[i]) && key[i] != '_')
+	if (!key || (!ft_isalpha(key[i]) && key[i] != '_'))
 		return (FALSE);
 	while (key[++i])
 	{
@@ -69,45 +108,46 @@ void	ft_export(t_cmd *cmd, t_env *env)
 	char	*value;
 	char	*key;
 	int		i;
+	char	*equal_sign;
 
-	i = -1;
-	if (cmd->args[1] == NULL)
-		ft_print_declare_env(env);
-	else
+	if (!cmd->args[1])
 	{
-		while (cmd->args[1][++i])
+		ft_print_declare_env(env);
+		return ;
+	}
+	i = 0;
+	while (cmd->args[++i])
+	{
+		equal_sign = ft_strchr(cmd->args[i], '=');
+		if (equal_sign)
 		{
-			if (cmd->args[1][i] == '=')
-			{
-				key = ft_strndup(cmd->args[1], i);
-				value = ft_strdup(cmd->args[1] + i + 1);
-				if (!check_validity_export(key) || !key || !value || !key[0]
-					|| !value[0])
-				{
-					g_exit_code = 1;
-					ft_fprintf(2, "bash: %s: '%s': not a valid identifier\n",
-						cmd->args[0], cmd->args[1]);
-					return ;
-				}
-				else if (!env)
-					env = create_env_node(key, value);
-				else
-					ft_update_key(env, key, value);
-				free(key);
-				free(value);
-				g_exit_code = 0;
-				return ;
-			}
+			key = ft_strndup(cmd->args[i], equal_sign - cmd->args[i]);
+			value = ft_strdup(equal_sign + 1);
+			if (!value)
+				value = ft_strdup("");
 		}
-		if (!check_validity_export(cmd->args[1]))
+		else
+		{
+			key = ft_strdup(cmd->args[i]); // Only key provided, value is NULL
+       		value = NULL;
+		}
+
+		if (!check_validity_export(key) || !key[0])
 		{
 			g_exit_code = 1;
-			ft_fprintf(2, "bash: %s: %s: not a valid identifier\n",
-				cmd->args[0], cmd->args[1]);
-			return ;
+			ft_fprintf(2, "bash: export: '%s': not a valid identifier\n", cmd->args[i]);
+			free(key);
+			free(value);
+			return;
 		}
-		g_exit_code = 0;
+		if (!env)
+			env = create_env_node(key, value ? value : "");
+		else
+			ft_update_key(env, key, value ? value : "");
+		free(key);
+		free(value);
 	}
+    g_exit_code = 0;
 }
 
 void	ft_env(t_cmd *cmd, t_env *env)
@@ -155,14 +195,10 @@ void	supress_env(t_env *env, char *search)
 
 void	ft_unset(t_cmd *cmd, t_env *env)
 {
-	t_env	*current;
-	t_env	*previous;
 	int		i;
 
 	if (cmd->args[1] == NULL)
 		return ;
-	current = env->next;
-	previous = env;
 	i = 0;
 	while (cmd->args[++i])
 		supress_env(env, cmd->args[i]);

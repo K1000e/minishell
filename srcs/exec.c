@@ -65,7 +65,10 @@ char	*get_path_variable(t_env *env)
 
 	current = env->next;
 	current = ft_find_key(current, "PATH");
-	return (current->value + 1);
+	if (current)
+		return (current->value);
+	else
+		return (NULL);
 }
 
 t_bool	is_directory(const char *path)
