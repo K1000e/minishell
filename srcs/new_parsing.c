@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/03 23:07:52 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/05 19:32:16 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -431,12 +431,12 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	int	i;
 	int	in;
 	int	out;
-	int her;
+	//int her;
 
 	i = -1;
 	in = 0;
 	out = 0;
-	her = 0;
+	//her = 0;
 	//int x = 0;
 	// order = 0;
 	new_cmd->order_file = ft_strdup("");
@@ -460,7 +460,7 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, new_cmd->args[i + 1]);
 			new_cmd->order_file = ft_join(new_cmd->order_file, "h");
 			new_cmd->nb_heredoc++;
-			her++;
+			//her++;
 			i++;
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)

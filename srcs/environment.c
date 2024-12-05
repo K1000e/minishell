@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/03 00:12:19 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/05 19:54:51 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,11 +117,11 @@ t_env	*get_env(char **env, t_env *new_env, char *executable)
 	new_env->key = NULL;
 	new_env->value = NULL;
 	new_env->next = NULL;
-	exe = ft_strrchr(executable, '/') + 1;
+	exe = ft_strrchr(executable, '/');
 	if (exe)
-		new_env->executable = ft_strdup(exe);
+		new_env->executable = ft_strdup(exe + 1);
 	else
-		new_env->executable = ft_strdup(executable + 1);
+		new_env->executable = ft_strdup(executable);
 	while (env[++i])
 	{
 		j = -1;
