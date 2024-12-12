@@ -65,28 +65,11 @@ int	ft_envsize(t_env *lst)
 	return (i);
 }
 
-// char **base_env(t_env *env) //printenv
-// {
-// 	t_env *current;
-// 	char **environment;
-// 	int i;
-
-// 	current = env;
-// 	environment = ft_calloc(ft_envsize(env) + 1, sizeof(char *));
-// 	i = 0;
-// 	while (current)
-// 	{
-// 		environment[i++] = ft_strjoin(env->key, env->value);
-// 		current = current->next;
-// 	}
-// 	return (environment);
-// }
-
-char	**base_env(t_env *env) // printenv
+char	**base_env(t_env *env)
 {
-	t_env *current;
-	char **environment;
-	int i;
+	t_env	*current;
+	char	**environment;
+	int		i;
 
 	current = env->next;
 	environment = ft_calloc(ft_envsize(env) + 1, sizeof(char *));

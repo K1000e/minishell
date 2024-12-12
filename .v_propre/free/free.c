@@ -19,13 +19,11 @@ void free_cmd_list(t_cmd *cmd_list) {
 	while (cmd_list) {
 		current = cmd_list;
 		cmd_list = cmd_list->next;
-		//printf("Freeing command: %s\n", current->cmd); // Debug deallocation
 		free(current->cmd);
 		if (current->args) {
 			i = -1;
 			while (current->args[++i])
 			{
-				//printf("Freeing argument[%d]: %s\n", i, current->args[i]);
 				free(current->args[i]);
 			}
 			free(current->args);

@@ -1,17 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putnbr_base.c                                   :+:      :+:    :+:   */
+/*   ft_fprint_base.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/26 11:41:59 by cgorin            #+#    #+#             */
-/*   Updated: 2024/08/30 14:57:22 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/12 16:34:59 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ft_printf.h"
-
 
 int	ft_putnbr_base_fd(int fd, unsigned int n, char *base, int base_len)
 {
@@ -24,11 +23,11 @@ int	ft_putnbr_base_fd(int fd, unsigned int n, char *base, int base_len)
 	return (i);
 }
 
-
 static int	ft_print_adress_fd(int fd, const unsigned long n)
 {
 	if (n / 16)
-		return (ft_print_adress_fd(fd, n / 16) + ft_print_adress_fd(fd, n % 16));
+		return (ft_print_adress_fd(fd, n / 16)
+			+ ft_print_adress_fd(fd, n % 16));
 	else if (!(n / 10))
 		ft_print_char_fd(fd, n + '0');
 	else

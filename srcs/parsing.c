@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
+/*   Updated: 2024/12/12 16:16:48 by codespace        ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minihell.h"
 
 char	*ft_strndup(char *str, size_t len)
@@ -97,17 +109,17 @@ void	free_cmd_node(t_cmd *cmd_node)
 	if (cmd_node)
 	{
 		if (cmd_node->cmd)
-			free(cmd_node->cmd); // Free the command string
+			free(cmd_node->cmd);
 		if (cmd_node->args)
 		{
 			i = 0;
 			while (cmd_node->args[i])
 			{
-				free(cmd_node->args[i]); // Free each argument
+				free(cmd_node->args[i]);
 				i++;
 			}
-			free(cmd_node->args); // Free the args array
+			free(cmd_node->args);
 		}
-		free(cmd_node); // Finally, free the command node itself
+		free(cmd_node);
 	}
 }

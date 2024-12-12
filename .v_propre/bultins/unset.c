@@ -39,14 +39,10 @@ void suppress_env(t_env *env, char *search)
 
 void	ft_unset(t_cmd *cmd, t_env *env)
 {
-	//t_env	*current;
-	//t_env	*previous;
 	int		i;
 
 	if (cmd->args[1] == NULL)
 		return ;
-	//current = env->next;
-	//previous = env;
 	i = 0;
 	while (cmd->args[++i])
 		supress_env(env, cmd->args[i]);

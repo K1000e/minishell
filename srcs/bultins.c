@@ -96,10 +96,7 @@ void	ft_pwd(t_env *env)
 	current = ft_find_key(env, "PWD");
 	path = current->value;
 	if (!path)
-	{
-		// perror("getenv");
 		return ;
-	}
 	printf("%s\n", path);
 	g_exit_code = 0;
 }

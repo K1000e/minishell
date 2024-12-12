@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   new_parsing.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/05 19:32:16 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/12 16:14:23 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,14 +190,14 @@ t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->cmd = ft_strdup(cmd_str);
 	cmd->token = ft_strdup(cmd_tokens);
 	if (!cmd->cmd || !cmd->token)
-    {
-        free(cmd->cmd);
-        free(cmd->token);
-        free(cmd);
-        free(cmd_str);
-        free(cmd_tokens);
-        return NULL;
-    }
+	{
+		free(cmd->cmd);
+		free(cmd->token);
+		free(cmd);
+		free(cmd_str);
+		free(cmd_tokens);
+		return NULL;
+	}
 	cmd->next = NULL;
 	cmd->append = 0;
 	cmd->redirection = FALSE;
@@ -234,13 +234,13 @@ void	make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
 	cmd->args_token = malloc(sizeof(char *) * (cmd->nb_token + 1));
 	if (!cmd->args || !cmd->args_token)
-    {
-        if (cmd->args)
-            free(cmd->args);
-        if (cmd->args_token)
-            free(cmd->args_token);
-        return;
-    }
+	{
+		if (cmd->args)
+			free(cmd->args);
+		if (cmd->args_token)
+			free(cmd->args_token);
+		return;
+	}
 	parse_args(cmd_str, cmd_tokens, cmd);
 }
 
@@ -280,11 +280,6 @@ void	parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 			i++;
 		if (cmd_tokens[i])
 		{
-			/* if (ft_strcmp(cmd->args[nb_args]) == "<<" && ft_strncmp(cmd_str, """", 2) == 0)
-			{
-				
-			} */
-				//i++;
 			token = cmd_tokens[i];
 			start = i;
 			while (cmd_tokens[i] && cmd_tokens[i] == token)
@@ -405,88 +400,4 @@ char **add_to_tab(char **tab, const char *str)
 	if (tab)
 		free(tab);
 	return (new_tab);
-}
-
-int	handle_input_redirection(t_cmd *cmd, int i, int *in)
-{
-	if (cmd->args[i + 1])
-	{
-		cmd->redirection = TRUE;
-		cmd->order_file = ft_join(cmd->order_file, "i");
-		/* if (ft_strcmp(cmd->args[i], "<<") == 0)
-		{
-			
-		} */
-	//	else
-			cmd->in_file[*in] = ft_strdup(cmd->args[i + 1]);
-		//cmd->heredoc[*in] = (ft_strcmp(cmd->args[i], ">>") == 0);
-		return (i);
-	}
-	else
-	{
-		free_cmd_list(cmd);
-		return (-1);
-	}
-}
-
-int	handle_output_redirection_(t_cmd *cmd, int i, int *out)
-{
-	if (cmd->args[i + 1])
-	{
-		cmd->redirection = TRUE;
-		cmd->order_file = ft_join(cmd->order_file, "o");
-		cmd->out_file[*out] = ft_strdup(cmd->args[i + 1]);
-		cmd->append[*out] = (ft_strcmp(cmd->args[i], ">>") == 0);
-		return (i);
-	}
-	else
-	{
-		free_cmd_list(cmd);
-		return (-1);
-	}
-}
-
-t_cmd	*handle_redirection_(t_cmd *new_cmd)
-{
-	int	i;
-	int	in;
-	int	out;
-
-	i = -1;
-	in = 0;
-	out = 0;
-	new_cmd->order_file = ft_strdup("");
-	while (new_cmd->args[++i])
-	{
-		if (ft_strcmp(new_cmd->args[i], ">") == 0 || ft_strcmp(new_cmd->args[i],
-				">>") == 0)
-		{
-			i = handle_output_redirection_(new_cmd, i, &out);
-			out++;
-			if (i == -1)
-				return (NULL);
-			i++;
-		}
-		else if (ft_strcmp(new_cmd->args[i], "<<") == 0)
-		{
-			new_cmd->redirection = TRUE;
-			if (ft_strcmp(new_cmd->args_token[i + 1], "ee") == 0)
-				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, "\0");
-			else
-				new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter, new_cmd->args[i + 1]);
-			new_cmd->order_file = ft_join(new_cmd->order_file, "h");
-			new_cmd->nb_heredoc++;
-			//her++;
-			i++;
-		}
-		else if (ft_strcmp(new_cmd->args[i], "<") == 0)
-		{
-			i = handle_input_redirection(new_cmd, i, &in);
-			in++;
-			if (i == -1)
-				return (NULL);
-			i++;
-		}
-	}
-	return (new_cmd);
 }

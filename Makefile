@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+         #
+#    By: codespace <codespace@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/04 00:09:49 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/12 16:28:12 by codespace        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,12 @@ LST_SRCS	:=	main.c			\
 				exec.c 			\
 				bultins_env.c 	\
 				bultins.c 		\
+				kitty.c \
+				expander.c \
+				utils.c \
+				redirection_parsing.c \
+				redirection_exec.c \
+				signal.c \
 				#pipex_execute.c \
 				#pipex.c 		\
 				pipex_open_free.c 

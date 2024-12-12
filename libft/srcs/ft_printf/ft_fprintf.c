@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*   ft_fprintf.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/10 23:52:35 by cgorin            #+#    #+#             */
-/*   Updated: 2024/10/15 18:50:57 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/12 16:34:06 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int	ft_fprintf_format(int fd, const char *format, va_list ap)
 	if (*format == 'i' || *format == 'd')
 		return (ft_print_i_d_fd(fd, va_arg(ap, int)));
 	else if (*format == 'c')
-		return (ft_print_char_fd(fd,va_arg(ap, int)));
+		return (ft_print_char_fd(fd, va_arg(ap, int)));
 	else if (*format == 's')
 		return (ft_print_s_fd(fd, va_arg(ap, char *)));
 	else if (*format == 'x' || *format == 'X')

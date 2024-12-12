@@ -285,7 +285,6 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env, char **env_)
 		fake_error(pipex, "", 127);
 	}
 	exit(1);
-	//g_exit_code = 1;
 }
 
 void	exec_non_builtins(t_cmd *cmd, t_env *env)

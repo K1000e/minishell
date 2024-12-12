@@ -17,7 +17,6 @@ char	*ft_strndup(char *str, size_t len)
 	char	*dup;
 	size_t	len_dup;
 
-	//len_dup = 0;
 	len_dup = ft_strlen(str);
 	if (len_dup > len)
 		len_dup = len;

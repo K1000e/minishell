@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   check_errors.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
+/*   Updated: 2024/12/12 16:41:31 by codespace        ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minihell.h"
 
 /*
@@ -18,7 +30,6 @@ libft
 minihell
 pipex
 srcs
-
 
 | cat
 zsh: parse error near `|'
@@ -103,5 +114,19 @@ t_bool	match_quotes(char *line)
 		ft_fprintf(2, "bash: unmatched quote\n");
 		return (FALSE);
 	}
+	return (TRUE);
+}
+
+t_bool	is_valid_command_format(const char *cmd)
+{
+	int	i;
+
+	i = 0;
+	while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\''
+		&& cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
+		i++;
+	if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>'
+		&& cmd[i] != '<' && cmd[i] != '\0')
+		return (FALSE);
 	return (TRUE);
 }

@@ -5,7 +5,7 @@ t_env	*ft_find_key(t_env *env, char *key)
 	t_env	*current;
 
 	if (!env || !key)
-        return NULL;
+		return NULL;
 	current = env->next;
 
 	while (current)
@@ -40,36 +40,36 @@ void	ft_update_key(t_env *env, char *key, char *value)
 	}
 }
 
-void    ft_sort_env(t_env **env)
+void	ft_sort_env(t_env **env)
 {
-    t_env   *current;
-    t_env   *next;
-    char    *tmp_key;
-    char    *tmp_value;
-    int     swapped;
+	t_env   *current;
+	t_env   *next;
+	char	*tmp_key;
+	char	*tmp_value;
+	int	 swapped;
 
-    if (!env || !(*env) || !(*env)->next)
-        return;
+	if (!env || !(*env) || !(*env)->next)
+		return;
 
-    do {
-        swapped = 0;
-        current = *env;
-        while (current->next)
-        {
-            next = current->next;
-            if (strcmp(current->key, next->key) > 0)
-            {
-                tmp_key = current->key;
-                tmp_value = current->value;
-                current->key = next->key;
-                current->value = next->value;
-                next->key = tmp_key;
-                next->value = tmp_value;
-                swapped = 1;
-            }
-            current = current->next;
-        }
-    } while (swapped);
+	do {
+		swapped = 0;
+		current = *env;
+		while (current->next)
+		{
+			next = current->next;
+			if (strcmp(current->key, next->key) > 0)
+			{
+				tmp_key = current->key;
+				tmp_value = current->value;
+				current->key = next->key;
+				current->value = next->value;
+				next->key = tmp_key;
+				next->value = tmp_value;
+				swapped = 1;
+			}
+			current = current->next;
+		}
+	} while (swapped);
 }
 
 void	ft_print_declare_env(t_env *env)
@@ -128,8 +128,8 @@ void	ft_export(t_cmd *cmd, t_env *env)
 		}
 		else
 		{
-			key = ft_strdup(cmd->args[i]); // Only key provided, value is NULL
-       		value = NULL;
+			key = ft_strdup(cmd->args[i]);
+			value = NULL;
 		}
 
 		if (!check_validity_export(key) || !key[0])
@@ -147,7 +147,7 @@ void	ft_export(t_cmd *cmd, t_env *env)
 		free(key);
 		free(value);
 	}
-    g_exit_code = 0;
+	g_exit_code = 0;
 }
 
 void	ft_env(t_cmd *cmd, t_env *env)

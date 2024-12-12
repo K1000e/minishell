@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/27 16:10:50 by cgorin            #+#    #+#             */
-/*   Updated: 2024/06/18 05:01:10 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/12 16:33:40 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,8 @@ int		ft_print_char_fd(int fd, char c);
 int		ft_print_p_fd(int fd, void *ptr);
 int		ft_print_s_fd(int fd, char *s);
 int		ft_print_i_d_fd(int fd, int number);
-int     ft_print_x_fd(int fd, unsigned int n, char format);
+int		ft_print_x_fd(int fd, unsigned int n, char format);
 int		ft_print_u_fd(int fd, unsigned int number);
 int		ft_putnbr_base_fd(int fd, unsigned int n, char *base, int base_len);
-
 
 #endif

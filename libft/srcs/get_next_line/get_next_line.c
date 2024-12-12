@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 20:07:52 by cgorin            #+#    #+#             */
-/*   Updated: 2024/09/12 12:38:30 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/12 16:33:03 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ char	*ft_join(char *buffer, char *buf)
 	char	*tmp;
 
 	if (!buffer)
-        return ft_strdup(buf);
+		return (ft_strdup(buf));
 	tmp = ft_strjoin(buffer, buf);
 	free(buffer);
 	return (tmp);
