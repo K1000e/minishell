@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_errors.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 16:41:31 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/12 22:36:44 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,40 @@ zsh: parse error near `|'
 	}
 	return (TRUE);
 } */
+
+t_bool	check_redir(const char *line, char token, int i)
+{
+	int	j;
+
+	j = 0;
+	while (j < i)
+	{
+		if (line[i] == '\0')
+		{
+			ft_fprintf(2, "syntax error near unexpected token `newline'\n");
+			return (FALSE);
+		}
+		j++;
+	}
+	if (line[i] == token)
+	{
+		i++;
+		while (line[i] && ft_isspace(line[i]))
+			i++;
+		if (line[i] == '\0' || line[i] == token)
+		{
+			ft_fprintf(2, "syntax error near unexpected token `newline'\n");
+			return (FALSE);
+		}
+		if (line[i] == '|' /* || line[i] == '<' || line[i] == '> '*/)
+		{
+			ft_fprintf(2, "syntax error near unexpected token `|'\n", line[i]);
+			return (FALSE);
+		}
+	}
+	return (TRUE);
+}
+
 t_bool	count_redir(const char *line)
 {
 	int	j;

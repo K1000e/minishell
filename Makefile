@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: codespace <codespace@student.42.fr>        +#+  +:+       +#+         #
+#    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/12 16:28:12 by codespace        ###   ########.fr        #
+#    Updated: 2024/12/12 22:20:30 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		:=	minishell
 
 CC			:=	cc
-CFLAGS		:= -Wall -Wextra -Werror -ggdb -g3 -fsanitize=address 
+CFLAGS		:= -Wall -Wextra -Werror -ggdb #-g3 -fsanitize=address 
 LDFLAGS		:= -lreadline
 
 #CFLAGS = -Wall -Wextra -Werror -I/opt/homebrew/opt/readline/include #-g -fsanitize=address 

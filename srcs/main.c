@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 16:08:02 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/12 20:40:50 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	minihell(t_env *env, int save_stdin, int save_stdout)
 		}
 		if (ft_strlen(line) > 0)
 			add_history(line);
-		if (!match_quotes(line) || !count_redir(line))
+		if (!match_quotes(line) || !count_redir(line)/*  || !check_redir(line) */)
 		{
 			free(line);
 			continue ;

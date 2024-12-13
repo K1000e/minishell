@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   new_parsing.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 16:14:23 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/12 22:38:18 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,19 @@ t_cmd	*parse_command(char *line)
 	if (!parse.token_line)
 		return (NULL);
 	check_char(&parse);
-	if (!check_pipe(parse.token_line))
-		return (NULL);
+	//if (!check_pipe(parse.token_line))
+	//	return (NULL);
 	i = 0;
 	j = 0;
 	while (TRUE)
 	{
+		if (parse.token_line[i] != '\0' && ((parse.token_line[i] == '>'
+			|| (parse.token_line[i] == '<')) && !check_redir(parse.token_line, parse.token_line[i], i)))
+		{
+			free(parse.token_line);
+			free(parse.command_line);
+			return (NULL);
+		}
 		if (parse.token_line[i] == '\0' || (parse.token_line[i] == '|'
 				&& check_pipe_validity(line, i)))
 		{
@@ -133,6 +140,8 @@ int	count_redirection(char *cmd, char type)
 
 	i = 0;
 	count = 0;
+	if (!cmd)
+		return (0);
 	while (cmd[i])
 	{
 		if (cmd[i] == type)
