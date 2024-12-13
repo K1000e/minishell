@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
+#    By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/12 22:20:30 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/13 23:21:15 by mabdessm         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,6 +36,7 @@ LST_SRCS	:=	main.c			\
 				bultins_env.c 	\
 				bultins.c 		\
 				kitty.c \
+				chillguy.c \
 				expander.c \
 				utils.c \
 				redirection_parsing.c \

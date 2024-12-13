@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minihell.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 22:30:57 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/13 23:23:55 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,7 @@ t_bool	is_directory(const char *path);
 void	fake_error(t_pipex *pipex, char *message, int error_code);
 
 void	ft_kitty(void);
+void	print_chill_guy(void);
 t_bool	check_redir(const char *line, char token, int i);
 
 #endif
