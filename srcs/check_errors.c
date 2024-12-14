@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 22:36:44 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/13 21:58:07 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ t_bool	check_redir(const char *line, char token, int i)
 	{
 		if (line[i] == '\0')
 		{
-			ft_fprintf(2, "syntax error near unexpected token `newline'\n");
+			ft_fprintf(2, "1syntax error near unexpected token `newline'\n");
 			return (FALSE);
 		}
 		j++;
@@ -65,16 +65,19 @@ t_bool	check_redir(const char *line, char token, int i)
 	if (line[i] == token)
 	{
 		i++;
+		if (line[i] == token)
+			i++;
 		while (line[i] && ft_isspace(line[i]))
 			i++;
 		if (line[i] == '\0' || line[i] == token)
 		{
-			ft_fprintf(2, "syntax error near unexpected token `newline'\n");
+			printf("line[i] = %c\n", line[i]);
+			ft_fprintf(2, "2syntax error near unexpected token `newline'\n");
 			return (FALSE);
 		}
-		if (line[i] == '|' /* || line[i] == '<' || line[i] == '> '*/)
+		if (line[i] == '|')
 		{
-			ft_fprintf(2, "syntax error near unexpected token `|'\n", line[i]);
+			ft_fprintf(2, "3syntax error near unexpected token `|'\n", line[i]);
 			return (FALSE);
 		}
 	}

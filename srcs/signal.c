@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 16:08:09 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/14 16:28:17 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,23 @@ void	sigint_handler(int signal)
 	}
 }
 
+void	sigint_handler_exe(int signal)
+{
+	if (signal == SIGINT)
+	{
+		printf("\n");
+		rl_replace_line("", 1);
+		rl_on_new_line();
+		//rl_redisplay();
+	}
+}
+
 void	sigint_heredoc_handler(int signal)
 {
 	if (signal == SIGINT)
 	{
 		printf("\n");
-		close(STDIN_FILENO);
+		
 	}
 }
 

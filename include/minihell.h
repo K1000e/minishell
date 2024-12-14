@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minihell.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/13 23:23:55 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/12/14 17:01:47 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ typedef struct s_pipex
 	int		file_o;
 	char	*limiter;
 	char	*outfile;
+	int		heredoc_fd;
 }	t_pipex;
 
 typedef struct s_parse
@@ -111,7 +112,7 @@ void	ft_unset(t_cmd *cmd, t_env *env);
 t_bool	count_redir(const char *line);
 t_bool	match_quotes(char *line);
 
-/* FUNCTIONS *//* ENVIRONMENT */
+/* FUNCTIONS *//* ENVIRONMENT const*/
 t_env	*create_env_node(char *key, char *value);
 t_env	*get_env(char **env, t_env *new_env, char *executable);
 void	ft_env_add_back_(t_env **lst, t_env *new);

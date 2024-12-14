@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 14:01:24 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/11/27 17:22:44 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/12/13 22:09:01 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,12 @@ void	reopen_heredoc(t_pipex *pipex)
 	if (pipex->file_i == -1)
 	{
 		perror("Opening Heredoc Failed");
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
 	}
 	if (unlink(".heredoc") == -1)
 	{
 		perror("Failed to remove heredoc file");
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
 	}
 }
 

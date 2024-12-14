@@ -3,60 +3,97 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_exec.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/12 16:32:05 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/14 16:08:36 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-int handle_heredoc(const char *delimiter)
+void	ft_putchar_fd(char c, int fd)
 {
-	pid_t pid;
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	int pipefd[2];
+	write(fd, &c, 1);
+}
 
-	if (pipe(pipefd) == -1) {
-		perror("pipe");
-		return -1;
-	}
-	pid = fork();
-	if (pid == 0)
+void	ft_putstr_fd(char *s, int fd)
+{
+	int	i;
+
+	if (!s)
+		return ;
+	i = 0;
+	while (s[i])
 	{
-		signal(SIGINT, sigint_heredoc_handler);
-		close(pipefd[0]);
-		write(1, "> ", 2);
-		while ((read = getline(&line, &len, stdin)) != -1)
+		ft_putchar_fd(s[i], fd);
+		i++;
+	}
+}
+
+int	ft_compare(char *limiter, char *line)
+{
+	if (!(ft_strncmp(line, limiter, ft_strlen(limiter)) == 0))
+		return (0);
+	if (line[ft_strlen(limiter)] != '\n')
+		return (0);
+	return (1);
+}
+
+void	reopen_heredoc(t_pipex *pipex, t_bool is_last)
+{
+	pipex->file_i = open(pipex->heredoc_file, O_RDONLY);
+	if (pipex->file_i == -1)
+	{
+		perror("Opening Heredoc Failed");
+	//	exit(EXIT_FAILURE);
+	}
+	if (is_last)
+	{
+		if (unlink(pipex->heredoc_file) == -1)
 		{
-			if (line == NULL)
-				exit(EXIT_FAILURE);
-			if (line[read - 1] == '\n')
-				line[read - 1] = '\0';
-			if (strcmp(line, delimiter) == 0)
-			{
-				free(line);
-				exit(EXIT_SUCCESS);
-			}
-			write(pipefd[1], line, strlen(line));
-			write(pipefd[1], "\n", 1);
-			write(1, "> ", 2);
+			perror("Failed to remove heredoc file");
+		//	exit(EXIT_FAILURE);
 		}
-		free(line);
-		close(pipefd[1]);
-		exit(EXIT_SUCCESS);
 	}
-	else
+}
+
+int handle_heredoc(char *delimiter, t_bool is_last)
+{
+	char	*line;
+	//int		heredoc_fd;
+	t_pipex	*pipex;
+	//pid_t pid;
+	unsigned long long		i;
+
+	pipex = malloc(sizeof(t_pipex));
+	pipex->file_i = -1;
+	pipex->file_o = -1;
+	pipex->heredoc_file = ".heredoc";
+	i = 0;
+	while (access(pipex->heredoc_file, F_OK) == 0)
+		pipex->heredoc_file = ft_strjoin(".heredoc", ft_itoa(i++));
+	pipex->heredoc_fd = open(pipex->heredoc_file, O_CREAT | O_WRONLY | O_TRUNC, 0777);
+	if (pipex->heredoc_fd == -1)
 	{
-		close(pipefd[1]);
-		wait(NULL);
-		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
+		perror("Heredoc Creation Failed");
+		exit(EXIT_FAILURE);
 	}
-	return pipefd[0];
+	while (1)
+	{
+		ft_printf("> ");
+		line = get_next_line(STDIN_FILENO);
+		if (!line || ft_compare(delimiter, line))
+		{
+			free(line);
+			break ;
+		}
+		ft_putstr_fd(line, pipex->heredoc_fd);
+		free(line);
+	}
+	close(pipex->heredoc_fd);
+	reopen_heredoc(pipex, is_last);
+	return (pipex->heredoc_fd);
 }
 
 void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
@@ -169,16 +206,20 @@ int	redirection_exec_bultins(t_cmd *cmd)
 	j = 0;
 	k = 0;
 	int h = 0;
-	if (!cmd->order_file || (int)ft_strlen(cmd->order_file) != cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc)
-    {
-        fprintf(stderr, "Error: Invalid redirection metadata\n");
-        return 1;
-    }
+	/* if (!cmd->order_file && (int)ft_strlen(cmd->order_file) != cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc)
+	{
+		ft_fprintf(stderr, "Error: Invalid redirection metadata\n");
+		return 1;
+	} */
 	while ((size_t)++i < ft_strlen(cmd->order_file))
 	{
 		if (cmd->order_file[i] == 'h')
 		{
-			pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
+			//pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
+			if (i < cmd->nb_infile + cmd->nb_heredoc)
+				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], FALSE);
+			else
+				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], TRUE);
 			if (pipex.file_i < 0)
 				exit(1);
 			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
@@ -250,7 +291,11 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 	{
 		if (cmd->order_file[i] == 'h')
 		{
-			fd = handle_heredoc(cmd->heredoc_delimiter[h]);
+			//pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
+			if (i < cmd->nb_infile + cmd->nb_heredoc)
+				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], FALSE);
+			else
+				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], TRUE);
 			if (fd < 0)
 				return(1);
 			if (pipex.file_i != -1)

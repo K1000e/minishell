@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/12 16:40:53 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/13 22:04:21 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ void	execute_builtin(t_cmd *cmd, t_env *env)
 		ft_env(cmd, current);
 }
 
-char	*ft_join(char *buffer, char *buf)
+/* char	*ft_join(char *buffer, char *buf)
 {
 	char	*tmp;
 
@@ -155,7 +155,7 @@ char	*ft_join(char *buffer, char *buf)
 	tmp = ft_strjoin(buffer, buf);
 	free(buffer);
 	return (tmp);
-}
+} */
 
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env,
 		char **env_)
