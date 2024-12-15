@@ -12,42 +12,6 @@
 
 #include "../include/minihell.h"
 
-/*
-> test   OK
-< test   OK
-
-test >
-zsh: parse error near `\n'
-test <
-zsh: parse error near `\n'
-
-ls |
-pipe> cat
-Makefile
-hek
-include
-libft
-minihell
-pipex
-srcs
-
-| cat
-zsh: parse error near `|'
-
-*/
-
-/* t_bool check_error(char *line)
-{
-	int	j;
-	int	j;
-
-	if ()
-	{
-		return (FALSE);
-	}
-	return (TRUE);
-} */
-
 t_bool	check_redir(const char *line, char token, int i)
 {
 	int	j;
