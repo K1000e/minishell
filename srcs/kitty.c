@@ -6,13 +6,13 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/14 18:38:44 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 03:17:20 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minihell.h"
 
-void print_ascii_art_p1(void)
+void	print_ascii_art_p1(void)
 {
 	printf(C"              ⣀⣀⣀⡀                          ⣀⣤⣄         \n");
 	printf(B"            ⢠⡾⠋⠉⠉⠉⠛⢶⣄⣀⣀⣀⣤⣤⣤⣤⣤⢤⣤⣤⣤⣤⣀⣀ ⣠⣶⣿⣿⣿⣶⣟⠉ ⠙⢷⣄    \n");
@@ -35,7 +35,7 @@ void print_ascii_art_p1(void)
 	printf(C"      ⠘⢷⡄  ⢀⣠⠞⠋ ⠈⠻⣿⣿⣦              ⠙⠛⠛⠉     ⣀⣴⣾⠃      ⠹⣆\n");
 }
 
-void print_ascii_art_p2(void)
+void	print_ascii_art_p2(void)
 {
 	printf(R"        ⠹⢦⣴⠟⠁     ⠙⢿⣿⣿⣤              ⣀⣀⣀⣤⣴⣶⣿⣿⣿⡟        ⣿\n");
 	printf(G"        ⣰⠟⠙⠳⢦⣄⡀    ⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏        ");
@@ -60,7 +60,7 @@ void print_ascii_art_p2(void)
 	printf(RESET);
 }
 
-void	ft_kitty()
+void	ft_kitty(void)
 {
 	print_ascii_art_p1();
 	print_ascii_art_p2();
