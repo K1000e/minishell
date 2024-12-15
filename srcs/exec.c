@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/15 02:20:07 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:35:05 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	single_builtin(t_cmd *cmd, t_env *env)
 	g_exit_code = 0;
 	pipex = malloc(sizeof(t_pipex));
 	if (cmd->redirection)
-		g_exit_code = redirection_exec_bultins_single(cmd, pipex);
+		g_exit_code = redirection_exec_builtins(cmd, pipex, FALSE);
 	if (g_exit_code >= 1)
 	{
 		g_exit_code = 1;
@@ -131,7 +131,7 @@ void	execute_builtin(t_cmd *cmd, t_env *env)
 	current = env;
 	g_exit_code = 0;
 	if (cmd->redirection)
-		g_exit_code = redirection_exec_bultins(cmd, pipex);
+		g_exit_code = redirection_exec_builtins(cmd, pipex, TRUE);
 	if (cmd->args[0] == NULL)
 		return ;
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
@@ -208,7 +208,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	if (pid == 0)
 	{
 		if (cmd->redirection)
-			g_exit_code = redirection_exec_bultins(cmd, pipex);
+			g_exit_code = redirection_exec_builtins(cmd, pipex, TRUE);
 		if (g_exit_code >= 1)
 			exit(1);
 		execute_non_builtins(pipex, cmd, env, b_env);

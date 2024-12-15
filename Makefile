@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+         #
+#    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/15 03:47:34 by mabdessm         ###   ########.fr        #
+#    Updated: 2024/12/15 04:03:55 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,6 +43,8 @@ LST_SRCS	:=	main.c			\
 				redirection_parsing.c \
 				redirection_exec.c \
 				signal.c \
+				open_file.c \
+				heredoc.c \
 				#pipex_execute.c \
 				#pipex.c 		\
 				pipex_open_free.c 

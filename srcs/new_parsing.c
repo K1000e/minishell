@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/14 17:27:07 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 03:14:18 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ t_cmd	*parse_command(char *line)
 	if (!parse.token_line)
 		return (NULL);
 	check_char(&parse);
-	//if (!check_pipe(parse.token_line))
-	//	return (NULL);
 	i = 0;
 	j = 0;
 	while (TRUE)

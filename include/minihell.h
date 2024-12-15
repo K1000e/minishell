@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 02:20:12 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 03:08:24 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,14 @@ typedef struct s_parse
 	char	*command_line;
 }	t_parse;
 
+typedef struct s_file
+{
+	int		j;
+	int		k;
+	int		h;
+	char	type;
+}	t_file;
+
 extern int	g_exit_code;
 
 /* FUNCTIONS *//* MAIN */
@@ -151,8 +159,9 @@ char	**base_env(t_env *env);
 char	*ft_strjoin_free(char *s1, char *s2, int is_free);
 t_bool	is_builtin(char *cmd);
 void	single_builtin(t_cmd *cmd, t_env *env);
-int		redirection_exec_bultins(t_cmd *cmd, t_pipex *pipex);
-int		redirection_exec_bultins_single(t_cmd *cmd, t_pipex *pipex);
+//int		redirection_exec_bultins(t_cmd *cmd, t_pipex *pipex);
+//int		redirection_exec_bultins_single(t_cmd *cmd, t_pipex *pipex);
+int	redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex, t_bool should_exit);
 
 void	set_signal_action(void (*handler)(int));
 void	sigint_heredoc_handler(int signal);
@@ -167,4 +176,10 @@ void	ft_kitty(void);
 void	print_chill_guy(void);
 t_bool	check_redir(const char *line, char token, int i);
 
+int	open_infile(t_pipex *pipex, t_cmd *cmd, int j);
+int	open_outfile(t_pipex *pipex, t_cmd *cmd, int k);
+
+void handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last);
+
+void	reopen_heredoc(t_pipex *pipex, t_bool is_last);
 #endif
