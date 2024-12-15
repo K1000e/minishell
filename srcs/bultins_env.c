@@ -5,16 +5,15 @@ t_env	*ft_find_key(t_env *env, char *key)
 	t_env	*current;
 
 	if (!env || !key)
-		return NULL;
+		return (NULL);
 	current = env->next;
-
 	while (current)
 	{
 		if (ft_strcmp(current->key, key) == 0)
 			return (current);
 		current = current->next;
 	}
-	return env;
+	return (env);
 }
 
 void	ft_update_key(t_env *env, char *key, char *value)
@@ -42,16 +41,17 @@ void	ft_update_key(t_env *env, char *key, char *value)
 
 void	ft_sort_env(t_env **env)
 {
-	t_env   *current;
-	t_env   *next;
+	t_env	*current;
+	t_env	*next;
 	char	*tmp_key;
 	char	*tmp_value;
-	int	 swapped;
+	int		swapped;
 
 	if (!env || !(*env) || !(*env)->next)
-		return;
-
-	do {
+		return ;
+	swapped = 1;
+	while (swapped)
+	{
 		swapped = 0;
 		current = *env;
 		while (current->next)
@@ -69,7 +69,7 @@ void	ft_sort_env(t_env **env)
 			}
 			current = current->next;
 		}
-	} while (swapped);
+	}
 }
 
 void	ft_print_declare_env(t_env *env)
@@ -131,19 +131,29 @@ void	ft_export(t_cmd *cmd, t_env *env)
 			key = ft_strdup(cmd->args[i]);
 			value = NULL;
 		}
-
 		if (!check_validity_export(key) || !key[0])
 		{
 			g_exit_code = 1;
-			ft_fprintf(2, "bash: export: '%s': not a valid identifier\n", cmd->args[i]);
+			ft_fprintf(2, "bash: export: '%s': not a valid identifier\n",
+				cmd->args[i]);
 			free(key);
 			free(value);
-			return;
+			return ;
 		}
 		if (!env)
-			env = create_env_node(key, value ? value : "");
+		{
+			if (value)
+				env = create_env_node(key, value);
+			else
+				env = create_env_node(key, "");
+		}
 		else
-			ft_update_key(env, key, value ? value : "");
+		{
+			if (value)
+				ft_update_key(env, key, value);
+			else
+				ft_update_key(env, key, "");
+		}
 		free(key);
 		free(value);
 	}
