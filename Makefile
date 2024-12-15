@@ -6,7 +6,7 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/15 04:37:56 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/15 07:22:04 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,20 +31,26 @@ LST_SRCS	:=	main.c			\
 				environment.c	\
 				check_errors.c 	\
 				prompt.c 		\
-				parsing/parsing.c 		\
+				parsing/parsing_utils.c 		\
 				exec.c 			\
-				bultins_env.c 	\
-				bultins.c 		\
-				bultins_utils.c \
+				builtins/bultins_env.c 	\
+				builtins/bultins_env_utils.c \
+				builtins/bultins.c 		\
+				builtins/bultins_utils.c \
+				builtins/ft_export.c \
 				emotes/kitty.c \
 				emotes/chillguy.c \
 				expander.c \
 				utils.c \
-				redirection_parsing.c \
+				parsing/redirection_parsing.c \
+				parsing/create_command.c \
 				redirection_exec.c \
 				signal.c \
 				open_file.c \
 				heredoc.c \
+				parsing/check.c \
+				parsing/create_args.c \
+				parsing/token.c \
 				#pipex_execute.c \
 				#pipex.c 		\
 				pipex_open_free.c 
@@ -75,6 +81,7 @@ $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 	@mkdir -p $(DIR_OBJS)/parsing
 	@mkdir -p $(DIR_OBJS)/execution
 	@mkdir -p $(DIR_OBJS)/emotes
+	@mkdir -p $(DIR_OBJS)/builtins
 	$(CC) $(CFLAGS) -I $(DIR_INCS) -c $< -o $@
 	printf "$(ERASE)$(BLUE) > Compilation :$(END) $< \n"
 

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 04:16:41 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 07:24:20 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,14 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	i = -1;
 	in = 0;
 	out = 0;
+	if (new_cmd->nb_outfile)
+	{
+		new_cmd->out_file = ft_calloc(sizeof(char *),
+				(new_cmd->nb_outfile + 1));
+		new_cmd->append = ft_calloc(sizeof(int), (new_cmd->nb_outfile + 1));
+	}
+	if (new_cmd->nb_infile)
+		new_cmd->in_file = ft_calloc(sizeof(char *), (new_cmd->nb_infile + 1));
 	new_cmd->order_file = ft_strdup("");
 	while (new_cmd->args[++i])
 	{
@@ -101,5 +109,28 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 		if (!new_cmd)
 			return (NULL);
 	}
+	new_cmd->args = clear_redir(new_cmd);
 	return (new_cmd);
+}
+int	count_redirection(char *cmd, char type)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	if (!cmd)
+		return (0);
+	while (cmd[i])
+	{
+		if (cmd[i] == type)
+		{
+			i++;
+			if (cmd[i] == type)
+				i++;
+			count++;
+		}
+		i++;
+	}
+	return (count);
 }

@@ -6,37 +6,11 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 04:28:53 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 07:01:05 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
-
-t_bool	check_pipe(char *token)
-{
-	int		i;
-	t_bool	char_found;
-
-	i = 0;
-	while (token[i])
-	{
-		if (token[i] != '|' && token[i] != ' ')
-			char_found = TRUE;
-		if (token[i] == '|')
-		{
-			if (token[i + 1] == '|' || token[i + 1] == '\0' || i == 0
-				|| !char_found)
-			{
-				ft_fprintf(2, "bash: syntax error near unexpected token `|'\n");
-				g_exit_code = 2;
-				return (FALSE);
-			}
-			char_found = FALSE;
-		}
-		i++;
-	}
-	return (TRUE);
-}
 
 t_cmd	*parse_command(char *line)
 {
@@ -88,73 +62,6 @@ t_cmd	*parse_command(char *line)
 	return (cmd_list);
 }
 
-t_bool	check_pipe_validity(char *line, int i)
-{
-	int	y;
-
-	y = 0;
-	if (i == 0)
-	{
-		ft_fprintf(2, "syntax error near unexpected token `|'\n");
-		return (FALSE);
-	}
-	while (y < i)
-	{
-		if (line[i] == '\0')
-		{
-			ft_fprintf(2, "syntax error near unexpected token `|'\n");
-			return (FALSE);
-		}
-		y++;
-	}
-	if (line[i] == '|')
-	{
-		i++;
-		while (line[i] && ft_isspace(line[i]))
-			i++;
-		if (line[i] == '\0' || line[i] == '|')
-		{
-			ft_fprintf(2, "syntax error near unexpected token `|'\n");
-			return (FALSE);
-		}
-	}
-	return (TRUE);
-}
-
-t_cmd	*create_commands(t_parse *parse, int start, int end, t_cmd *cmd)
-{
-	char	*command;
-	char	*tokens;
-
-	command = ft_strndup(&parse->command_line[start], end - start);
-	tokens = ft_strndup(&parse->token_line[start], end - start);
-	cmd = create_cmd_node_(command, tokens, cmd);
-	return (cmd);
-}
-
-int	count_redirection(char *cmd, char type)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	if (!cmd)
-		return (0);
-	while (cmd[i])
-	{
-		if (cmd[i] == type)
-		{
-			i++;
-			if (cmd[i] == type)
-				i++;
-			count++;
-		}
-		i++;
-	}
-	return (count);
-}
-
 char	**clear_redir(t_cmd *cmd)
 {
 	char	**new_args;
@@ -189,67 +96,6 @@ char	**clear_redir(t_cmd *cmd)
 	return (new_args);
 }
 
-t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
-{
-	cmd = malloc(sizeof(t_cmd));
-	cmd->cmd = ft_strdup(cmd_str);
-	cmd->token = ft_strdup(cmd_tokens);
-	if (!cmd->cmd || !cmd->token)
-	{
-		free(cmd->cmd);
-		free(cmd->token);
-		free(cmd);
-		free(cmd_str);
-		free(cmd_tokens);
-		return (NULL);
-	}
-	cmd->next = NULL;
-	cmd->append = 0;
-	cmd->redirection = FALSE;
-	cmd->heredoc_redirection = FALSE;
-	cmd->nb_infile = count_redirection(cmd_tokens, '<');
-	cmd->nb_outfile = count_redirection(cmd_tokens, '>');
-	cmd->nb_heredoc = 0;
-	cmd->heredoc_delimiter = NULL;
-	if (cmd->nb_outfile)
-	{
-		cmd->out_file = ft_calloc(sizeof(char *), (cmd->nb_outfile + 1));
-		cmd->append = ft_calloc(sizeof(int), (cmd->nb_outfile + 1));
-	}
-	else
-		cmd->out_file = NULL;
-	if (cmd->nb_infile)
-		cmd->in_file = ft_calloc(sizeof(char *), (cmd->nb_infile + 1));
-	else
-		cmd->in_file = NULL;
-	cmd->order_file = NULL;
-	make_argument(cmd_str, cmd_tokens, cmd);
-	if (cmd->nb_infile || cmd->nb_outfile)
-	{
-		cmd = handle_redirection_(cmd);
-		cmd->args = clear_redir(cmd);
-	}
-	free(cmd_str);
-	free(cmd_tokens);
-	return (cmd);
-}
-
-void	make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
-{
-	cmd->nb_token = count_tokens_(cmd_tokens);
-	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	cmd->args_t = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	if (!cmd->args || !cmd->args_t)
-	{
-		if (cmd->args)
-			free(cmd->args);
-		if (cmd->args_t)
-			free(cmd->args_t);
-		return ;
-	}
-	parse_args(cmd_str, cmd_tokens, cmd);
-}
-
 int	count_tokens_(const char *cmd_tokens)
 {
 	int		count;
@@ -268,35 +114,6 @@ int	count_tokens_(const char *cmd_tokens)
 		count++;
 	}
 	return (count);
-}
-
-void	parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
-{
-	int		start;
-	int		i;
-	int		nb_args;
-	char	token;
-
-	i = 0;
-	start = 0;
-	nb_args = 0;
-	while (cmd_tokens[i])
-	{
-		while (cmd_tokens[i] && cmd_tokens[i] == ' ')
-			i++;
-		if (cmd_tokens[i])
-		{
-			token = cmd_tokens[i];
-			start = i;
-			while (cmd_tokens[i] && cmd_tokens[i] == token)
-				i++;
-			cmd->args[nb_args] = ft_strndup(&cmd_str[start], i - start);
-			cmd->args_t[nb_args] = ft_strndup(&cmd_tokens[start], i - start);
-			nb_args++;
-		}
-	}
-	cmd->args[nb_args] = NULL;
-	cmd->args_t[nb_args] = NULL;
 }
 
 void	clear_quotes(t_parse *parse)
@@ -350,7 +167,7 @@ void	clear_quotes(t_parse *parse)
 	free(res_command);
 }
 
-void	check_char(t_parse *parse)
+/* void	check_char(t_parse *parse)
 {
 	int	i;
 
@@ -383,9 +200,9 @@ void	check_char(t_parse *parse)
 			parse->token_line[i] = ' ';
 	}
 	clear_quotes(parse);
-}
+} */
 
-char	**add_to_tab(char **tab, const char *str)
+/* char	**add_to_tab(char **tab, const char *str)
 {
 	int		i;
 	char	**new_tab;
@@ -408,3 +225,4 @@ char	**add_to_tab(char **tab, const char *str)
 		free(tab);
 	return (new_tab);
 }
+ */

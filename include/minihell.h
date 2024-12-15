@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 04:16:41 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 07:22:31 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,9 @@ t_env	*create_env_node(char *key, char *value);
 t_env	*get_env(char **env, t_env *new_env, char *executable);
 void	ft_env_add_back_(t_env **lst, t_env *new);
 void	ft_export(t_cmd *cmd, t_env *env);
+void	ft_sort_env(t_env **env);
+void	ft_print_declare_env(t_env *env);
+t_bool	check_validity_export(const char *key);
 
 /* FUNCTIONS *//* PARSING */
 char	*ft_strndup(char *str, size_t len);
@@ -182,4 +185,11 @@ int	open_outfile(t_pipex *pipex, t_cmd *cmd, int k);
 void handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last);
 
 void	reopen_heredoc(t_pipex *pipex, t_bool is_last);
+char	**clear_redir(t_cmd *cmd);
+int	count_redirection(char *cmd, char type);
+
+void	clear_quotes(t_parse *parse);
+void	free_cmd_list(t_cmd *cmd_list);
+void	free_string_array(char **array);
+//void	check_char(t_parse *parse);
 #endif
