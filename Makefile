@@ -6,7 +6,7 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/15 04:03:55 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/15 04:37:56 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,17 +27,17 @@ DIR_PIPEX	:=	pipex
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c			\
-				new_parsing.c 	\
+				parsing/new_parsing.c 	\
 				environment.c	\
 				check_errors.c 	\
 				prompt.c 		\
-				parsing.c 		\
+				parsing/parsing.c 		\
 				exec.c 			\
 				bultins_env.c 	\
 				bultins.c 		\
 				bultins_utils.c \
-				kitty.c \
-				chillguy.c \
+				emotes/kitty.c \
+				emotes/chillguy.c \
 				expander.c \
 				utils.c \
 				redirection_parsing.c \
@@ -72,6 +72,9 @@ WHITE 		= 	\033[37m
 
 $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 	@mkdir -p $(DIR_OBJS)
+	@mkdir -p $(DIR_OBJS)/parsing
+	@mkdir -p $(DIR_OBJS)/execution
+	@mkdir -p $(DIR_OBJS)/emotes
 	$(CC) $(CFLAGS) -I $(DIR_INCS) -c $< -o $@
 	printf "$(ERASE)$(BLUE) > Compilation :$(END) $< \n"
 
