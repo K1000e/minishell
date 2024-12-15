@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/14 16:08:36 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 01:21:07 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,43 +42,25 @@ int	ft_compare(char *limiter, char *line)
 
 void	reopen_heredoc(t_pipex *pipex, t_bool is_last)
 {
-	pipex->file_i = open(pipex->heredoc_file, O_RDONLY);
-	if (pipex->file_i == -1)
-	{
-		perror("Opening Heredoc Failed");
-	//	exit(EXIT_FAILURE);
-	}
 	if (is_last)
-	{
+		pipex->file_i = open(pipex->heredoc_file, O_RDONLY);
+	if (pipex->file_i == -1)
+		perror("Opening Heredoc Failed");
+	if (!is_last)
 		if (unlink(pipex->heredoc_file) == -1)
-		{
 			perror("Failed to remove heredoc file");
-		//	exit(EXIT_FAILURE);
-		}
-	}
 }
 
-int handle_heredoc(char *delimiter, t_bool is_last)
+void handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last)
 {
 	char	*line;
-	//int		heredoc_fd;
-	t_pipex	*pipex;
-	//pid_t pid;
 	unsigned long long		i;
 
-	pipex = malloc(sizeof(t_pipex));
-	pipex->file_i = -1;
-	pipex->file_o = -1;
 	pipex->heredoc_file = ".heredoc";
 	i = 0;
 	while (access(pipex->heredoc_file, F_OK) == 0)
 		pipex->heredoc_file = ft_strjoin(".heredoc", ft_itoa(i++));
 	pipex->heredoc_fd = open(pipex->heredoc_file, O_CREAT | O_WRONLY | O_TRUNC, 0777);
-	if (pipex->heredoc_fd == -1)
-	{
-		perror("Heredoc Creation Failed");
-		exit(EXIT_FAILURE);
-	}
 	while (1)
 	{
 		ft_printf("> ");
@@ -93,7 +75,6 @@ int handle_heredoc(char *delimiter, t_bool is_last)
 	}
 	close(pipex->heredoc_fd);
 	reopen_heredoc(pipex, is_last);
-	return (pipex->heredoc_fd);
 }
 
 void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
@@ -144,181 +125,146 @@ void	fake_open_outfile(t_pipex *pipex, t_cmd *cmd)
 	}
 }
 
-int	open_outfile(t_pipex *pipex, t_cmd *cmd)
+int	open_infile(t_pipex *pipex, t_cmd *cmd, int j)
 {
-	int	i;
+	int fd;
 
-	i = -1;
-	while (cmd->out_file && cmd->out_file[++i])
+	fd = open(cmd->in_file[j], O_RDONLY);
+	//printf("fd = %d\n", fd);
+	if (fd < 0)
 	{
-		if (cmd->append[i] == 0)
-			pipex->file_o = open(cmd->out_file[i], O_CREAT | O_TRUNC | O_WRONLY,
-					0644);
-		else
-			pipex->file_o = open(cmd->out_file[i],
-					O_CREAT | O_APPEND | O_WRONLY, 0644);
-		if (pipex->file_o < 0)
-		{
-			perror(cmd->out_file[i]);
-			return (1);
-		}
-		if (i < cmd->nb_outfile - 1)
-			close(pipex->file_o);
+		perror(cmd->in_file[j]);
+		return(1);
 	}
+	if (pipex->file_i != -1)
+		close(pipex->file_i);
+	pipex->file_i = fd;
 	return (0);
 }
 
-int	open_infile(t_pipex *pipex, t_cmd *cmd)
+int	open_outfile(t_pipex *pipex, t_cmd *cmd, int k)
 {
-	int	i;
+	int	fd;
 
-	i = -1;
-	while (cmd->in_file && cmd->in_file[++i])
+	if (cmd->append[k] == 0)
+		fd = open(cmd->out_file[k],
+				O_CREAT | O_TRUNC | O_WRONLY, 0644);
+	else
+		fd = open(cmd->out_file[k],
+				O_CREAT | O_APPEND | O_WRONLY, 0644);
+	if (fd < 0)
 	{
-		pipex->file_i = open(cmd->in_file[i], O_RDONLY);
-		if (pipex->file_i < 0)
-		{
-			perror(cmd->in_file[i]);
-			return (1);
-		}
-		if (i < cmd->nb_infile - 1)
-			close(pipex->file_i);
+		perror(cmd->out_file[k]);
+		return (1);
 	}
+	if (pipex->file_o)
+		close(pipex->file_o);
+	pipex->file_o = fd;
 	return (0);
 }
 
 int	redirection_exec_bultins(t_cmd *cmd)
 {
-	t_pipex	pipex;
-	int		exit_code;
+	t_pipex	*pipex;
 	int		i;
 	int		j;
 	int		k;
+	int		h;
 
-	pipex.file_i = -1;
-	pipex.file_o = -1;
-	pipex.pipe_fd[0] = -1;
-	pipex.pipe_fd[1] = -1;
-	exit_code = 0;
-	if (!cmd || !cmd->cmd)
-		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
+	pipex = malloc(sizeof(t_pipex));
+	pipex->file_i = -1;
+	pipex->file_o = -1;
+	if (cmd->order_file == NULL)
+		return (1);
 	i = -1;
 	j = 0;
 	k = 0;
-	int h = 0;
-	/* if (!cmd->order_file && (int)ft_strlen(cmd->order_file) != cmd->nb_infile + cmd->nb_outfile + cmd->nb_heredoc)
-	{
-		ft_fprintf(stderr, "Error: Invalid redirection metadata\n");
-		return 1;
-	} */
-	while ((size_t)++i < ft_strlen(cmd->order_file))
+	h = 0;
+	while (cmd->order_file[++i])
 	{
 		if (cmd->order_file[i] == 'h')
 		{
-			//pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
-			if (i < cmd->nb_infile + cmd->nb_heredoc)
-				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], FALSE);
+			if (h < cmd->nb_heredoc-1)
+				handle_heredoc(cmd->heredoc_delimiter[h], pipex, FALSE);
 			else
-				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], TRUE);
-			if (pipex.file_i < 0)
-				exit(1);
-			if (i < cmd->nb_infile + cmd->nb_heredoc - 1)
-				close(pipex.file_i);
+				handle_heredoc(cmd->heredoc_delimiter[h], pipex, TRUE);
 			h++;
 		}
 		else if (cmd->order_file[i] == 'i')
 		{
-			pipex.file_i = open(cmd->in_file[j], O_RDONLY);
-			if (pipex.file_i < 0)
-			{
-				perror(cmd->in_file[j]);
+			if (open_infile(pipex, cmd, j) == 1)
 				exit(1);
-			}
-			if (i < cmd->nb_infile - 1 + cmd->nb_heredoc - 1)
-				close(pipex.file_i);
 			j++;
 		}
 		else if (cmd->order_file[i] == 'o')
 		{
-			if (cmd->append[k] == 0)
-				pipex.file_o = open(cmd->out_file[k],
-						O_CREAT | O_TRUNC | O_WRONLY, 0644);
-			else
-				pipex.file_o = open(cmd->out_file[k],
-						O_CREAT | O_APPEND | O_WRONLY, 0644);
-			if (pipex.file_o < 0)
-			{
-				perror(cmd->out_file[k]);
+			if (open_outfile(pipex, cmd, k) == 1)
 				exit(1);
-			}
-			if (i < cmd->nb_outfile - 1)
-				close(pipex.file_o);
 			k++;
 		}
 	}
-	if (cmd->nb_infile == 0)
-		dup2(pipex.pipe_fd[0], STDIN_FILENO);
-	else
-		dup2(pipex.file_i, STDIN_FILENO);
-	if (cmd->nb_outfile == 0)
-		dup2(pipex.pipe_fd[1], STDOUT_FILENO);
-	else
-		dup2(pipex.file_o, STDOUT_FILENO);
-	if (pipex.pipe_fd[1] != -1)
-		close(pipex.pipe_fd[1]);
-	if (pipex.pipe_fd[0] != -1)
-		close(pipex.pipe_fd[0]);
-	return (exit_code);
+	//printf("file_i = %d\n", pipex->file_i);
+	if (pipex->file_i != -1)
+		dup2(pipex->file_i, STDIN_FILENO);
+	if (pipex->file_i != -1 && cmd->heredoc_redirection)
+		reopen_heredoc(pipex, FALSE);
+	else if (pipex->file_i != -1)
+		close(pipex->pipe_fd[1]);
+	if (pipex->file_o != -1)
+	{
+		dup2(pipex->file_o, STDOUT_FILENO);
+		close(pipex->file_o);
+	}
+	return (0);
 }
 
 int	redirection_exec_bultins_single(t_cmd *cmd)
 {
-	t_pipex	pipex;
+	t_pipex	*pipex;
 	int		i;
 	int		j;
 	int		k;
-	int fd;
+	int		h;
 
-	pipex.file_i = -1;
-	pipex.file_o = -1;
-	if (!cmd || !cmd->cmd)
-		fake_error(&pipex, "Invalid command: command is empty or NULL", 1);
+	pipex = malloc(sizeof(t_pipex));
+	pipex->file_i = -1;
+	pipex->file_o = -1;
+	if (cmd->order_file == NULL)
+		return (1);
 	i = -1;
 	j = 0;
 	k = 0;
-	int h = 0;
-	while ((size_t)++i < ft_strlen(cmd->order_file))
+	h = 0;
+	while (cmd->order_file[++i])
 	{
 		if (cmd->order_file[i] == 'h')
 		{
-			//pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h]);
-			if (i < cmd->nb_infile + cmd->nb_heredoc)
-				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], FALSE);
+			if (h < cmd->nb_heredoc-1)
+				handle_heredoc(cmd->heredoc_delimiter[h], pipex, FALSE);
 			else
-				pipex.file_i = handle_heredoc(cmd->heredoc_delimiter[h], TRUE);
-			if (fd < 0)
-				return(1);
-			if (pipex.file_i != -1)
-				close(pipex.file_i);
-			pipex.file_i = fd;
+				handle_heredoc(cmd->heredoc_delimiter[h], pipex, TRUE);
 			h++;
 		}
 		else if (cmd->order_file[i] == 'i')
 		{
-			fd = open(cmd->in_file[j], O_RDONLY);
+			if (open_infile(pipex, cmd, j) == 1)
+				return (1);
+			/* fd = open(cmd->in_file[j], O_RDONLY);
 			if (fd < 0)
 			{
 				perror(cmd->in_file[j]);
 				return(1);
 			}
-			if (pipex.file_i != -1)
-				close(pipex.file_i);
-			pipex.file_i = fd;
+			if (pipex->file_i != -1)
+				close(pipex->file_i);
+			pipex->file_i = fd; */
 			j++;
 		}
 		else if (cmd->order_file[i] == 'o')
 		{
-			if (cmd->append[k] == 0)
+			if (open_outfile(pipex, cmd, k) == 1)
+				return (1);
+			/* if (cmd->append[k] == 0)
 				fd = open(cmd->out_file[k],
 						O_CREAT | O_TRUNC | O_WRONLY, 0644);
 			else
@@ -329,26 +275,24 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 				perror(cmd->out_file[k]);
 				return (1);
 			}
-			if (pipex.file_o)
-				close(pipex.file_o);
-			pipex.file_o = fd;
+			if (pipex->file_o)
+				close(pipex->file_o);
+			pipex->file_o = fd; */
 			k++;
 		}
 		else
-		{
-			ft_fprintf(2, "Error: Unknown redirection type '%c'\n", cmd->order_file[i]);
 			return 1;
-		}
 	}
-	if (pipex.file_i != -1)
+	if (pipex->file_i != -1)
+		dup2(pipex->file_i, STDIN_FILENO);
+	if (pipex->file_i != -1 && cmd->heredoc_redirection)
+		reopen_heredoc(pipex, FALSE);
+	else if (pipex->file_i != -1)
+		close(pipex->pipe_fd[1]);
+	if (pipex->file_o != -1)
 	{
-		dup2(pipex.file_i, STDIN_FILENO);
-		close(pipex.file_i);
-	}
-	if (pipex.file_o != -1)
-	{
-		dup2(pipex.file_o, STDOUT_FILENO);
-		close(pipex.file_o);
+		dup2(pipex->file_o, STDOUT_FILENO);
+		close(pipex->file_o);
 	}
 	return (0);
 }

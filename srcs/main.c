@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/14 17:10:10 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/14 17:21:28 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,31 +47,12 @@ int	ascii_art(char *line)
 	return (0);
 }
 
-int	ascii_art(char *line)
-{
-	if (ft_strcmp(line, "kitty") == 0 || ft_strcmp(line, "KITTY") == 0
-		|| ft_strcmp(line, "Kitty") == 0)
-	{
-		ft_kitty();
-		return (1);
-	}
-	if (ft_strcmp(line, "chill") == 0 || ft_strcmp(line, "chillguy") == 0
-		|| ft_strcmp(line, "CHILL") == 0 || ft_strcmp(line, "CHILLGUY") == 0
-		|| ft_strcmp(line, "Chillguy") == 0 || ft_strcmp(line, "Chill") == 0)
-	{
-		print_chill_guy();
-		return (1);
-	}
-	return (0);
-}
-
 void	ft_command(char *line, t_env *env)
 {
 	char	*expanded_line;
 	t_cmd	*commands;
 	t_cmd	*tmp;
 
-	if (ascii_art(line))
 	if (ascii_art(line))
 		return ;
 	commands = NULL;

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/14 17:01:47 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/14 18:34:10 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,12 @@
 
 // Définir la couleur du texte
 # define RESET "\001\033[0m\002"
-# define RED "\001\033[1;31m\002"
-# define GREEN "\001\033[1;32m\002"
-# define YELLOW "\001\033[1;33m\002"
-# define BLUE "\001\033[1;34m\002"
-# define PURPLE "\001\033[1;35m\002"
-# define CYAN "\001\033[1;36m\002"
+# define R "\001\033[1;31m\002"
+# define G "\001\033[1;32m\002"
+# define Y "\001\033[1;33m\002"
+# define B "\001\033[1;34m\002"
+# define P "\001\033[1;35m\002"
+# define C "\001\033[1;36m\002"
 
 /* STRUCTURES */
 
@@ -61,6 +61,7 @@ typedef struct s_cmd
 	int				*append;
 	char			*heredoc;
 	t_bool			redirection;
+	t_bool			heredoc_redirection;
 	char			**heredoc_delimiter;
 	int				nb_heredoc;
 	t_bool			is_pipe;
@@ -84,6 +85,7 @@ typedef struct s_pipex
 	int		file_o;
 	char	*limiter;
 	char	*outfile;
+	char	*heredoc_file;
 	int		heredoc_fd;
 }	t_pipex;
 

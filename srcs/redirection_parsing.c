@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_parsing.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 16:40:32 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/14 17:26:33 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 					= add_to_tab(new_cmd->heredoc_delimiter, new_cmd->args[i + 1]);
 			new_cmd->order_file = ft_join(new_cmd->order_file, "h");
 			new_cmd->nb_heredoc++;
+			new_cmd->heredoc_redirection = TRUE;
 			i++;
 		}
 		else if (ft_strcmp(new_cmd->args[i], "<") == 0)

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/13 22:04:21 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/14 17:53:44 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,17 +145,6 @@ void	execute_builtin(t_cmd *cmd, t_env *env)
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
 }
-
-/* char	*ft_join(char *buffer, char *buf)
-{
-	char	*tmp;
-
-	if (!buffer)
-		return (ft_strdup(buf));
-	tmp = ft_strjoin(buffer, buf);
-	free(buffer);
-	return (tmp);
-} */
 
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env,
 		char **env_)

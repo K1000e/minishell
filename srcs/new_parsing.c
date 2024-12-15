@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/13 21:54:14 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/14 17:27:07 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,6 +210,7 @@ t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	cmd->next = NULL;
 	cmd->append = 0;
 	cmd->redirection = FALSE;
+	cmd->heredoc_redirection = FALSE;
 	cmd->nb_infile = count_redirection(cmd_tokens, '<');
 	cmd->nb_outfile = count_redirection(cmd_tokens, '>');
 	cmd->nb_heredoc = 0;
