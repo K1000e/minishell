@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 03:19:42 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 04:16:41 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	handle_output_redirection_(t_cmd *cmd, int i, int *out)
 t_cmd	*handle_heredoc_redirection(t_cmd *new_cmd, int *i)
 {
 	new_cmd->redirection = TRUE;
-	if (ft_strcmp(new_cmd->args_token[*i + 1], "ee") == 0)
+	if (ft_strcmp(new_cmd->args_t[*i + 1], "ee") == 0)
 		new_cmd->heredoc_delimiter = add_to_tab(new_cmd->heredoc_delimiter,
 				"\0");
 	else

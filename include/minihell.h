@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 03:08:24 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 04:16:41 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ typedef struct s_cmd
 {
 	char			*cmd;
 	char			**args;
-	char			**args_token;
+	char			**args_t;
 	char			*token;
 	int				nb_token;
 	int				nb_outfile;

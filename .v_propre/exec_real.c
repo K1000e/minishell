@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/15 01:56:19 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:31:51 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,7 +218,7 @@ void execute_builtin(t_cmd *cmd, t_env *env)
 	current = env;
 	g_exit_code = 0;
 	if (cmd->redirection)
-		g_exit_code = redirection_exec_bultins(cmd);
+		g_exit_code = redirection_exec_builtins(cmd);
 	if (g_exit_code >= 1)
 	{
 		g_exit_code = 1;

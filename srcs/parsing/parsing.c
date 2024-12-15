@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/15 02:43:38 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 04:16:41 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ void	free_cmd_list(t_cmd *cmd_list)
 		next = current->next;
 		if (current->cmd)
 			free(current->cmd);
-        if (current->token)
-            free(current->token);
+		if (current->token)
+			free(current->token);
 		if (current->args)
 		{
 			i = -1;
@@ -48,12 +48,12 @@ void	free_cmd_list(t_cmd *cmd_list)
 				free(current->args[i]);
 			free(current->args);
 		}
-		if (current->args_token)
+		if (current->args_t)
 		{
 			i = -1;
-			while (current->args_token[++i])
-				free(current->args_token[i]);
-			free(current->args_token);
+			while (current->args_t[++i])
+				free(current->args_t[i]);
+			free(current->args_t);
 		}
 		if (current->out_file)
 		{
@@ -74,12 +74,12 @@ void	free_cmd_list(t_cmd *cmd_list)
 		if (current->order_file)
 			free(current->order_file);
 		if (current->heredoc_delimiter)
-        {
-            i = -1;
-            while (current->heredoc_delimiter[++i])
-                free(current->heredoc_delimiter[i]);
-            free(current->heredoc_delimiter);
-        }
+		{
+			i = -1;
+			while (current->heredoc_delimiter[++i])
+				free(current->heredoc_delimiter[i]);
+			free(current->heredoc_delimiter);
+		}
 		free(current);
 		current = next;
 	}

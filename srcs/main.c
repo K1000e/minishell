@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 01:42:34 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 04:09:10 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,8 @@ void	ft_command(char *line, t_env *env)
 	else if (tmp->args[0] && (!commands->is_pipe && is_builtin(tmp->args[0])))
 		single_builtin(tmp, env);
 	else if (tmp->args[0] == NULL)
-	{
 		if (tmp->redirection)
 			single_builtin(tmp, env);
-			//g_exit_code = redirection_exec_bultins_single(tmp, p);
-	}
 	free_cmd_list(commands);
 }
 
@@ -93,7 +90,7 @@ void	minihell(t_env *env, int save_stdin, int save_stdout)
 		}
 		if (ft_strlen(line) > 0)
 			add_history(line);
-		if (!match_quotes(line) || !count_redir(line)/*  || !check_redir(line) */)
+		if (!match_quotes(line) || !count_redir(line))
 		{
 			free(line);
 			continue ;

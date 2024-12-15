@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 03:14:18 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 04:28:53 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ t_cmd	*parse_command(char *line)
 	while (TRUE)
 	{
 		if (parse.token_line[i] != '\0' && ((parse.token_line[i] == '>'
-			|| parse.token_line[i] == '<') && !check_redir(parse.token_line, parse.token_line[i], i)))
+					|| parse.token_line[i] == '<')
+				&& !check_redir(parse.token_line, parse.token_line[i], i)))
 		{
 			free(parse.token_line);
 			free(parse.command_line);
@@ -163,31 +164,28 @@ char	**clear_redir(t_cmd *cmd)
 	cmd->nb_token -= (cmd->nb_infile * 2) - (cmd->nb_outfile * 2);
 	new_args = ft_calloc(sizeof(char *), (cmd->nb_token + 1));
 	i = -1;
-	x = 0;
+	x = -1;
 	while (cmd->args[++i])
 	{
-		if (ft_strcmp(cmd->args_token[i], ">") == 0
-			|| ft_strcmp(cmd->args_token[i], ">>") == 0
-			|| ft_strcmp(cmd->args_token[i], "<") == 0
-			|| ft_strcmp(cmd->args_token[i], "<<") == 0)
+		if (ft_strcmp(cmd->args_t[i], ">") == 0
+			|| ft_strcmp(cmd->args_t[i], ">>") == 0
+			|| ft_strcmp(cmd->args_t[i], "<") == 0
+			|| ft_strcmp(cmd->args_t[i], "<<") == 0)
 			i++;
 		else
-		{
-			new_args[x] = ft_strdup(cmd->args[i]);
-			x++;
-		}
+			new_args[++x] = ft_strdup(cmd->args[i]);
 	}
 	i = -1;
 	while (cmd->args[++i])
 	{
 		free(cmd->args[i]);
-		if (cmd->args_token[i])
-			free(cmd->args_token[i]);
+		if (cmd->args_t[i])
+			free(cmd->args_t[i]);
 	}
 	free(cmd->args);
-	free(cmd->args_token);
+	free(cmd->args_t);
 	cmd->args = new_args;
-    cmd->args_token = NULL;
+	cmd->args_t = NULL;
 	return (new_args);
 }
 
@@ -203,7 +201,7 @@ t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 		free(cmd);
 		free(cmd_str);
 		free(cmd_tokens);
-		return NULL;
+		return (NULL);
 	}
 	cmd->next = NULL;
 	cmd->append = 0;
@@ -240,14 +238,14 @@ void	make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
 	cmd->nb_token = count_tokens_(cmd_tokens);
 	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	cmd->args_token = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	if (!cmd->args || !cmd->args_token)
+	cmd->args_t = malloc(sizeof(char *) * (cmd->nb_token + 1));
+	if (!cmd->args || !cmd->args_t)
 	{
 		if (cmd->args)
 			free(cmd->args);
-		if (cmd->args_token)
-			free(cmd->args_token);
-		return;
+		if (cmd->args_t)
+			free(cmd->args_t);
+		return ;
 	}
 	parse_args(cmd_str, cmd_tokens, cmd);
 }
@@ -293,13 +291,12 @@ void	parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 			while (cmd_tokens[i] && cmd_tokens[i] == token)
 				i++;
 			cmd->args[nb_args] = ft_strndup(&cmd_str[start], i - start);
-			cmd->args_token[nb_args] = ft_strndup(&cmd_tokens[start], i
-					- start);
+			cmd->args_t[nb_args] = ft_strndup(&cmd_tokens[start], i - start);
 			nb_args++;
 		}
 	}
 	cmd->args[nb_args] = NULL;
-	cmd->args_token[nb_args] = NULL;
+	cmd->args_t[nb_args] = NULL;
 }
 
 void	clear_quotes(t_parse *parse)
@@ -308,12 +305,13 @@ void	clear_quotes(t_parse *parse)
 	int		x;
 	char	*res_token;
 	char	*res_command;
+	t_bool	heredoc;
 
 	res_token = ft_calloc(sizeof(char), ft_strlen(parse->token_line) + 1);
 	res_command = ft_calloc(sizeof(char), ft_strlen(parse->token_line) + 1);
 	i = -1;
 	x = 0;
-	t_bool heredoc = FALSE;
+	heredoc = FALSE;
 	while (parse->token_line[++i])
 	{
 		if (parse->token_line[i] == '<' && parse->token_line[i + 1] == '<')
@@ -337,7 +335,8 @@ void	clear_quotes(t_parse *parse)
 		}
 		if (parse->token_line[i] == 'e' && !heredoc)
 			continue ;
-		if (heredoc && parse->token_line[i] != '<' && parse->token_line[i] != 'e' && parse->token_line[i] != ' ')
+		if (heredoc && parse->token_line[i] != '<'
+			&& parse->token_line[i] != 'e' && parse->token_line[i] != ' ')
 			heredoc = FALSE;
 		res_token[x] = parse->token_line[i];
 		res_command[x] = parse->command_line[i];
@@ -386,10 +385,10 @@ void	check_char(t_parse *parse)
 	clear_quotes(parse);
 }
 
-char **add_to_tab(char **tab, const char *str)
+char	**add_to_tab(char **tab, const char *str)
 {
-	int i;
-	char **new_tab;
+	int		i;
+	char	**new_tab;
 
 	i = 0;
 	if (tab)
