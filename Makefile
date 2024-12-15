@@ -6,7 +6,7 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/15 04:02:06 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/15 04:03:55 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,7 @@ LST_SRCS	:=	main.c			\
 				exec.c 			\
 				bultins_env.c 	\
 				bultins.c 		\
+				bultins_utils.c \
 				kitty.c \
 				chillguy.c \
 				expander.c \
