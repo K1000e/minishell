@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/14 17:53:44 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:20:07 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,13 @@ void	fake_error(t_pipex *pipex, char *message, int error_code)
 void	single_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env	*current;
+	t_pipex	*pipex;
 
 	current = env;
 	g_exit_code = 0;
+	pipex = malloc(sizeof(t_pipex));
 	if (cmd->redirection)
-		g_exit_code = redirection_exec_bultins_single(cmd);
+		g_exit_code = redirection_exec_bultins_single(cmd, pipex);
 	if (g_exit_code >= 1)
 	{
 		g_exit_code = 1;
@@ -123,11 +125,13 @@ void	single_builtin(t_cmd *cmd, t_env *env)
 void	execute_builtin(t_cmd *cmd, t_env *env)
 {
 	t_env	*current;
+	t_pipex	*pipex;
 
+	pipex = malloc(sizeof(t_pipex));
 	current = env;
 	g_exit_code = 0;
 	if (cmd->redirection)
-		g_exit_code = redirection_exec_bultins(cmd);
+		g_exit_code = redirection_exec_bultins(cmd, pipex);
 	if (cmd->args[0] == NULL)
 		return ;
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
@@ -144,6 +148,7 @@ void	execute_builtin(t_cmd *cmd, t_env *env)
 		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
+	free(pipex);
 }
 
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env,
@@ -186,35 +191,38 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env,
 
 void	exec_non_builtins(t_cmd *cmd, t_env *env)
 {
-	t_pipex	pipex;
+	t_pipex	*pipex;
 	pid_t	pid;
 	int		i;
 	char	**b_env;
 
 	b_env = base_env(env);
 	g_exit_code = 0;
-	pipex.file_i = -1;
-	pipex.file_o = -1;
-	if (pipe(pipex.pipe_fd) == -1)
-		fake_error(&pipex, "Couldn't open pipe", 1);
+	pipex = malloc(sizeof(t_pipex));
+	pipex->file_i = -1;
+	pipex->file_o = -1;
+	if (pipe(pipex->pipe_fd) == -1)
+		fake_error(pipex, "Couldn't open pipe", 1);
+	set_signal_action(sigint_heredoc_handler);
 	pid = fork();
 	if (pid == 0)
 	{
 		if (cmd->redirection)
-			g_exit_code = redirection_exec_bultins(cmd);
+			g_exit_code = redirection_exec_bultins(cmd, pipex);
 		if (g_exit_code >= 1)
 			exit(1);
-		execute_non_builtins(&pipex, cmd, env, b_env);
+		execute_non_builtins(pipex, cmd, env, b_env);
 		waitpid(pid, &g_exit_code, 0);
 		g_exit_code = WEXITSTATUS(g_exit_code);
 	}
+	set_signal_action(sigint_handler);
 	i = 0;
 	while (b_env[i])
 		free(b_env[i++]);
 	free(b_env);
 	if (pid == -1)
-		fake_error(&pipex, "Invalid fork()", 1);
-	fake_free_all(&pipex);
+		fake_error(pipex, "Invalid fork()", 1);
+	fake_free_all(pipex);
 	waitpid(pid, &g_exit_code, 0);
 	g_exit_code = WEXITSTATUS(g_exit_code);
 }

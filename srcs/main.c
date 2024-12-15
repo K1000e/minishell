@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/14 17:21:28 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 01:42:34 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,10 +68,11 @@ void	ft_command(char *line, t_env *env)
 		execute_command(tmp, env);
 	else if (tmp->args[0] && (!commands->is_pipe && is_builtin(tmp->args[0])))
 		single_builtin(tmp, env);
-	else if (tmp->args[0] == NULL )
+	else if (tmp->args[0] == NULL)
 	{
 		if (tmp->redirection)
-			g_exit_code = redirection_exec_bultins_single(tmp);
+			single_builtin(tmp, env);
+			//g_exit_code = redirection_exec_bultins_single(tmp, p);
 	}
 	free_cmd_list(commands);
 }

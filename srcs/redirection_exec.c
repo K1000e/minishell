@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/15 01:21:07 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 01:56:58 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ void handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last)
 	i = 0;
 	while (access(pipex->heredoc_file, F_OK) == 0)
 		pipex->heredoc_file = ft_strjoin(".heredoc", ft_itoa(i++));
+	set_signal_action(sigint_heredoc_handler);
 	pipex->heredoc_fd = open(pipex->heredoc_file, O_CREAT | O_WRONLY | O_TRUNC, 0777);
 	while (1)
 	{
@@ -75,6 +76,7 @@ void handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last)
 	}
 	close(pipex->heredoc_fd);
 	reopen_heredoc(pipex, is_last);
+	set_signal_action(sigint_handler);
 }
 
 void	fake_open_infile(t_pipex *pipex, t_cmd *cmd)
@@ -133,6 +135,7 @@ int	open_infile(t_pipex *pipex, t_cmd *cmd, int j)
 	//printf("fd = %d\n", fd);
 	if (fd < 0)
 	{
+		//printf("error\n");
 		perror(cmd->in_file[j]);
 		return(1);
 	}
@@ -163,17 +166,13 @@ int	open_outfile(t_pipex *pipex, t_cmd *cmd, int k)
 	return (0);
 }
 
-int	redirection_exec_bultins(t_cmd *cmd)
+int	redirection_exec_bultins(t_cmd *cmd, t_pipex *pipex)
 {
-	t_pipex	*pipex;
 	int		i;
 	int		j;
 	int		k;
 	int		h;
 
-	pipex = malloc(sizeof(t_pipex));
-	pipex->file_i = -1;
-	pipex->file_o = -1;
 	if (cmd->order_file == NULL)
 		return (1);
 	i = -1;
@@ -203,7 +202,6 @@ int	redirection_exec_bultins(t_cmd *cmd)
 			k++;
 		}
 	}
-	//printf("file_i = %d\n", pipex->file_i);
 	if (pipex->file_i != -1)
 		dup2(pipex->file_i, STDIN_FILENO);
 	if (pipex->file_i != -1 && cmd->heredoc_redirection)
@@ -218,17 +216,13 @@ int	redirection_exec_bultins(t_cmd *cmd)
 	return (0);
 }
 
-int	redirection_exec_bultins_single(t_cmd *cmd)
+int	redirection_exec_bultins_single(t_cmd *cmd, t_pipex *pipex)
 {
-	t_pipex	*pipex;
 	int		i;
 	int		j;
 	int		k;
 	int		h;
 
-	pipex = malloc(sizeof(t_pipex));
-	pipex->file_i = -1;
-	pipex->file_o = -1;
 	if (cmd->order_file == NULL)
 		return (1);
 	i = -1;
@@ -287,6 +281,8 @@ int	redirection_exec_bultins_single(t_cmd *cmd)
 		dup2(pipex->file_i, STDIN_FILENO);
 	if (pipex->file_i != -1 && cmd->heredoc_redirection)
 		reopen_heredoc(pipex, FALSE);
+	else if (pipex->file_i != -1)
+		close(pipex->file_i);
 	else if (pipex->file_i != -1)
 		close(pipex->pipe_fd[1]);
 	if (pipex->file_o != -1)

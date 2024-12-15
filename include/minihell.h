@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/14 18:34:10 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:20:12 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,8 @@ char	**base_env(t_env *env);
 char	*ft_strjoin_free(char *s1, char *s2, int is_free);
 t_bool	is_builtin(char *cmd);
 void	single_builtin(t_cmd *cmd, t_env *env);
-int		redirection_exec_bultins(t_cmd *cmd);
-int		redirection_exec_bultins_single(t_cmd *cmd);
+int		redirection_exec_bultins(t_cmd *cmd, t_pipex *pipex);
+int		redirection_exec_bultins_single(t_cmd *cmd, t_pipex *pipex);
 
 void	set_signal_action(void (*handler)(int));
 void	sigint_heredoc_handler(int signal);

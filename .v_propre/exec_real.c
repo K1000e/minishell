@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/02 22:03:42 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 01:56:19 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,6 +303,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	pid = fork();
 	if (pid == 0)
 	{
+		set_signal_action(sigint_heredoc_handler);
 		if (cmd->redirection)
 			g_exit_code = redirection_exec_bultins(cmd);
 		if (g_exit_code >= 1)
@@ -340,6 +341,7 @@ t_bool is_builtin(char *cmd)
 
 void ex_child1(int pipefd[2], t_cmd *cmd, t_env *env)
 {
+	set_signal_action(sigint_heredoc_handler);
 	dup2(pipefd[1], STDOUT_FILENO);
 	close(pipefd[0]);
 	close(pipefd[1]);
@@ -350,6 +352,7 @@ void ex_child1(int pipefd[2], t_cmd *cmd, t_env *env)
 
 void ex_child2(int pipefd[2], t_cmd *cmd, t_env *env)
 {
+	set_signal_action(sigint_heredoc_handler);
 	dup2(pipefd[0], STDIN_FILENO);
 	close(pipefd[0]);
 	close(pipefd[1]);
