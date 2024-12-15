@@ -3,18 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   bultins.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/03 01:35:56 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 02:09:27 by mabdessm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-void	ft_exit(t_cmd *cmd)
+int	ft_exit_code(int nb_args, t_cmd *cmd)
 {
 	int	exit_code;
+
+	exit_code = 0;
+	if (nb_args == 2)
+		exit_code = ft_atoi(cmd->args[1]) % 256;
+	printf("exit\n");
+	return (exit_code);
+}
+
+void	ft_exit(t_cmd *cmd)
+{
 	int	nb_args;
 	int	i;
 
@@ -34,13 +44,7 @@ void	ft_exit(t_cmd *cmd)
 		}
 	}
 	if (nb_args <= 2)
-	{
-		exit_code = 0;
-		if (nb_args == 2)
-			exit_code = ft_atoi(cmd->args[1]) % 256;
-		printf("exit\n");
-		exit(exit_code);
-	}
+		exit(ft_exit_code(nb_args, cmd));
 	ft_fprintf(2, "exit: too many arguments\n");
 	g_exit_code = 1;
 }
@@ -115,7 +119,7 @@ void	ft_cd(t_cmd *cmd, t_env *env)
 		if (current && current->value)
 		{
 			g_exit_code = 0;
-			directory = current->value ;
+			directory = current->value;
 		}
 		else
 		{
