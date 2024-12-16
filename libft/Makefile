@@ -74,7 +74,6 @@ LST_SRCS	:= 	libft/ft_atoi.c			\
 				ft_printf/ft_sprint_base.c 	\
 				get_next_line/get_next_line.c
 
-
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 
 LST_INCS	:=	libft.h get_next_line.h ft_printf.h

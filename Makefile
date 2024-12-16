@@ -6,7 +6,7 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/16 23:50:05 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/16 23:56:25 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,44 +27,41 @@ DIR_PIPEX	:=	pipex
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c			\
-				parsing/parsing.c 	\
+				utils.c			\
+				signal.c		\
+				free.c			\
+				check_errors.c	\
 				environment/environment.c	\
-				environment/env_utils.c	\
-				check_errors.c 	\
-				parsing/parsing_utils.c 		\
-				execution/exec.c 			\
-				builtins/bultins_env.c 	\
-				builtins/bultins_env_utils.c \
-				builtins/bultins.c 		\
-				builtins/bultins_utils.c \
-				builtins/ft_export.c \
-				emotes/kitty.c \
-				emotes/chillguy.c \
-				expander/expander.c \
-				utils.c \
-				parsing/redirection_parsing.c \
-				parsing/create_command.c \
-				execution/redirection_exec.c \
-				signal.c \
-				execution/open_file.c \
-				execution/heredoc.c \
-				parsing/parsing_check.c \
-				parsing/create_args.c \
-				parsing/parsing_token.c \
-				parsing/parsing_quote.c \
-				execution/path.c \
-				free.c \
-				execution/execution.c
+				environment/env_utils.c		\
+				expander/expander.c			\
+				parsing/parsing.c				\
+				parsing/parsing_utils.c			\
+				parsing/parsing_check.c			\
+				parsing/create_args.c			\
+				parsing/parsing_token.c			\
+				parsing/parsing_quote.c			\
+				parsing/redirection_parsing.c	\
+				parsing/create_command.c		\
+				execution/exec.c					\
+				execution/redirection_exec.c		\
+				execution/execution.c				\
+				execution/open_file.c				\
+				execution/heredoc.c					\
+				execution/path.c					\
+				builtins/bultins_env.c					\
+				builtins/bultins_env_utils.c			\
+				builtins/bultins.c						\
+				builtins/bultins_utils.c				\
+				builtins/ft_export.c					\
+				emotes/kitty.c								\
+				emotes/chillguy.c
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
 
 LST_INCS	:=	minihell.h
 
-SRCS		:=	$(addprefix $(DIR_SRCS)/,$(LST_SRCS)) \
-				#pipex_execute.c \
-				pipex_main.c \
-				pipex_open_free.c
+SRCS		:=	$(addprefix $(DIR_SRCS)/,$(LST_SRCS))
 OBJS		:=	$(addprefix $(DIR_OBJS)/,$(LST_OBJS))
 INCS		:=	$(addprefix $(DIR_INCS)/,$(LST_INCS))
 
@@ -79,13 +76,12 @@ WHITE 		= 	\033[37m
 
 $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 	@mkdir -p $(DIR_OBJS)
+	@mkdir -p $(DIR_OBJS)/environment
+	@mkdir -p $(DIR_OBJS)/expander
 	@mkdir -p $(DIR_OBJS)/parsing
 	@mkdir -p $(DIR_OBJS)/execution
-	@mkdir -p $(DIR_OBJS)/emotes
 	@mkdir -p $(DIR_OBJS)/builtins
-	@mkdir -p $(DIR_OBJS)/expander
-	@mkdir -p $(DIR_OBJS)/environment
-	@mkdir -p $(DIR_OBJS)/execution
+	@mkdir -p $(DIR_OBJS)/emotes
 	$(CC) $(CFLAGS) -I $(DIR_INCS) -c $< -o $@
 	printf "$(ERASE)$(BLUE) > Compilation :$(END) $< \n"
 
