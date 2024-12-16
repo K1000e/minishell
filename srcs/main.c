@@ -62,8 +62,11 @@ static void	minihell(t_env *env, int save_stdin, int save_stdout)
 {
 	char	*line;
 
+	line = NULL;
 	while (1)
 	{
+		if (line)
+	 		free(line);
 		dup2(save_stdin, STDIN_FILENO);
 		dup2(save_stdout, STDOUT_FILENO);
 		line = readline("\001\033[1;31m\002🔥 HellShell 🔥 \001\033[0m\002");
@@ -72,16 +75,15 @@ static void	minihell(t_env *env, int save_stdin, int save_stdout)
 			ft_printf("exit\n");
 			break ;
 		}
+		if (line[0] == '\0')
+			continue ;
 		if (ft_strlen(line) > 0)
 			add_history(line);
 		if (!match_quotes(line) || !count_redir(line))
-		{
-			free(line);
 			continue ;
-		}
 		ft_command(line, env);
-		free(line);
 	}
+	free(line);
 	exit(0);
 }
 

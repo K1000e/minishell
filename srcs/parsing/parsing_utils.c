@@ -57,7 +57,7 @@ char	**add_to_tab(char **tab, const char *str)
 		while (tab[i] != NULL)
 			i++;
 	new_tab = malloc((i + 2) * sizeof(char *));
-	new_tab[i] = strdup(str);
+	new_tab[i] = ft_strdup(str);
 	if (!new_tab[i])
 	{
 		free(new_tab);

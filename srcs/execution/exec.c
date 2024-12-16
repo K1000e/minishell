@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 23:08:46 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 23:48:38 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,11 @@ void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 
 	pipex = malloc(sizeof(t_pipex));
 	current = env;
+	pipex->file_i = -1;
+	pipex->file_o = -1;
 	if (cmd->redirection)
 		g_exit_code = redirection_exec(cmd, pipex, TRUE);
+	free(pipex);
 	if ((g_exit_code >= 1 && single) || cmd->args[0] == NULL)
 		return ;
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
@@ -57,8 +60,6 @@ void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
-	if (!single)
-		free(pipex);
 }
 
 static void	execute_non_builtins(t_pipex *p, t_cmd *cmd, t_env *env,

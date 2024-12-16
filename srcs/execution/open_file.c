@@ -43,7 +43,7 @@ int	open_outfile(t_pipex *pipex, t_cmd *cmd, int k)
 		perror(cmd->out_file[k]);
 		return (1);
 	}
-	if (pipex->file_o)
+	if (pipex->file_o != -1)
 		close(pipex->file_o);
 	pipex->file_o = fd;
 	return (0);

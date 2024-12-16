@@ -22,6 +22,8 @@ void	free_all(t_pipex *pipex)
 		close(pipex->file_i);
 	if (pipex->file_o != -1)
 		close(pipex->file_o);
+	if (pipex)
+		free(pipex);
 }
 
 void	free_string_array(char **array)

@@ -37,7 +37,7 @@ static int	count_redir_parsing(char *cmd, char type)
 
 static t_cmd	*create_cmd_node(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
-	cmd = malloc(sizeof(t_cmd));
+	cmd = malloc(sizeof(t_cmd)); //HERE
 	cmd->cmd = ft_strdup(cmd_str);
 	cmd->token = ft_strdup(cmd_tokens);
 	if (!cmd->cmd || !cmd->token)
