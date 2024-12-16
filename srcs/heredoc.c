@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 12:36:35 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 18:47:23 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,9 @@ void	handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last)
 			O_CREAT | O_WRONLY | O_TRUNC, 0777);
 	while (1)
 	{
-		ft_printf("> ");
-		line = get_next_line(STDIN_FILENO);
+		ft_fprintf(0, "> ");
+		line = get_next_line(0);
+		//ft_fprintf(pipex->heredoc_fd, "%s", line);
 		if (!line || ft_compare(delimiter, line))
 		{
 			free(line);

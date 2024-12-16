@@ -3,31 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 13:07:44 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 18:08:24 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
-
-/* void	is_pipe(t_cmd *cmd)
-{
-	t_cmd	*current;
-
-	current = cmd;
-	while (current)
-	{
-		if (current->next)
-		{
-			current->is_pipe = TRUE;
-		}
-		else
-			current->is_pipe = FALSE;
-		current = current->next;
-	}
-} */
 
 int	ascii_art(char *line) // a deplacer 
 {

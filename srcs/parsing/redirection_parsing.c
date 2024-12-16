@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 01:59:15 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 17:24:35 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,28 +61,31 @@ t_cmd	*handle_heredoc_redirection(t_cmd *new_cmd, int *i)
 	return (new_cmd);
 }
 
-t_cmd	*process_redirection(t_cmd *new_cmd, int *i, int *in, int *out)
+t_cmd	*process_redirection(t_cmd *cmd, int *i, int *in, int *out)
 {
-	if (ft_strcmp(new_cmd->args[*i], ">") == 0
-		|| ft_strcmp(new_cmd->args[*i], ">>") == 0)
+	/* if (!ft_strcmp(cmd->args[*i], ">>") || !ft_strcmp(cmd->args[*i], "<<")
+		|| !ft_strcmp(cmd->args[*i], ">") || !ft_strcmp(cmd->args[*i], "<")) 
+		cmd->redirection = TRUE;*/
+	if (ft_strcmp(cmd->args[*i], ">") == 0
+		|| ft_strcmp(cmd->args[*i], ">>") == 0)
 	{
-		*i = handle_output_redirection_(new_cmd, *i, out);
+		*i = handle_output_redirection_(cmd, *i, out);
 		(*out)++;
 		if (*i == -1)
 			return (NULL);
 		(*i)++;
 	}
-	else if (ft_strcmp(new_cmd->args[*i], "<<") == 0)
-		return (handle_heredoc_redirection(new_cmd, i));
-	else if (ft_strcmp(new_cmd->args[*i], "<") == 0)
+	else if (ft_strcmp(cmd->args[*i], "<<") == 0)
+		return (handle_heredoc_redirection(cmd, i));
+	else if (ft_strcmp(cmd->args[*i], "<") == 0)
 	{
-		*i = handle_input_redirection(new_cmd, *i, in);
+		*i = handle_input_redirection(cmd, *i, in);
 		(*in)++;
 		if (*i == -1)
 			return (NULL);
 		(*i)++;
 	}
-	return (new_cmd);
+	return (cmd);
 }
 
 t_cmd	*handle_redirection_(t_cmd *new_cmd)

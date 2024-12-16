@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 13:20:29 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 18:43:41 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,10 @@ void	execute_command(t_cmd *cmd, t_env *env)
 	child1 = fork();
 	if (child1 == 0)
 		ex_child1(pipefd, cmd, env);
+	//waitpid(child1, &g_exit_code, 0);
 	child2 = fork();
 	if (child2 == 0)
 		ex_child2(pipefd, cmd, env);
 	parent(child1, child2, pipefd);
+	//g_exit_code = WEXITSTATUS(g_exit_code);
 }
