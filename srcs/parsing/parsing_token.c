@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   token.c                                            :+:      :+:    :+:   */
+/*   parsing_token.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 12:22:31 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:39:06 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-void	handle_double_quotes(t_parse *parse, int *i)
+static void	handle_double_quotes(t_parse *parse, int *i)
 {
 	parse->token_line[*i] = 'e';
 	while (parse->token_line[++(*i)] && parse->token_line[*i] != '"')
@@ -20,7 +20,7 @@ void	handle_double_quotes(t_parse *parse, int *i)
 	parse->token_line[*i] = 'e';
 }
 
-void	handle_single_quotes(t_parse *parse, int *i)
+static void	handle_single_quotes(t_parse *parse, int *i)
 {
 	parse->token_line[*i] = 'e';
 	while (parse->token_line[++(*i)] && parse->token_line[*i] != '\'')
@@ -28,7 +28,7 @@ void	handle_single_quotes(t_parse *parse, int *i)
 	parse->token_line[*i] = 'e';
 }
 
-void	handle_special_characters(t_parse *parse, int *i)
+static void	handle_special_characters(t_parse *parse, int *i)
 {
 	if (parse->token_line[*i] == '|')
 		parse->token_line[*i] = '|';
@@ -46,14 +46,12 @@ void	handle_special_characters(t_parse *parse, int *i)
 		parse->token_line[*i] = ' ';
 }
 
-void	check_char(t_parse *parse)
+void	tokenize_char(t_parse *parse)
 {
 	int	i;
 
 	i = -1;
 	while (parse->token_line[++i])
-	{
 		handle_special_characters(parse, &i);
-	}
 	clear_quotes(parse);
 }

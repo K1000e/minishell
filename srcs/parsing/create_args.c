@@ -6,31 +6,33 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 06:57:06 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 21:01:17 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-void	make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
+static int	count_tokens(const char *cmd_tokens)
 {
-	cmd->nb_token = count_tokens_(cmd_tokens);
-	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	cmd->args_t = malloc(sizeof(char *) * (cmd->nb_token + 1));
-	if (!cmd->args || !cmd->args_t)
+	int		count;
+	int		i;
+	char	token;
+
+	count = 0;
+	i = 0;
+	while (cmd_tokens[i])
 	{
-		if (cmd->args)
-			free(cmd->args);
-		if (cmd->args_t)
-			free(cmd->args_t);
-		return ;
+		while (cmd_tokens[i] && cmd_tokens[i] == ' ')
+			i++;
+		token = cmd_tokens[i];
+		while (cmd_tokens[i] && cmd_tokens[i] == token)
+			i++;
+		count++;
 	}
-	parse_args(cmd_str, cmd_tokens, cmd);
-	if (cmd->nb_infile || cmd->nb_outfile)
-		cmd = handle_redirection_(cmd);
+	return (count);
 }
 
-void	parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
+static void	parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
 	int		start;
 	int		i;
@@ -57,4 +59,22 @@ void	parse_args(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 	}
 	cmd->args[nb_args] = NULL;
 	cmd->args_t[nb_args] = NULL;
+}
+
+void	make_argument(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
+{
+	cmd->nb_token = count_tokens(cmd_tokens);
+	cmd->args = malloc(sizeof(char *) * (cmd->nb_token + 1));
+	cmd->args_t = malloc(sizeof(char *) * (cmd->nb_token + 1));
+	if (!cmd->args || !cmd->args_t)
+	{
+		if (cmd->args)
+			free(cmd->args);
+		if (cmd->args_t)
+			free(cmd->args_t);
+		return ;
+	}
+	parse_args(cmd_str, cmd_tokens, cmd);
+	if (cmd->nb_infile || cmd->nb_outfile)
+		cmd = handle_redirection(cmd);
 }

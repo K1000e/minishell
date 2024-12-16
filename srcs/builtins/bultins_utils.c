@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bultins_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 02:29:37 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 13:25:14 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:33:48 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ void	ft_cd_env(t_env *env, t_env *current, char *directory)
 	}
 }
 
-static void	ft_cd2(t_cmd *cmd, t_env *env, char *directory, t_env *current)
+static void	ft_cd_execution(t_cmd *cmd, t_env *env, char *directory,
+		t_env *current)
 {
 	if (cmd->args[1] == NULL)
 	{
@@ -76,5 +77,5 @@ void	ft_cd(t_cmd *cmd, t_env *env)
 
 	directory = NULL;
 	current = NULL;
-	ft_cd2(cmd, env, directory, current);
+	ft_cd_execution(cmd, env, directory, current);
 }

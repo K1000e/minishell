@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_errors.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 12:21:59 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:21:32 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ t_bool	check_redir(const char *line, char token, int i)
 	return (TRUE);
 }
 
-t_bool	count_redirection_(const char *line, char token, int *i)
+static t_bool	count_redirection_err(const char *line, char token, int *i)
 {
 	if (line[*i + 1] && line[*i + 1] == token)
 	{
@@ -65,12 +65,12 @@ t_bool	count_redir(const char *line)
 	{
 		if (line[j] == '>')
 		{
-			if (!count_redirection_(line, '>', &j))
+			if (!count_redirection_err(line, '>', &j))
 				return (FALSE);
 		}
 		else if (line[j] == '<')
 		{
-			if (!count_redirection_(line, '<', &j))
+			if (!count_redirection_err(line, '<', &j))
 				return (FALSE);
 		}
 		else

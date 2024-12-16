@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 22:13:07 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 23:33:05 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,40 +46,9 @@ void	ft_update_key(t_env *env, char *key, char *value)
 		else
 		{
 			env_node = create_env_node(key, value);
-			ft_env_add_back_(&env, env_node);
+			ft_env_add_back(&env, env_node);
 		}
 	}
-}
-
-void	ft_print_declare_env(t_env *env)
-{
-	t_env	*current;
-
-	current = env->next;
-	ft_sort_env(&current);
-	while (current)
-	{
-		printf("declare -x %s", current->key);
-		if (current->value)
-			printf("=\"%s\"", current->value);
-		printf("\n");
-		current = current->next;
-	}
-}
-
-t_bool	check_validity_export(const char *key)
-{
-	int	i;
-
-	i = 0;
-	if (!key || (!ft_isalpha(key[i]) && key[i] != '_'))
-		return (FALSE);
-	while (key[++i])
-	{
-		if (!ft_isalnum(key[i]) && key[i] != '_')
-			return (FALSE);
-	}
-	return (TRUE);
 }
 
 void	ft_env(t_cmd *cmd, t_env *env)

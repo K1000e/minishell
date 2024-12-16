@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   bultins.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mabdessm <mabdessm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 18:33:23 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 03:50:43 by mabdessm         ###   ########.fr       */
+/*   Updated: 2024/12/16 23:28:22 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-int	ft_exit_code(int nb_args, t_cmd *cmd)
+static int	ft_exit_code(int nb_args, t_cmd *cmd)
 {
 	int	exit_code;
 
@@ -49,7 +49,7 @@ void	ft_exit(t_cmd *cmd)
 	g_exit_code = 1;
 }
 
-t_bool	ft_check_option_echo(t_cmd *cmd, int j)
+static t_bool	ft_check_option_echo(t_cmd *cmd, int j)
 {
 	int		i;
 	t_bool	option;

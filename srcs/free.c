@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 13:19:08 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:19:33 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	free_parse(t_parse *parse)
 	free(parse);
 }
 
-void	free_cmd_node(t_cmd *cmd_node)
+static void	free_cmd_node(t_cmd *cmd_node)
 {
 	if (cmd_node->cmd)
 		free(cmd_node->cmd);

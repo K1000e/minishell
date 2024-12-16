@@ -3,14 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   environment.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 13:08:59 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:37:27 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
+
+static int	ft_envsize(t_env *lst)
+{
+	int	i;
+
+	i = 0;
+	while (lst != NULL)
+	{
+		i++;
+		lst = lst->next;
+	}
+	return (i);
+}
 
 t_env	*create_env_node(char *key, char *value)
 {
@@ -47,7 +60,7 @@ char	**base_env(t_env *env)
 	return (environment);
 }
 
-t_env	*intialize_env(t_env *new_env, char *executable)
+static t_env	*intialize_env(t_env *new_env, char *executable)
 {
 	char	*exe;
 
@@ -83,7 +96,7 @@ t_env	*create_env(char **env, t_env *new_env, char *executable, int i)
 				key = ft_strndup(env[i], j);
 				value = ft_strdup(env[i] + j + 1);
 				env_node = create_env_node(key, value);
-				ft_env_add_back_(&new_env, env_node);
+				ft_env_add_back(&new_env, env_node);
 				free(key);
 				free(value);
 				break ;

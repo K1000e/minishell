@@ -6,13 +6,13 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 18:08:24 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 23:43:39 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-int	ascii_art(char *line) // a deplacer 
+static int	ascii_art(char *line)
 {
 	if (ft_strcmp(line, "kitty") == 0 || ft_strcmp(line, "KITTY") == 0
 		|| ft_strcmp(line, "Kitty") == 0)
@@ -30,7 +30,7 @@ int	ascii_art(char *line) // a deplacer
 	return (0);
 }
 
-void	ft_command(char *line, t_env *env)
+static void	ft_command(char *line, t_env *env)
 {
 	char	*expanded_line;
 	t_cmd	*commands;
@@ -58,7 +58,7 @@ void	ft_command(char *line, t_env *env)
 	free_cmd_list(commands);
 }
 
-void	minihell(t_env *env, int save_stdin, int save_stdout)
+static void	minihell(t_env *env, int save_stdin, int save_stdout)
 {
 	char	*line;
 

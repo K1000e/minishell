@@ -1,42 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   quote.c                                            :+:      :+:    :+:   */
+/*   parsing_quote.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 12:41:04 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:35:09 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-void	clear_quotes_append(t_parse *temp, t_parse *parse, int *x, int i)
+static void	clear_quotes_append(t_parse *temp, t_parse *p, int *x, int i)
 {
-	temp->token_line[*x] = parse->token_line[i];
-	temp->cmd_line[*x] = parse->cmd_line[i];
+	temp->token_line[*x] = p->token_line[i];
+	temp->cmd_line[*x] = p->cmd_line[i];
 	(*x)++;
 }
 
-void	clear_quotes_append_dbl(t_parse *temp, t_parse *parse, int *x, int i)
+static void	clear_quotes_append_dbl(t_parse *temp, t_parse *p, int *x, int i)
 {
-	clear_quotes_append(temp, parse, x, i);
-	clear_quotes_append(temp, parse, x, ++i);
+	clear_quotes_append(temp, p, x, i);
+	clear_quotes_append(temp, p, x, ++i);
 }
 
-void	ft_copy_clean_cmd(t_parse *temp, t_parse *parse)
+static void	ft_copy_clean_cmd(t_parse *temp, t_parse *p)
 {
-	free(parse->token_line);
-	free(parse->cmd_line);
-	parse->token_line = ft_strdup(temp->token_line);
-	parse->cmd_line = ft_strdup(temp->cmd_line);
+	free(p->token_line);
+	free(p->cmd_line);
+	p->token_line = ft_strdup(temp->token_line);
+	p->cmd_line = ft_strdup(temp->cmd_line);
 	free(temp->token_line);
 	free(temp->cmd_line);
 	free(temp);
 }
 
-void	clear_quotes_loop(t_parse *temp, t_parse *p, t_bool heredoc, int x)
+static void	clear_quotes_loop(t_parse *temp, t_parse *p, t_bool heredoc, int x)
 {
 	int	i;
 

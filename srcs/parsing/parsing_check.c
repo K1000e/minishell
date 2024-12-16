@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check.c                                            :+:      :+:    :+:   */
+/*   parsing_check.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 13:26:33 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:34:29 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,24 +43,4 @@ t_bool	is_invalid_redir(t_parse *parse, int i)
 			&& !check_redir(parse->token_line, parse->token_line[i], i)))
 		return (FALSE);
 	return (TRUE);
-}
-
-int	count_tokens_(const char *cmd_tokens)
-{
-	int		count;
-	int		i;
-	char	token;
-
-	count = 0;
-	i = 0;
-	while (cmd_tokens[i])
-	{
-		while (cmd_tokens[i] && cmd_tokens[i] == ' ')
-			i++;
-		token = cmd_tokens[i];
-		while (cmd_tokens[i] && cmd_tokens[i] == token)
-			i++;
-		count++;
-	}
-	return (count);
 }

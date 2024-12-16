@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 13:02:29 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 23:25:18 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-char	*get_path_variable(t_env *env)
+static char	*get_path_variable(t_env *env)
 {
 	t_env	*current;
 
@@ -24,7 +24,7 @@ char	*get_path_variable(t_env *env)
 		return (NULL);
 }
 
-t_bool	path_access(t_cmd *command, char *full_path)
+static t_bool	path_access(t_cmd *command, char *full_path)
 {
 	if (access(full_path, X_OK) == 0)
 	{

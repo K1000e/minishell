@@ -6,13 +6,13 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 17:24:35 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 20:39:51 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-int	handle_input_redirection(t_cmd *cmd, int i, int *in)
+static int	handle_input_redirection(t_cmd *cmd, int i, int *in)
 {
 	if (cmd->args[i + 1])
 	{
@@ -28,7 +28,7 @@ int	handle_input_redirection(t_cmd *cmd, int i, int *in)
 	}
 }
 
-int	handle_output_redirection_(t_cmd *cmd, int i, int *out)
+static int	handle_output_redirection(t_cmd *cmd, int i, int *out)
 {
 	if (cmd->args[i + 1])
 	{
@@ -45,7 +45,7 @@ int	handle_output_redirection_(t_cmd *cmd, int i, int *out)
 	}
 }
 
-t_cmd	*handle_heredoc_redirection(t_cmd *new_cmd, int *i)
+static t_cmd	*handle_heredoc_redirection(t_cmd *new_cmd, int *i)
 {
 	new_cmd->redirection = TRUE;
 	if (ft_strcmp(new_cmd->args_t[*i + 1], "ee") == 0)
@@ -61,15 +61,12 @@ t_cmd	*handle_heredoc_redirection(t_cmd *new_cmd, int *i)
 	return (new_cmd);
 }
 
-t_cmd	*process_redirection(t_cmd *cmd, int *i, int *in, int *out)
+static t_cmd	*process_redirection(t_cmd *cmd, int *i, int *in, int *out)
 {
-	/* if (!ft_strcmp(cmd->args[*i], ">>") || !ft_strcmp(cmd->args[*i], "<<")
-		|| !ft_strcmp(cmd->args[*i], ">") || !ft_strcmp(cmd->args[*i], "<")) 
-		cmd->redirection = TRUE;*/
 	if (ft_strcmp(cmd->args[*i], ">") == 0
 		|| ft_strcmp(cmd->args[*i], ">>") == 0)
 	{
-		*i = handle_output_redirection_(cmd, *i, out);
+		*i = handle_output_redirection(cmd, *i, out);
 		(*out)++;
 		if (*i == -1)
 			return (NULL);
@@ -88,7 +85,7 @@ t_cmd	*process_redirection(t_cmd *cmd, int *i, int *in, int *out)
 	return (cmd);
 }
 
-t_cmd	*handle_redirection_(t_cmd *new_cmd)
+t_cmd	*handle_redirection(t_cmd *new_cmd)
 {
 	int	i;
 	int	in;

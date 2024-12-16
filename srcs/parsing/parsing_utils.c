@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 13:26:14 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/16 20:23:56 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,29 +69,6 @@ char	**add_to_tab(char **tab, const char *str)
 	if (tab)
 		free(tab);
 	return (new_tab);
-}
-
-int	count_redirection(char *cmd, char type)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	if (!cmd)
-		return (0);
-	while (cmd[i])
-	{
-		if (cmd[i] == type)
-		{
-			i++;
-			if (cmd[i] == type)
-				i++;
-			count++;
-		}
-		i++;
-	}
-	return (count);
 }
 
 t_bool	return_error(char *error, int exit_code)

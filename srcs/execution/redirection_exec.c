@@ -6,20 +6,20 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 18:38:15 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 23:12:45 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-int	redirection_exit(t_bool should_exit)
+static int	redirection_exit(t_bool should_exit)
 {
 	if (should_exit)
 		exit(1);
 	return (1);
 }
 
-void	handle_file_descriptors(t_pipex *pipex, t_cmd *cmd)
+static void	handle_file_descriptors(t_pipex *pipex, t_cmd *cmd)
 {
 	if (pipex->file_i != -1)
 		dup2(pipex->file_i, STDIN_FILENO);
@@ -34,7 +34,7 @@ void	handle_file_descriptors(t_pipex *pipex, t_cmd *cmd)
 	}
 }
 
-int	handle_file_redirection(t_pipex *pipex, t_cmd *cmd, t_file *info,
+static int	handle_file_redirection(t_pipex *pipex, t_cmd *cmd, t_file *info,
 	t_bool should_exit)
 {
 	if (info->type == 'h')
@@ -58,7 +58,7 @@ int	handle_file_redirection(t_pipex *pipex, t_cmd *cmd, t_file *info,
 	return (0);
 }
 
-int	redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex, t_bool should_exit)
+int	redirection_exec(t_cmd *cmd, t_pipex *pipex, t_bool should_exit)
 {
 	int		i;
 	t_file	*info;

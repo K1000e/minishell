@@ -6,13 +6,13 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 18:47:23 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 23:42:34 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-int	ft_compare(char *limiter, char *line)
+static int	ft_compare(char *limiter, char *line)
 {
 	if (!(ft_strncmp(line, limiter, ft_strlen(limiter)) == 0))
 		return (0);
@@ -46,7 +46,6 @@ void	handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last)
 	{
 		ft_fprintf(0, "> ");
 		line = get_next_line(0);
-		//ft_fprintf(pipex->heredoc_fd, "%s", line);
 		if (!line || ft_compare(delimiter, line))
 		{
 			free(line);
