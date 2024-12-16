@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bultins_env_utils.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
+/*   Updated: 2024/12/15 22:14:37 by cgorin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minihell.h"
 
 void	supress_env(t_env *env, char *search)
@@ -54,8 +66,6 @@ void	ft_sort_env(t_env **env)
 {
 	t_env	*current;
 	t_env	*next;
-	// char	*tmp_key;
-	// char	*tmp_value;
 	int		swapped;
 
 	if (!env || !(*env) || !(*env)->next)
@@ -71,12 +81,6 @@ void	ft_sort_env(t_env **env)
 			if (ft_strcmp(current->key, next->key) > 0)
 			{
 				change_values(current, next);
-				// tmp_key = current->key;
-				// tmp_value = current->value;
-				// current->key = next->key; //? 
-				// current->value = next->value;
-				// next->key = tmp_key;
-				// next->value = tmp_value;
 				swapped = 1;
 			}
 			current = current->next;

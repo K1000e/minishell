@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 04:44:34 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 06:34:59 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,31 +20,42 @@ t_bool	check_redir(const char *line, char token, int i)
 	while (j < i)
 	{
 		if (line[i] == '\0')
-		{
-			ft_fprintf(2, "syntax error near unexpected token `newline'\n");
-			return (FALSE);
-		}
+			return (return_error(ERR_SYNTAX"1`newline'", 2));
 		j++;
 	}
 	if (line[i] == token)
 	{
 		i++;
+		printf("line[%d] = %c\n", i, line[i]);
 		if (line[i] == token)
 			i++;
+		printf("line[%d] = %c\n", i, line[i]);
 		while (line[i] && ft_isspace(line[i]))
 			i++;
+		printf("line[%d] = %c\n", i, line[i]);
 		if (line[i] == '\0' || line[i] == token)
-		{
-			printf("line[i] = %c\n", line[i]);
-			ft_fprintf(2, "syntax error near unexpected token `newline'\n");
-			return (FALSE);
-		}
+			return (return_error(ERR_SYNTAX"2`newline'", 2));
 		if (line[i] == '|')
-		{
-			ft_fprintf(2, "syntax error near unexpected token `|'\n", line[i]);
-			return (FALSE);
-		}
+			return (return_error(ERR_SYNTAX"3`|'", 2));
 	}
+	return (TRUE);
+}
+
+t_bool	count_redirection_(const char *line, char token, int *i)
+{
+	if (line[*i + 1] && line[*i + 1] == token)
+	{
+		if (line[*i + 2] && line[*i + 2] == token)
+		{
+			if (token == '>')
+				return (return_error(ERR_SYNTAX"`>'", 2));
+			else
+				return (return_error(ERR_SYNTAX"`<'", 2));
+		}
+		*i += 2;
+	}
+	else
+		(*i)++;
 	return (TRUE);
 }
 
@@ -57,32 +68,13 @@ t_bool	count_redir(const char *line)
 	{
 		if (line[j] == '>')
 		{
-			if (line[j + 1] && line[j + 1] == '>')
-			{
-				if (line[j + 2] && line[j + 2] == '>')
-				{
-					ft_fprintf(2, "syntax error near unexpected token `>'\n");
-					return (FALSE);
-				}
-				j += 2;
-			}
-			else
-				j++;
+			if (!count_redirection_(line, '>', &j))
+				return (FALSE);
 		}
 		else if (line[j] == '<')
 		{
-			if (line[j + 1] && line[j + 1] == '<')
-			{
-				if (line[j + 2] && line[j + 2] == '<')
-				{
-					ft_fprintf(2,
-						"bash: syntax error near unexpected token `<'\n");
-					return (FALSE);
-				}
-				j += 2;
-			}
-			else
-				j++;
+			if (!count_redirection_(line, '<', &j))
+				return (FALSE);
 		}
 		else
 			j++;
@@ -115,19 +107,5 @@ t_bool	match_quotes(char *line)
 		ft_fprintf(2, "bash: unmatched quote\n");
 		return (FALSE);
 	}
-	return (TRUE);
-}
-
-t_bool	is_valid_command_format(const char *cmd)
-{
-	int	i;
-
-	i = 0;
-	while (cmd[i] && !isspace(cmd[i]) && cmd[i] != '"' && cmd[i] != '\''
-		&& cmd[i] != '|' && cmd[i] != '>' && cmd[i] != '<')
-		i++;
-	if (cmd[i] && cmd[i] != ' ' && cmd[i] != '|' && cmd[i] != '>'
-		&& cmd[i] != '<' && cmd[i] != '\0')
-		return (FALSE);
 	return (TRUE);
 }

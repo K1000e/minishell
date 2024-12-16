@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 16:08:28 by codespace        ###   ########.fr       */
+/*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
+/*   Updated: 2024/12/16 05:57:39 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minihell.h"
 
-char	*get_env_var_value(const char *var_name, t_env *env)
+static char	*get_env_var_value(const char *var_name, t_env *env)
 {
 	t_env	*current;
 
@@ -79,7 +79,7 @@ static char	*append_char(char *result, char c)
 	return (new_result);
 }
 
-t_bool	is_within_single_quotes(const char *input, int index)
+static t_bool	is_within_single_quotes(const char *input, int index)
 {
 	int		i;
 	t_bool	single_quote;
@@ -97,26 +97,24 @@ t_bool	is_within_single_quotes(const char *input, int index)
 	return (single_quote);
 }
 
-static char	*process_input(const char *input, t_env *env)
+static char	*process_input(const char *input, t_env *env, int i)
 {
 	char	*result;
 	char	*to_append;
-	int		i;
 
-	i = 0;
 	result = ft_strdup("");
 	while (input[i])
 	{
 		if (input[i] == '$' && input[i + 1] && (input[i + 1] == '?'
-				|| ft_isalpha(input[i + 1]) || input[i + 1] == '_' || ft_isdigit(input[i + 1])))
+				|| ft_isalpha(input[i + 1]) || input[i + 1] == '_'
+				|| ft_isdigit(input[i + 1])))
 		{
 			if (is_within_single_quotes(input, i) || input[i + 1] == '"')
 			{
 				result = append_char(result, input[i++]);
 				continue ;
 			}
-			i++;
-			if (ft_isalpha(input[i]) || input[i] == '_')
+			if (ft_isalpha(input[++i]) || input[i] == '_')
 				to_append = handle_env_variable(input, &i, env);
 			else
 				to_append = handle_special_cases(input, &i, env);
@@ -132,6 +130,6 @@ char	*expand_env_vars(char *input, t_env *env)
 {
 	if (!input)
 		return (NULL);
-	input = process_input(input, env);
+	input = process_input(input, env, 0);
 	return (input);
 }

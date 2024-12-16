@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_fprint_num.c                                    :+:      :+:    :+:   */
+/*   ft_sprint_num.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/29 22:47:19 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/12 16:34:28 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/15 21:45:13 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,16 @@ static int	nbrlen(int n)
 	return (len);
 }
 
-int	ft_print_i_d_fd(int fd, int number)
+int	ft_print_i_d_str(char *buffer, int number)
 {
 	int	i;
 
 	i = nbrlen(number);
-	ft_putnbr_fd(number, fd);
+	ft_putnbr_base_str(buffer, number, "0123456789", 10);
 	return (i);
 }
 
-int	ft_print_u_fd(int fd, unsigned int number)
+int	ft_print_u_str(char *buffer, unsigned int number)
 {
 	int		i;
 	char	*base;
@@ -44,7 +44,7 @@ int	ft_print_u_fd(int fd, unsigned int number)
 	i = 0;
 	base = "0123456789";
 	if (number >= 10)
-		i += ft_print_u_fd(fd, number / 10);
-	i += ft_print_char_fd(fd, *(base + (number % 10)));
+		i += ft_print_u_str(buffer, number / 10);
+	i += ft_print_char_str(buffer, *(base + (number % 10)));
 	return (i);
 }

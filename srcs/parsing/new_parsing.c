@@ -6,93 +6,125 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 07:01:05 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 06:33:40 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-t_cmd	*parse_command(char *line)
+void	free_parse(t_parse *parse)
 {
-	t_cmd	*cmd_list;
+	if (!parse)
+		return ;
+	if (parse->token_line)
+		free(parse->token_line);
+	if (parse->cmd_line)
+		free(parse->cmd_line);
+	free(parse);
+}
+
+t_parse	*init_parse(char *line)
+{
+	t_parse	*parse;
+
+	parse = malloc(sizeof(t_parse));
+	if (!parse)
+		return (NULL);
+	parse->token_line = ft_strdup(line);
+	parse->cmd_line = ft_strdup(line);
+	if (!parse->token_line || !parse->cmd_line)
+		return (free_parse(parse), NULL);
+	check_char(parse);
+	return (parse);
+}
+
+t_bool	is_invalid_redir(t_parse *parse, int i)
+{
+	if (parse->token_line[i] != '\0' && ((parse->token_line[i] == '>'
+				|| parse->token_line[i] == '<')
+			&& !check_redir(parse->token_line, parse->token_line[i], i)))
+		return (FALSE);
+	return (TRUE);
+}
+
+void	update_pipe_status(t_cmd *cmd_list, char *token_line, int *i)
+{
+	if (token_line[*i] == '|')
+	{
+		cmd_list->is_pipe = TRUE;
+		(*i)++;
+	}
+	else
+		cmd_list->is_pipe = FALSE;
+}
+
+t_cmd	*parse_command_loop(char *line, t_parse *parse, t_cmd *cmd_list)
+{
 	t_cmd	*new_cmd;
-	t_parse	parse;
 	int		i;
 	int		j;
 
-	cmd_list = NULL;
 	new_cmd = NULL;
-	parse.token_line = ft_strdup(line);
-	parse.command_line = ft_strdup(line);
-	if (!parse.token_line)
-		return (NULL);
-	check_char(&parse);
 	i = 0;
 	j = 0;
 	while (TRUE)
 	{
-		if (parse.token_line[i] != '\0' && ((parse.token_line[i] == '>'
-					|| parse.token_line[i] == '<')
-				&& !check_redir(parse.token_line, parse.token_line[i], i)))
-		{
-			free(parse.token_line);
-			free(parse.command_line);
+		printf("line[%d] = %c\n", i, line[i]);
+		if (is_invalid_redir(parse, i) || (parse->token_line[i] == '|'
+				&& !check_pipe_validity(line, i)))
 			return (NULL);
-		}
-		if (parse.token_line[i] == '\0' || (parse.token_line[i] == '|'
+		if (parse->token_line[i] == '\0' || (parse->token_line[i] == '|'
 				&& check_pipe_validity(line, i)))
 		{
-			new_cmd = create_commands(&parse, j, i, new_cmd);
+			new_cmd = create_commands(parse, j, i, new_cmd);
 			ft_cmd_add_back(&cmd_list, new_cmd);
-			if (parse.token_line[i] == '|')
-			{
-				cmd_list->is_pipe = TRUE;
-				i++;
-			}
-			else
-				cmd_list->is_pipe = FALSE;
+			update_pipe_status(cmd_list, parse->token_line, &i);
 			j = i;
 		}
-		if (!parse.token_line[i])
+		if (!parse->token_line[i])
 			break ;
 		i++;
 	}
-	free(parse.token_line);
-	free(parse.command_line);
 	return (cmd_list);
 }
 
-char	**clear_redir(t_cmd *cmd)
+t_cmd	*parse_command(char *line)
+{
+	t_parse	*parse;
+	t_cmd	*cmd_list;
+
+	cmd_list = NULL;
+	parse = init_parse(line);
+	if (!parse || !parse->token_line)
+		return (free_parse(parse), NULL);
+	cmd_list = parse_command_loop(line, parse, cmd_list);
+	free_parse(parse);
+	return (cmd_list);
+}
+
+char	**clear_redir(t_cmd *c)
 {
 	char	**new_args;
 	int		i;
 	int		x;
 
-	cmd->nb_token -= (cmd->nb_infile * 2) - (cmd->nb_outfile * 2);
-	new_args = ft_calloc(sizeof(char *), (cmd->nb_token + 1));
+	c->nb_token -= (c->nb_infile * 2) - (c->nb_outfile * 2);
+	new_args = ft_calloc(sizeof(char *), (c->nb_token + 1));
 	i = -1;
 	x = -1;
-	while (cmd->args[++i])
+	while (c->args[++i])
 	{
-		if (ft_strcmp(cmd->args_t[i], ">") == 0
-			|| ft_strcmp(cmd->args_t[i], ">>") == 0
-			|| ft_strcmp(cmd->args_t[i], "<") == 0
-			|| ft_strcmp(cmd->args_t[i], "<<") == 0)
+		if (!ft_strcmp(c->args_t[i], ">") || !ft_strcmp(c->args_t[i], ">>")
+			|| !ft_strcmp(c->args_t[i], "<") || !ft_strcmp(c->args_t[i], "<<"))
 			i++;
 		else
-			new_args[++x] = ft_strdup(cmd->args[i]);
+			new_args[++x] = ft_strdup(c->args[i]);
 	}
 	i = -1;
-	while (cmd->args[++i])
-	{
-		free(cmd->args[i]);
-		if (cmd->args_t[i])
-			free(cmd->args_t[i]);
-	}
-	free(cmd->args);
-	free(cmd->args_t);
-	cmd->args = new_args;
-	cmd->args_t = NULL;
+	free_string_array(c->args);
+	free_string_array(c->args_t);
+	c->args = new_args;
+	c->args_t = NULL;
 	return (new_args);
 }
 
@@ -115,114 +147,3 @@ int	count_tokens_(const char *cmd_tokens)
 	}
 	return (count);
 }
-
-void	clear_quotes(t_parse *parse)
-{
-	int		i;
-	int		x;
-	char	*res_token;
-	char	*res_command;
-	t_bool	heredoc;
-
-	res_token = ft_calloc(sizeof(char), ft_strlen(parse->token_line) + 1);
-	res_command = ft_calloc(sizeof(char), ft_strlen(parse->token_line) + 1);
-	i = -1;
-	x = 0;
-	heredoc = FALSE;
-	while (parse->token_line[++i])
-	{
-		if (parse->token_line[i] == '<' && parse->token_line[i + 1] == '<')
-		{
-			heredoc = TRUE;
-			res_token[x] = parse->token_line[i];
-			res_command[x++] = parse->command_line[i];
-			res_token[x] = parse->token_line[++i];
-			res_command[x++] = parse->command_line[i];
-			continue ;
-		}
-		if (heredoc && parse->command_line[i] == '"'
-			&& parse->command_line[i + 1] == '"')
-		{
-			res_token[x] = parse->token_line[i];
-			res_command[x++] = parse->command_line[i++];
-			res_token[x] = parse->token_line[i];
-			res_command[x++] = parse->command_line[i];
-			heredoc = FALSE;
-			continue ;
-		}
-		if (parse->token_line[i] == 'e' && !heredoc)
-			continue ;
-		if (heredoc && parse->token_line[i] != '<'
-			&& parse->token_line[i] != 'e' && parse->token_line[i] != ' ')
-			heredoc = FALSE;
-		res_token[x] = parse->token_line[i];
-		res_command[x] = parse->command_line[i];
-		x++;
-	}
-	free(parse->token_line);
-	free(parse->command_line);
-	parse->token_line = ft_strdup(res_token);
-	parse->command_line = ft_strdup(res_command);
-	free(res_token);
-	free(res_command);
-}
-
-/* void	check_char(t_parse *parse)
-{
-	int	i;
-
-	i = -1;
-	while (parse->token_line[++i])
-	{
-		if (parse->token_line[i] == '|')
-			parse->token_line[i] = '|';
-		else if (parse->token_line[i] == '>')
-			parse->token_line[i] = '>';
-		else if (parse->token_line[i] == '<')
-			parse->token_line[i] = '<';
-		else if (parse->token_line[i] == '"')
-		{
-			parse->token_line[i] = 'e';
-			while (parse->token_line[++i] && parse->token_line[i] != '"')
-				parse->token_line[i] = 'c';
-			parse->token_line[i] = 'e';
-		}
-		else if (parse->token_line[i] == '\'')
-		{
-			parse->token_line[i] = 'e';
-			while (parse->token_line[++i] && parse->token_line[i] != '\'')
-				parse->token_line[i] = 'c';
-			parse->token_line[i] = 'e';
-		}
-		else if (!ft_isspace(parse->token_line[i]))
-			parse->token_line[i] = 'c';
-		else
-			parse->token_line[i] = ' ';
-	}
-	clear_quotes(parse);
-} */
-
-/* char	**add_to_tab(char **tab, const char *str)
-{
-	int		i;
-	char	**new_tab;
-
-	i = 0;
-	if (tab)
-		while (tab[i] != NULL)
-			i++;
-	new_tab = malloc((i + 2) * sizeof(char *));
-	new_tab[i] = strdup(str);
-	if (!new_tab[i])
-	{
-		free(new_tab);
-		return (NULL);
-	}
-	new_tab[i + 1] = NULL;
-	while (--i >= 0)
-		new_tab[i] = tab[i];
-	if (tab)
-		free(tab);
-	return (new_tab);
-}
- */

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/15 02:35:05 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 05:40:32 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,18 @@ t_bool	is_directory(const char *path)
 	return (FALSE);
 }
 
+t_bool	path_access(t_cmd *command, char *full_path)
+{
+	if (access(full_path, X_OK) == 0)
+	{
+		command->args[0] = ft_strdup(full_path);
+		command->path = TRUE;
+		free(full_path);
+		return (TRUE);
+	}
+	return (FALSE);
+}
+
 void	find_executable(t_cmd *command, t_env *env)
 {
 	size_t	i;
@@ -41,12 +53,10 @@ void	find_executable(t_cmd *command, t_env *env)
 	char	*full_path;
 	int		start;
 
+	command->path = FALSE;
 	path = get_path_variable(env);
 	if (!path)
-	{
-		command->path = FALSE;
 		return ;
-	}
 	start = 0;
 	i = -1;
 	while (++i <= ft_strlen(path))
@@ -55,18 +65,12 @@ void	find_executable(t_cmd *command, t_env *env)
 		{
 			dir = ft_substr(path, start, i - start);
 			full_path = ft_join(ft_join(dir, "/"), command->args[0]);
-			if (access(full_path, X_OK) == 0)
-			{
-				command->args[0] = ft_strdup(full_path);
-				free(full_path);
-				command->path = TRUE;
+			if (path_access(command, full_path))
 				return ;
-			}
 			free(full_path);
 			start = i + 1;
 		}
 	}
-	command->path = FALSE;
 }
 
 void	fake_free_all(t_pipex *pipex)
@@ -81,58 +85,16 @@ void	fake_free_all(t_pipex *pipex)
 		close(pipex->file_o);
 }
 
-void	fake_error(t_pipex *pipex, char *message, int error_code)
-{
-	fake_free_all(pipex);
-	ft_fprintf(2, "%s\n", message);
-	g_exit_code = error_code;
-	exit(error_code);
-}
-
-void	single_builtin(t_cmd *cmd, t_env *env)
-{
-	t_env	*current;
-	t_pipex	*pipex;
-
-	current = env;
-	g_exit_code = 0;
-	pipex = malloc(sizeof(t_pipex));
-	if (cmd->redirection)
-		g_exit_code = redirection_exec_builtins(cmd, pipex, FALSE);
-	if (g_exit_code >= 1)
-	{
-		g_exit_code = 1;
-		return ;
-	}
-	if (cmd->args[0] == NULL)
-		return ;
-	if (ft_strcmp(cmd->args[0], "exit") == 0)
-		ft_exit(cmd);
-	else if (ft_strcmp(cmd->args[0], "echo") == 0)
-		ft_echo(cmd);
-	else if (ft_strcmp(cmd->args[0], "cd") == 0)
-		ft_cd(cmd, env);
-	else if (ft_strcmp(cmd->args[0], "export") == 0)
-		ft_export(cmd, current);
-	else if (ft_strcmp(cmd->args[0], "unset") == 0)
-		ft_unset(cmd, current);
-	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
-		ft_pwd(env);
-	else if (ft_strcmp(cmd->args[0], "env") == 0)
-		ft_env(cmd, current);
-}
-
-void	execute_builtin(t_cmd *cmd, t_env *env)
+void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 {
 	t_env	*current;
 	t_pipex	*pipex;
 
 	pipex = malloc(sizeof(t_pipex));
 	current = env;
-	g_exit_code = 0;
 	if (cmd->redirection)
 		g_exit_code = redirection_exec_builtins(cmd, pipex, TRUE);
-	if (cmd->args[0] == NULL)
+	if (g_exit_code >= 1 && single)
 		return ;
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
@@ -148,7 +110,17 @@ void	execute_builtin(t_cmd *cmd, t_env *env)
 		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
 		ft_env(cmd, current);
-	free(pipex);
+	if (!single)
+		free(pipex);
+}
+
+void	error(t_pipex *pipex, char *cmd, char *message, int error_code)
+{
+	ft_fprintf(2, "bash: %s: ", cmd);
+	ft_fprintf(2, "%s\n", message);
+	fake_free_all(pipex);
+	g_exit_code = error_code;
+	exit(error_code);
 }
 
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env,
@@ -160,32 +132,17 @@ void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env,
 	if (execve(cmd->args[0], cmd->args, env_) == -1)
 	{
 		if (ft_strchr(cmd->args[0], '/') && is_directory(cmd->args[0]))
-		{
-			ft_fprintf(2, "%s: Is a directory", cmd->args[0]);
-			fake_error(pipex, "", 126);
-		}
+			error(pipex, cmd->args[0], "Is a directory", 126);
 		if (ft_strchr(cmd->args[0], '/') == NULL)
-		{
-			ft_fprintf(2, "bash: %s: command not found", cmd->args[0]);
-			fake_error(pipex, "", 127);
-		}
+			error(pipex, cmd->args[0], "command not found", 127);
 		else if (access(cmd->args[0], F_OK) == 0 && access(cmd->args[0],
 				X_OK) != 0)
-		{
-			ft_fprintf(2, "bash: %s: Permission denied", cmd->args[0]);
-			fake_error(pipex, "", 126);
-		}
+			error(pipex, cmd->args[0], "Permission denied", 126);
 		else
-		{
-			ft_fprintf(2, "bash: %s: No such file or directory", cmd->args[0]);
-			fake_error(pipex, "", 127);
-		}
+			error(pipex, cmd->args[0], "No such file or directory", 127);
 	}
 	if (!cmd->path)
-	{
-		ft_fprintf(2, "bash: %s: No such file or directory", cmd->args[0]);
-		fake_error(pipex, "", 127);
-	}
+		error(pipex, cmd->args[0], "command not found", 127);
 	exit(1);
 }
 
@@ -193,7 +150,6 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 {
 	t_pipex	*pipex;
 	pid_t	pid;
-	int		i;
 	char	**b_env;
 
 	b_env = base_env(env);
@@ -202,26 +158,18 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	pipex->file_i = -1;
 	pipex->file_o = -1;
 	if (pipe(pipex->pipe_fd) == -1)
-		fake_error(pipex, "Couldn't open pipe", 1);
+		error(pipex, "", "Couldn't open pipe", 1);
 	set_signal_action(sigint_heredoc_handler);
 	pid = fork();
 	if (pid == 0)
 	{
 		if (cmd->redirection)
 			g_exit_code = redirection_exec_builtins(cmd, pipex, TRUE);
-		if (g_exit_code >= 1)
-			exit(1);
 		execute_non_builtins(pipex, cmd, env, b_env);
-		waitpid(pid, &g_exit_code, 0);
-		g_exit_code = WEXITSTATUS(g_exit_code);
+		g_exit_code = WEXITSTATUS(waitpid(pid, &g_exit_code, 0));
 	}
 	set_signal_action(sigint_handler);
-	i = 0;
-	while (b_env[i])
-		free(b_env[i++]);
-	free(b_env);
-	if (pid == -1)
-		fake_error(pipex, "Invalid fork()", 1);
+	free_string_array(b_env);
 	fake_free_all(pipex);
 	waitpid(pid, &g_exit_code, 0);
 	g_exit_code = WEXITSTATUS(g_exit_code);
@@ -276,7 +224,7 @@ void	execute_command(t_cmd *cmd, t_env *env)
 	if (!cmd->is_pipe)
 	{
 		if (!cmd->args[0] || is_builtin(cmd->args[0]))
-			execute_builtin(cmd, env);
+			execute_builtin(cmd, env, FALSE);
 		else
 			exec_non_builtins(cmd, env);
 		return ;

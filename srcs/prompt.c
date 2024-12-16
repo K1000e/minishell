@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   prompt.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
+/*   Updated: 2024/12/15 22:15:28 by cgorin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/minihell.h"
 
 /*
@@ -21,7 +33,7 @@ char	*get_current_path(void)
 
 /*
 ** Fonction : get_username
-** Retourne le nom d'utilisateur en récupérant la variable d'environnement "USER".
+** Retourne le nom d'utilisateur en récupérant la variable d'environnem "USER".
 */
 
 char	*get_username(void)
@@ -41,13 +53,6 @@ char	*get_username(void)
 ** Fonction : prompt_hell
 ** Crée l'invite personnalisée pour le shell avec un compteur d'âmes piégées.
 */
-
-char	*prompt_hell(int i)
-{
-	char	*prompt;
-	char	*prompt2;
-	char	*in;
-
 	// char *path;
 	// char *username;
 	/* path = get_current_path();
@@ -55,6 +60,13 @@ char	*prompt_hell(int i)
 		path = strdup("unknown");
 	} */
 	// username = get_username();
+
+char	*prompt_hell(int i)
+{
+	char	*prompt;
+	char	*prompt2;
+	char	*in;
+
 	in = ft_itoa(i);
 	prompt = ft_strjoin("\001\033[1;31m\002🔥 HellShell 🔥 ", in);
 	free(in);

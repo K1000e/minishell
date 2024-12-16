@@ -6,7 +6,7 @@
 #    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/15 07:22:04 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/16 01:45:25 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,6 +51,7 @@ LST_SRCS	:=	main.c			\
 				parsing/check.c \
 				parsing/create_args.c \
 				parsing/token.c \
+				parsing/quote.c \
 				#pipex_execute.c \
 				#pipex.c 		\
 				pipex_open_free.c 

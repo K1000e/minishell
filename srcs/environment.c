@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:11 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/05 19:54:51 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 05:42:41 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,16 +84,10 @@ char	**base_env(t_env *env)
 	return (environment);
 }
 
-t_env	*get_env(char **env, t_env *new_env, char *executable)
+t_env	*intialize_env(t_env *new_env, char *executable)
 {
-	int		i;
-	int		j;
-	t_env	*env_node;
-	char	*value;
-	char	*key;
 	char	*exe;
 
-	i = -1;
 	new_env = malloc(sizeof(t_env));
 	if (!new_env)
 		return (NULL);
@@ -105,6 +99,17 @@ t_env	*get_env(char **env, t_env *new_env, char *executable)
 		new_env->executable = ft_strdup(exe + 1);
 	else
 		new_env->executable = ft_strdup(executable);
+	return (new_env);
+}
+
+t_env	*get_env(char **env, t_env *new_env, char *executable, int i)
+{
+	int		j;
+	t_env	*env_node;
+	char	*value;
+	char	*key;
+
+	new_env = intialize_env(new_env, executable);
 	while (env[++i])
 	{
 		j = -1;

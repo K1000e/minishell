@@ -6,13 +6,13 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 04:09:10 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 05:41:39 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-void	is_pipe(t_cmd *cmd)
+void	is_pipe(t_cmd *cmd) // a deplacer dans parsing_utils.c
 {
 	t_cmd	*current;
 
@@ -29,7 +29,7 @@ void	is_pipe(t_cmd *cmd)
 	}
 }
 
-int	ascii_art(char *line)
+int	ascii_art(char *line) // a deplacer 
 {
 	if (ft_strcmp(line, "kitty") == 0 || ft_strcmp(line, "KITTY") == 0
 		|| ft_strcmp(line, "Kitty") == 0)
@@ -64,13 +64,14 @@ void	ft_command(char *line, t_env *env)
 		return ;
 	is_pipe(commands);
 	tmp = commands;
+	g_exit_code = 0;
 	if (tmp->args[0] && (commands->is_pipe || !is_builtin(tmp->args[0])))
 		execute_command(tmp, env);
 	else if (tmp->args[0] && (!commands->is_pipe && is_builtin(tmp->args[0])))
-		single_builtin(tmp, env);
+		execute_builtin(tmp, env, TRUE);
 	else if (tmp->args[0] == NULL)
 		if (tmp->redirection)
-			single_builtin(tmp, env);
+			execute_builtin(tmp, env, TRUE);
 	free_cmd_list(commands);
 }
 
@@ -116,7 +117,7 @@ int	main(int argc, char **argv, char **environment)
 	{
 		save_stdin = dup(STDIN_FILENO);
 		save_stdout = dup(STDOUT_FILENO);
-		env = get_env(environment, env, argv[0]);
+		env = get_env(environment, env, argv[0], -1);
 		set_signal_action(sigint_handler);
 		minihell(env, save_stdin, save_stdout);
 	}

@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 06:58:44 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/15 22:44:46 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ t_cmd	*create_commands(t_parse *parse, int start, int end, t_cmd *cmd)
 	char	*command;
 	char	*tokens;
 
-	command = ft_strndup(&parse->command_line[start], end - start);
+	command = ft_strndup(&parse->cmd_line[start], end - start);
 	tokens = ft_strndup(&parse->token_line[start], end - start);
 	cmd = create_cmd_node_(command, tokens, cmd);
 	free(command);

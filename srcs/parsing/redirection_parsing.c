@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 07:24:20 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 01:59:15 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,26 +111,4 @@ t_cmd	*handle_redirection_(t_cmd *new_cmd)
 	}
 	new_cmd->args = clear_redir(new_cmd);
 	return (new_cmd);
-}
-int	count_redirection(char *cmd, char type)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	if (!cmd)
-		return (0);
-	while (cmd[i])
-	{
-		if (cmd[i] == type)
-		{
-			i++;
-			if (cmd[i] == type)
-				i++;
-			count++;
-		}
-		i++;
-	}
-	return (count);
 }

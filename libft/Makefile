@@ -67,7 +67,11 @@ LST_SRCS	:= 	libft/ft_atoi.c			\
 				ft_printf/ft_fprint_char.c 	\
 				ft_printf/ft_fprint_num.c 	\
 				ft_printf/ft_fprint_base.c 	\
-				get_next_line/get_next_line.c		
+				ft_printf/ft_sprintf.c		\
+				ft_printf/ft_sprint_char.c 	\
+				ft_printf/ft_sprint_num.c 	\
+				ft_printf/ft_sprint_base.c 	\
+				get_next_line/get_next_line.c
 
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)

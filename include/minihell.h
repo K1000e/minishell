@@ -6,7 +6,7 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 07:22:31 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 06:18:24 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 # define P "\001\033[1;35m\002"
 # define C "\001\033[1;36m\002"
 
+# define ERR_SYNTAX "bash: syntax error near unexpected token "
 /* STRUCTURES */
 
 typedef enum e_bool
@@ -92,7 +93,7 @@ typedef struct s_pipex
 typedef struct s_parse
 {
 	char	*token_line;
-	char	*command_line;
+	char	*cmd_line;
 }	t_parse;
 
 typedef struct s_file
@@ -124,7 +125,7 @@ t_bool	match_quotes(char *line);
 
 /* FUNCTIONS *//* ENVIRONMENT const*/
 t_env	*create_env_node(char *key, char *value);
-t_env	*get_env(char **env, t_env *new_env, char *executable);
+t_env	*get_env(char **env, t_env *new_env, char *executable, int i);
 void	ft_env_add_back_(t_env **lst, t_env *new);
 void	ft_export(t_cmd *cmd, t_env *env);
 void	ft_sort_env(t_env **env);
@@ -140,7 +141,7 @@ void	free_cmd_list(t_cmd *cmd_list);
 void	find_executable(t_cmd *command, t_env *env);
 t_env	*ft_find_key(t_env *env, char *key);
 char	*get_path_variable(t_env *env);
-void	execute_builtin(t_cmd *cmd, t_env *env);
+void	execute_builtin(t_cmd *cmd, t_env *env, int single);
 
 void	execute_builtin_redirection(t_cmd *cmd, t_env *env);
 void	execute_command(t_cmd *cmd, t_env *env);
@@ -161,10 +162,7 @@ char	**base_env(t_env *env);
 
 char	*ft_strjoin_free(char *s1, char *s2, int is_free);
 t_bool	is_builtin(char *cmd);
-void	single_builtin(t_cmd *cmd, t_env *env);
-//int		redirection_exec_bultins(t_cmd *cmd, t_pipex *pipex);
-//int		redirection_exec_bultins_single(t_cmd *cmd, t_pipex *pipex);
-int	redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex, t_bool should_exit);
+int		redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex, t_bool should_exit);
 
 void	set_signal_action(void (*handler)(int));
 void	sigint_heredoc_handler(int signal);
@@ -173,23 +171,22 @@ void	sigint_handler(int signal);
 char	*expand_env_vars(char *input, t_env *env);
 char	**add_to_tab(char **tab, const char *str);
 t_bool	is_directory(const char *path);
-void	fake_error(t_pipex *pipex, char *message, int error_code);
 
 void	ft_kitty(void);
 void	print_chill_guy(void);
 t_bool	check_redir(const char *line, char token, int i);
 
-int	open_infile(t_pipex *pipex, t_cmd *cmd, int j);
-int	open_outfile(t_pipex *pipex, t_cmd *cmd, int k);
+int		open_infile(t_pipex *pipex, t_cmd *cmd, int j);
+int		open_outfile(t_pipex *pipex, t_cmd *cmd, int k);
 
-void handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last);
+void	handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last);
 
 void	reopen_heredoc(t_pipex *pipex, t_bool is_last);
 char	**clear_redir(t_cmd *cmd);
-int	count_redirection(char *cmd, char type);
+int		count_redirection(char *cmd, char type);
 
 void	clear_quotes(t_parse *parse);
 void	free_cmd_list(t_cmd *cmd_list);
 void	free_string_array(char **array);
-//void	check_char(t_parse *parse);
+t_bool	return_error(char *error, int exit_code);
 #endif

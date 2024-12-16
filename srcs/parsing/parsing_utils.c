@@ -6,70 +6,11 @@
 /*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/15 06:51:33 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 01:59:53 by cgorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
-
-/* 
-void	free_cmd_list(t_cmd *cmd_list)
-{
-	t_cmd	*current;
-	t_cmd	*next;
-	int		i;
-
-	current = cmd_list;
-	while (current)
-	{
-		next = current->next;
-		if (current->cmd)
-			free(current->cmd);
-		if (current->token)
-			free(current->token);
-		if (current->args)
-		{
-			i = -1;
-			while (current->args[++i])
-				free(current->args[i]);
-			free(current->args);
-		}
-		if (current->args_t)
-		{
-			i = -1;
-			while (current->args_t[++i])
-				free(current->args_t[i]);
-			free(current->args_t);
-		}
-		if (current->out_file)
-		{
-			i = -1;
-			while (current->out_file[++i])
-				free(current->out_file[i]);
-			free(current->out_file);
-		}
-		if (current->in_file)
-		{
-			i = -1;
-			while (current->in_file[++i])
-				free(current->in_file[i]);
-			free(current->in_file);
-		}
-		if (current->append)
-			free(current->append);
-		if (current->order_file)
-			free(current->order_file);
-		if (current->heredoc_delimiter)
-		{
-			i = -1;
-			while (current->heredoc_delimiter[++i])
-				free(current->heredoc_delimiter[i]);
-			free(current->heredoc_delimiter);
-		}
-		free(current);
-		current = next;
-	}
-} */
 
 void	ft_cmd_add_back(t_cmd **lst, t_cmd *new)
 {
@@ -147,4 +88,27 @@ void	free_cmd_list(t_cmd *cmd_list)
 		free_cmd_node(current);
 		current = next;
 	}
+}
+
+int	count_redirection(char *cmd, char type)
+{
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	if (!cmd)
+		return (0);
+	while (cmd[i])
+	{
+		if (cmd[i] == type)
+		{
+			i++;
+			if (cmd[i] == type)
+				i++;
+			count++;
+		}
+		i++;
+	}
+	return (count);
 }
