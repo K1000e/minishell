@@ -19,6 +19,8 @@ void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 
 	pipex = malloc(sizeof(t_pipex));
 	current = env;
+	pipex->file_i = -1;
+	pipex->file_o = -1;
 	if (cmd->redirection)
 		g_exit_code = redirection_exec_builtins(cmd, pipex, TRUE);
 	free(pipex);

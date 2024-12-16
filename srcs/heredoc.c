@@ -46,7 +46,6 @@ void	handle_heredoc(char *delimiter, t_pipex *pipex, t_bool is_last)
 	{
 		ft_fprintf(0, "> ");
 		line = get_next_line(0);
-		//ft_fprintf(pipex->heredoc_fd, "%s", line);
 		if (!line || ft_compare(delimiter, line))
 		{
 			free(line);
