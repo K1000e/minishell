@@ -3,25 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   new_parsing.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 06:33:40 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 13:26:39 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
-
-void	free_parse(t_parse *parse)
-{
-	if (!parse)
-		return ;
-	if (parse->token_line)
-		free(parse->token_line);
-	if (parse->cmd_line)
-		free(parse->cmd_line);
-	free(parse);
-}
 
 t_parse	*init_parse(char *line)
 {
@@ -36,15 +25,6 @@ t_parse	*init_parse(char *line)
 		return (free_parse(parse), NULL);
 	check_char(parse);
 	return (parse);
-}
-
-t_bool	is_invalid_redir(t_parse *parse, int i)
-{
-	if (parse->token_line[i] != '\0' && ((parse->token_line[i] == '>'
-				|| parse->token_line[i] == '<')
-			&& !check_redir(parse->token_line, parse->token_line[i], i)))
-		return (FALSE);
-	return (TRUE);
 }
 
 void	update_pipe_status(t_cmd *cmd_list, char *token_line, int *i)
@@ -69,8 +49,7 @@ t_cmd	*parse_command_loop(char *line, t_parse *parse, t_cmd *cmd_list)
 	j = 0;
 	while (TRUE)
 	{
-		printf("line[%d] = %c\n", i, line[i]);
-		if (is_invalid_redir(parse, i) || (parse->token_line[i] == '|'
+		if (!is_invalid_redir(parse, i) || (parse->token_line[i] == '|'
 				&& !check_pipe_validity(line, i)))
 			return (NULL);
 		if (parse->token_line[i] == '\0' || (parse->token_line[i] == '|'
@@ -126,24 +105,4 @@ char	**clear_redir(t_cmd *c)
 	c->args = new_args;
 	c->args_t = NULL;
 	return (new_args);
-}
-
-int	count_tokens_(const char *cmd_tokens)
-{
-	int		count;
-	int		i;
-	char	token;
-
-	count = 0;
-	i = 0;
-	while (cmd_tokens[i])
-	{
-		while (cmd_tokens[i] && cmd_tokens[i] == ' ')
-			i++;
-		token = cmd_tokens[i];
-		while (cmd_tokens[i] && cmd_tokens[i] == token)
-			i++;
-		count++;
-	}
-	return (count);
 }

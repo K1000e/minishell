@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 01:59:53 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 13:26:14 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,27 +29,22 @@ void	ft_cmd_add_back(t_cmd **lst, t_cmd *new)
 	ptr->next = new;
 }
 
-void	free_cmd_node(t_cmd *cmd_node)
+t_bool	is_within_single_quotes(const char *input, int index)
 {
-	if (cmd_node->cmd)
-		free(cmd_node->cmd);
-	if (cmd_node->token)
-		free(cmd_node->token);
-	if (cmd_node->args)
-		free_string_array(cmd_node->args);
-	if (cmd_node->args_t)
-		free_string_array(cmd_node->args_t);
-	if (cmd_node->out_file)
-		free_string_array(cmd_node->out_file);
-	if (cmd_node->in_file)
-		free_string_array(cmd_node->in_file);
-	if (cmd_node->append)
-		free(cmd_node->append);
-	if (cmd_node->order_file)
-		free(cmd_node->order_file);
-	if (cmd_node->heredoc_delimiter)
-		free_string_array(cmd_node->heredoc_delimiter);
-	free(cmd_node);
+	int		i;
+	t_bool	single_quote;
+
+	i = 0;
+	single_quote = FALSE;
+	while (i < index)
+	{
+		if (input[i] == '\'' && !single_quote)
+			single_quote = TRUE;
+		else if (input[i] == '\'' && single_quote)
+			single_quote = FALSE;
+		i++;
+	}
+	return (single_quote);
 }
 
 char	**add_to_tab(char **tab, const char *str)
@@ -76,20 +71,6 @@ char	**add_to_tab(char **tab, const char *str)
 	return (new_tab);
 }
 
-void	free_cmd_list(t_cmd *cmd_list)
-{
-	t_cmd	*current;
-	t_cmd	*next;
-
-	current = cmd_list;
-	while (current)
-	{
-		next = current->next;
-		free_cmd_node(current);
-		current = next;
-	}
-}
-
 int	count_redirection(char *cmd, char type)
 {
 	int	i;
@@ -111,4 +92,11 @@ int	count_redirection(char *cmd, char type)
 		i++;
 	}
 	return (count);
+}
+
+t_bool	return_error(char *error, int exit_code)
+{
+	ft_fprintf(2, "%s\n", error);
+	g_exit_code = exit_code;
+	return (FALSE);
 }

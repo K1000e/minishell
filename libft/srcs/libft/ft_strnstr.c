@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/31 19:14:33 by cgorin            #+#    #+#             */
-/*   Updated: 2024/06/18 05:00:15 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 12:44:19 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/libft.h"
-//#include <stdio.h>
 
 static int	search_needle(const char *haystack, const char *needle)
 {

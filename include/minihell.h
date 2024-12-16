@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minihell.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 06:18:24 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 13:27:21 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ t_bool	match_quotes(char *line);
 
 /* FUNCTIONS *//* ENVIRONMENT const*/
 t_env	*create_env_node(char *key, char *value);
-t_env	*get_env(char **env, t_env *new_env, char *executable, int i);
+t_env	*create_env(char **env, t_env *new_env, char *executable, int i);
 void	ft_env_add_back_(t_env **lst, t_env *new);
 void	ft_export(t_cmd *cmd, t_env *env);
 void	ft_sort_env(t_env **env);
@@ -133,7 +133,7 @@ void	ft_print_declare_env(t_env *env);
 t_bool	check_validity_export(const char *key);
 
 /* FUNCTIONS *//* PARSING */
-char	*ft_strndup(char *str, size_t len);
+//char	*ft_strndup(char *str, size_t len);
 void	free_cmd_list(t_cmd *cmd_list);
 
 /* FUNCTIONS *//* EXECUTION */
@@ -162,7 +162,8 @@ char	**base_env(t_env *env);
 
 char	*ft_strjoin_free(char *s1, char *s2, int is_free);
 t_bool	is_builtin(char *cmd);
-int		redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex, t_bool should_exit);
+int		redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex,
+			t_bool should_exit);
 
 void	set_signal_action(void (*handler)(int));
 void	sigint_heredoc_handler(int signal);
@@ -189,4 +190,12 @@ void	clear_quotes(t_parse *parse);
 void	free_cmd_list(t_cmd *cmd_list);
 void	free_string_array(char **array);
 t_bool	return_error(char *error, int exit_code);
+void	is_pipe(t_cmd *cmd);
+
+int		ft_envsize(t_env *lst);
+void	free_all(t_pipex *pipex);
+void	exec_non_builtins(t_cmd *cmd, t_env *env);
+void	free_parse(t_parse *parse);
+t_bool	is_within_single_quotes(const char *input, int index);
+t_bool	is_invalid_redir(t_parse *parse, int i);
 #endif

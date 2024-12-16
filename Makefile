@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
+#    By: codespace <codespace@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/16 01:45:25 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/16 13:20:52 by codespace        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,8 @@ LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c			\
 				parsing/new_parsing.c 	\
-				environment.c	\
+				environment/environment.c	\
+				environment/env_utils.c	\
 				check_errors.c 	\
 				prompt.c 		\
 				parsing/parsing_utils.c 		\
@@ -40,7 +41,7 @@ LST_SRCS	:=	main.c			\
 				builtins/ft_export.c \
 				emotes/kitty.c \
 				emotes/chillguy.c \
-				expander.c \
+				expander/expander.c \
 				utils.c \
 				parsing/redirection_parsing.c \
 				parsing/create_command.c \
@@ -52,6 +53,9 @@ LST_SRCS	:=	main.c			\
 				parsing/create_args.c \
 				parsing/token.c \
 				parsing/quote.c \
+				path.c \
+				free.c \
+				execution.c \
 				#pipex_execute.c \
 				#pipex.c 		\
 				pipex_open_free.c 
@@ -83,6 +87,8 @@ $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 	@mkdir -p $(DIR_OBJS)/execution
 	@mkdir -p $(DIR_OBJS)/emotes
 	@mkdir -p $(DIR_OBJS)/builtins
+	@mkdir -p $(DIR_OBJS)/expander
+	@mkdir -p $(DIR_OBJS)/environment
 	$(CC) $(CFLAGS) -I $(DIR_INCS) -c $< -o $@
 	printf "$(ERASE)$(BLUE) > Compilation :$(END) $< \n"
 

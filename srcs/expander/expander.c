@@ -3,28 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 05:57:39 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 13:23:29 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minihell.h"
-
-static char	*get_env_var_value(const char *var_name, t_env *env)
-{
-	t_env	*current;
-
-	current = env->next;
-	while (current)
-	{
-		if (ft_strcmp(current->key, var_name) == 0)
-			return (current->value);
-		current = current->next;
-	}
-	return (NULL);
-}
 
 static char	*handle_env_variable(const char *input, int *i, t_env *env)
 {
@@ -40,7 +26,7 @@ static char	*handle_env_variable(const char *input, int *i, t_env *env)
 	var_name = ft_substr(input, start, len);
 	if (!var_name)
 		return (NULL);
-	value = get_env_var_value(var_name, env);
+	value = ft_find_key(env, var_name)->value;
 	free(var_name);
 	if (!value)
 		return (ft_strdup(""));
@@ -77,24 +63,6 @@ static char	*append_char(char *result, char c)
 	new_result = ft_strjoin(result, temp);
 	free(result);
 	return (new_result);
-}
-
-static t_bool	is_within_single_quotes(const char *input, int index)
-{
-	int		i;
-	t_bool	single_quote;
-
-	i = 0;
-	single_quote = FALSE;
-	while (i < index)
-	{
-		if (input[i] == '\'' && !single_quote)
-			single_quote = TRUE;
-		else if (input[i] == '\'' && single_quote)
-			single_quote = FALSE;
-		i++;
-	}
-	return (single_quote);
 }
 
 static char	*process_input(const char *input, t_env *env, int i)

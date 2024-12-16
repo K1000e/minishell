@@ -49,6 +49,7 @@ LST_SRCS	:= 	libft/ft_atoi.c			\
 				libft/ft_strlen.c		\
 				libft/ft_strmapi.c		\
 				libft/ft_strncmp.c		\
+				libft/ft_strndup.c		\
 				libft/ft_strnstr.c		\
 				libft/ft_strrchr.c		\
 				libft/ft_strtrim.c		\

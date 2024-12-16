@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 05:41:39 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 13:07:44 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-void	is_pipe(t_cmd *cmd) // a deplacer dans parsing_utils.c
+/* void	is_pipe(t_cmd *cmd)
 {
 	t_cmd	*current;
 
@@ -27,7 +27,7 @@ void	is_pipe(t_cmd *cmd) // a deplacer dans parsing_utils.c
 			current->is_pipe = FALSE;
 		current = current->next;
 	}
-}
+} */
 
 int	ascii_art(char *line) // a deplacer 
 {
@@ -117,7 +117,7 @@ int	main(int argc, char **argv, char **environment)
 	{
 		save_stdin = dup(STDIN_FILENO);
 		save_stdout = dup(STDOUT_FILENO);
-		env = get_env(environment, env, argv[0], -1);
+		env = create_env(environment, env, argv[0], -1);
 		set_signal_action(sigint_handler);
 		minihell(env, save_stdin, save_stdout);
 	}

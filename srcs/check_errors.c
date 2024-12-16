@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_errors.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 06:34:59 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 12:21:59 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,20 @@ t_bool	check_redir(const char *line, char token, int i)
 	while (j < i)
 	{
 		if (line[i] == '\0')
-			return (return_error(ERR_SYNTAX"1`newline'", 2));
+			return (return_error(ERR_SYNTAX"`newline'", 2));
 		j++;
 	}
 	if (line[i] == token)
 	{
 		i++;
-		printf("line[%d] = %c\n", i, line[i]);
 		if (line[i] == token)
 			i++;
-		printf("line[%d] = %c\n", i, line[i]);
 		while (line[i] && ft_isspace(line[i]))
 			i++;
-		printf("line[%d] = %c\n", i, line[i]);
 		if (line[i] == '\0' || line[i] == token)
-			return (return_error(ERR_SYNTAX"2`newline'", 2));
+			return (return_error(ERR_SYNTAX"`newline'", 2));
 		if (line[i] == '|')
-			return (return_error(ERR_SYNTAX"3`|'", 2));
+			return (return_error(ERR_SYNTAX"`|'", 2));
 	}
 	return (TRUE);
 }

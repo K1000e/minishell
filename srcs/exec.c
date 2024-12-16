@@ -3,87 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 05:40:32 by cgorin           ###   ########.fr       */
+/*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
+/*   Updated: 2024/12/16 13:20:32 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
-
-char	*get_path_variable(t_env *env)
-{
-	t_env	*current;
-
-	current = env->next;
-	current = ft_find_key(current, "PATH");
-	if (current)
-		return (current->value);
-	else
-		return (NULL);
-}
-
-t_bool	is_directory(const char *path)
-{
-	struct stat	statbuf;
-
-	if (stat(path, &statbuf) == 0 && S_ISDIR(statbuf.st_mode))
-		return (TRUE);
-	return (FALSE);
-}
-
-t_bool	path_access(t_cmd *command, char *full_path)
-{
-	if (access(full_path, X_OK) == 0)
-	{
-		command->args[0] = ft_strdup(full_path);
-		command->path = TRUE;
-		free(full_path);
-		return (TRUE);
-	}
-	return (FALSE);
-}
-
-void	find_executable(t_cmd *command, t_env *env)
-{
-	size_t	i;
-	char	*path;
-	char	*dir;
-	char	*full_path;
-	int		start;
-
-	command->path = FALSE;
-	path = get_path_variable(env);
-	if (!path)
-		return ;
-	start = 0;
-	i = -1;
-	while (++i <= ft_strlen(path))
-	{
-		if (path[i] == ':' || path[i] == '\0')
-		{
-			dir = ft_substr(path, start, i - start);
-			full_path = ft_join(ft_join(dir, "/"), command->args[0]);
-			if (path_access(command, full_path))
-				return ;
-			free(full_path);
-			start = i + 1;
-		}
-	}
-}
-
-void	fake_free_all(t_pipex *pipex)
-{
-	if (pipex->pipe_fd[0] != -1)
-		close(pipex->pipe_fd[0]);
-	if (pipex->pipe_fd[1] != -1)
-		close(pipex->pipe_fd[1]);
-	if (pipex->file_i != -1)
-		close(pipex->file_i);
-	if (pipex->file_o != -1)
-		close(pipex->file_o);
-}
 
 void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 {
@@ -94,7 +21,7 @@ void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 	current = env;
 	if (cmd->redirection)
 		g_exit_code = redirection_exec_builtins(cmd, pipex, TRUE);
-	if (g_exit_code >= 1 && single)
+	if ((g_exit_code >= 1 && single) || cmd->args[0] == NULL)
 		return ;
 	if (ft_strcmp(cmd->args[0], "exit") == 0)
 		ft_exit(cmd);
@@ -118,7 +45,7 @@ void	error(t_pipex *pipex, char *cmd, char *message, int error_code)
 {
 	ft_fprintf(2, "bash: %s: ", cmd);
 	ft_fprintf(2, "%s\n", message);
-	fake_free_all(pipex);
+	free_all(pipex);
 	g_exit_code = error_code;
 	exit(error_code);
 }
@@ -126,12 +53,15 @@ void	error(t_pipex *pipex, char *cmd, char *message, int error_code)
 void	execute_non_builtins(t_pipex *pipex, t_cmd *cmd, t_env *env,
 		char **env_)
 {
+	struct stat	statbuf;
+
 	cmd->path = TRUE;
 	if (access(cmd->args[0], X_OK) != 0)
 		find_executable(cmd, env);
 	if (execve(cmd->args[0], cmd->args, env_) == -1)
 	{
-		if (ft_strchr(cmd->args[0], '/') && is_directory(cmd->args[0]))
+		if (ft_strchr(cmd->args[0], '/') && stat(cmd->args[0], &statbuf) == 0
+			&& S_ISDIR(statbuf.st_mode))
 			error(pipex, cmd->args[0], "Is a directory", 126);
 		if (ft_strchr(cmd->args[0], '/') == NULL)
 			error(pipex, cmd->args[0], "command not found", 127);
@@ -170,7 +100,7 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env)
 	}
 	set_signal_action(sigint_handler);
 	free_string_array(b_env);
-	fake_free_all(pipex);
+	free_all(pipex);
 	waitpid(pid, &g_exit_code, 0);
 	g_exit_code = WEXITSTATUS(g_exit_code);
 }
@@ -185,7 +115,7 @@ t_bool	is_builtin(char *cmd)
 			|| ft_strcmp(cmd, "exit") == 0);
 	return (is_builtin);
 }
-
+/* 
 void	ex_child1(int pipefd[2], t_cmd *cmd, t_env *env)
 {
 	dup2(pipefd[1], STDOUT_FILENO);
@@ -237,4 +167,4 @@ void	execute_command(t_cmd *cmd, t_env *env)
 	if (child2 == 0)
 		ex_child2(pipefd, cmd, env);
 	parent(child1, child2, pipefd);
-}
+} */

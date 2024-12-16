@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 03:15:34 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 12:36:35 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@ void	reopen_heredoc(t_pipex *pipex, t_bool is_last)
 {
 	if (is_last)
 		pipex->file_i = open(pipex->heredoc_file, O_RDONLY);
-	if (pipex->file_i == -1)
-		perror("Opening Heredoc Failed");
 	if (!is_last)
 		if (unlink(pipex->heredoc_file) == -1)
 			perror("Failed to remove heredoc file");

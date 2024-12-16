@@ -3,20 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   quote.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 01:57:15 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/16 12:41:04 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minihell.h"
 
-static void	clear_quotes_append(t_parse *temp, t_parse *parse, int *x, int i)
+void	clear_quotes_append(t_parse *temp, t_parse *parse, int *x, int i)
 {
 	temp->token_line[*x] = parse->token_line[i];
 	temp->cmd_line[*x] = parse->cmd_line[i];
 	(*x)++;
+}
+
+void	clear_quotes_append_dbl(t_parse *temp, t_parse *parse, int *x, int i)
+{
+	clear_quotes_append(temp, parse, x, i);
+	clear_quotes_append(temp, parse, x, ++i);
 }
 
 void	ft_copy_clean_cmd(t_parse *temp, t_parse *parse)
@@ -30,9 +36,9 @@ void	ft_copy_clean_cmd(t_parse *temp, t_parse *parse)
 	free(temp);
 }
 
-void	clear_quotes_loop(t_parse *t, t_parse *p, t_bool heredoc, int x)
+void	clear_quotes_loop(t_parse *temp, t_parse *p, t_bool heredoc, int x)
 {
-	int		i;
+	int	i;
 
 	i = -1;
 	while (p->token_line[++i])
@@ -40,22 +46,21 @@ void	clear_quotes_loop(t_parse *t, t_parse *p, t_bool heredoc, int x)
 		if (p->token_line[i] == '<' && p->token_line[i + 1] == '<')
 		{
 			heredoc = TRUE;
-			clear_quotes_append(t, p, &x, i);
-			clear_quotes_append(t, p, &x, ++i);
+			clear_quotes_append_dbl(temp, p, &x, i++);
+			continue ;
 		}
 		if (heredoc && p->cmd_line[i] == '"' && p->cmd_line[i + 1] == '"')
 		{
-			clear_quotes_append(t, p, &x, i);
-			clear_quotes_append(t, p, &x, ++i);
+			clear_quotes_append_dbl(temp, p, &x, i++);
 			heredoc = FALSE;
+			continue ;
 		}
-		if (!(p->token_line[i] == 'e' && !heredoc))
-		{
-			if (heredoc && p->token_line[i] != '<'
-				&& p->token_line[i] != 'e' && p->token_line[i] != ' ')
-				heredoc = FALSE;
-			clear_quotes_append(t, p, &x, i);
-		}
+		if (p->token_line[i] == 'e' && !heredoc)
+			continue ;
+		if (heredoc && p->token_line[i] != '<' && p->token_line[i] != 'e'
+			&& p->token_line[i] != ' ')
+			heredoc = FALSE;
+		clear_quotes_append(temp, p, &x, i);
 	}
 }
 
