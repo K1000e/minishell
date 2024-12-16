@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: codespace <codespace@student.42.fr>        +#+  +:+       +#+         #
+#    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/16 13:20:52 by codespace        ###   ########.fr        #
+#    Updated: 2024/12/16 23:50:05 by cgorin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,13 +27,12 @@ DIR_PIPEX	:=	pipex
 LIBFT_LIB	:=	$(DIR_LIBFT)/libft.a
 
 LST_SRCS	:=	main.c			\
-				parsing/new_parsing.c 	\
+				parsing/parsing.c 	\
 				environment/environment.c	\
 				environment/env_utils.c	\
 				check_errors.c 	\
-				prompt.c 		\
 				parsing/parsing_utils.c 		\
-				exec.c 			\
+				execution/exec.c 			\
 				builtins/bultins_env.c 	\
 				builtins/bultins_env_utils.c \
 				builtins/bultins.c 		\
@@ -45,20 +44,17 @@ LST_SRCS	:=	main.c			\
 				utils.c \
 				parsing/redirection_parsing.c \
 				parsing/create_command.c \
-				redirection_exec.c \
+				execution/redirection_exec.c \
 				signal.c \
-				open_file.c \
-				heredoc.c \
-				parsing/check.c \
+				execution/open_file.c \
+				execution/heredoc.c \
+				parsing/parsing_check.c \
 				parsing/create_args.c \
-				parsing/token.c \
-				parsing/quote.c \
-				path.c \
+				parsing/parsing_token.c \
+				parsing/parsing_quote.c \
+				execution/path.c \
 				free.c \
-				execution.c \
-				#pipex_execute.c \
-				#pipex.c 		\
-				pipex_open_free.c 
+				execution/execution.c
 
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
@@ -89,6 +85,7 @@ $(DIR_OBJS)/%.o: $(DIR_SRCS)/%.c $(INCS)
 	@mkdir -p $(DIR_OBJS)/builtins
 	@mkdir -p $(DIR_OBJS)/expander
 	@mkdir -p $(DIR_OBJS)/environment
+	@mkdir -p $(DIR_OBJS)/execution
 	$(CC) $(CFLAGS) -I $(DIR_INCS) -c $< -o $@
 	printf "$(ERASE)$(BLUE) > Compilation :$(END) $< \n"
 
