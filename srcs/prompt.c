@@ -28,7 +28,7 @@ char	*get_current_path(void)
 		return (NULL);
 	}
 	path = ft_strrchr(path, '/');
-	return (strdup(path));
+	return (ft_strdup(path));
 }
 
 /*
@@ -46,7 +46,7 @@ char	*get_username(void)
 		perror("getenv");
 		return (NULL);
 	}
-	return (strdup(username));
+	return (ft_strdup(username));
 }
 
 /*

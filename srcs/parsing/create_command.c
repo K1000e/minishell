@@ -27,7 +27,7 @@ t_cmd	*create_commands(t_parse *parse, int start, int end, t_cmd *cmd)
 
 t_cmd	*create_cmd_node_(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
-	cmd = malloc(sizeof(t_cmd));
+	cmd = malloc(sizeof(t_cmd)); //HERE
 	cmd->cmd = ft_strdup(cmd_str);
 	cmd->token = ft_strdup(cmd_tokens);
 	if (!cmd->cmd || !cmd->token)

@@ -63,7 +63,7 @@ int	redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex, t_bool should_exit)
 	int		i;
 	t_file	*info;
 
-	info = malloc(sizeof(t_file));
+	info = malloc(sizeof(t_file)); //HERE
 	if (cmd->order_file == NULL)
 		return (1);
 	info->j = 0;
@@ -74,8 +74,12 @@ int	redirection_exec_builtins(t_cmd *cmd, t_pipex *pipex, t_bool should_exit)
 	{
 		info->type = cmd->order_file[i];
 		if (handle_file_redirection(pipex, cmd, info, should_exit))
+		{
+			free(info);
 			return (1);
+		}
 	}
 	handle_file_descriptors(pipex, cmd);
+	free(info);
 	return (0);
 }

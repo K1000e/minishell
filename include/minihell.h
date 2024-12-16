@@ -198,4 +198,5 @@ void	exec_non_builtins(t_cmd *cmd, t_env *env);
 void	free_parse(t_parse *parse);
 t_bool	is_within_single_quotes(const char *input, int index);
 t_bool	is_invalid_redir(t_parse *parse, int i);
+
 #endif
