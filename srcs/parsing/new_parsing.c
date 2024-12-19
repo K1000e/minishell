@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.c                                          :+:      :+:    :+:   */
+/*   new_parsing.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static t_parse	*init_parse(char *line)
+t_parse	*init_parse(char *line)
 {
 	t_parse	*parse;
 
@@ -23,11 +23,11 @@ static t_parse	*init_parse(char *line)
 	parse->cmd_line = ft_strdup(line);
 	if (!parse->token_line || !parse->cmd_line)
 		return (free_parse(parse), NULL);
-	tokenize_char(parse);
+	check_char(parse);
 	return (parse);
 }
 
-static void	update_pipe_status(t_cmd *cmd_list, char *token_line, int *i)
+void	update_pipe_status(t_cmd *cmd_list, char *token_line, int *i)
 {
 	if (token_line[*i] == '|')
 	{
@@ -38,7 +38,7 @@ static void	update_pipe_status(t_cmd *cmd_list, char *token_line, int *i)
 		cmd_list->is_pipe = FALSE;
 }
 
-static t_cmd	*parse_command_loop(char *line, t_parse *parse, t_cmd *cmd_list)
+t_cmd	*parse_command_loop(char *line, t_parse *parse, t_cmd *cmd_list)
 {
 	t_cmd	*new_cmd;
 	int		i;
@@ -67,6 +67,20 @@ static t_cmd	*parse_command_loop(char *line, t_parse *parse, t_cmd *cmd_list)
 	return (cmd_list);
 }
 
+t_cmd	*parse_command(char *line)
+{
+	t_parse	*parse;
+	t_cmd	*cmd_list;
+
+	cmd_list = NULL;
+	parse = init_parse(line);
+	if (!parse || !parse->token_line)
+		return (free_parse(parse), NULL);
+	cmd_list = parse_command_loop(line, parse, cmd_list);
+	free_parse(parse);
+	return (cmd_list);
+}
+
 char	**clear_redir(t_cmd *c)
 {
 	char	**new_args;
@@ -91,18 +105,4 @@ char	**clear_redir(t_cmd *c)
 	c->args = new_args;
 	c->args_t = NULL;
 	return (new_args);
-}
-
-t_cmd	*parse_command(char *line)
-{
-	t_parse	*parse;
-	t_cmd	*cmd_list;
-
-	cmd_list = NULL;
-	parse = init_parse(line);
-	if (!parse || !parse->token_line)
-		return (free_parse(parse), NULL);
-	cmd_list = parse_command_loop(line, parse, cmd_list);
-	free_parse(parse);
-	return (cmd_list);
 }

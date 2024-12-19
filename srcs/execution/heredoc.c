@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 23:42:34 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 static int	ft_compare(char *limiter, char *line)
 {

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_exec.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:57:23 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 23:12:45 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 static int	redirection_exit(t_bool should_exit)
 {
@@ -63,7 +63,7 @@ int	redirection_exec(t_cmd *cmd, t_pipex *pipex, t_bool should_exit)
 	int		i;
 	t_file	*info;
 
-	info = malloc(sizeof(t_file)); //HERE
+	info = malloc(sizeof(t_file));
 	if (cmd->order_file == NULL)
 		return (1);
 	info->j = 0;

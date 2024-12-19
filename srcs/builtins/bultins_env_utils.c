@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   bultins_env_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 22:14:37 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 void	supress_env(t_env *env, char *search)
 {

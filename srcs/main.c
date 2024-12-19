@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 23:43:39 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 static int	ascii_art(char *line)
 {
@@ -66,7 +66,7 @@ static void	minihell(t_env *env, int save_stdin, int save_stdout)
 	while (1)
 	{
 		if (line)
-	 		free(line);
+			free(line);
 		dup2(save_stdin, STDIN_FILENO);
 		dup2(save_stdout, STDOUT_FILENO);
 		line = readline("\001\033[1;31m\002🔥 HellShell 🔥 \001\033[0m\002");

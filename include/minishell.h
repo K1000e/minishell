@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   minihell.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 13:42:06 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 23:47:50 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:00 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINIHELL_H
-# define MINIHELL_H
+#ifndef MINISHELL_H
+# define MINISHELL_H
 
 # include <stdlib.h> 
 # include <stdio.h> 

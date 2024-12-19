@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 22:34:59 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 static void	ex_child1(int pipefd[2], t_cmd *cmd, t_env *env)
 {

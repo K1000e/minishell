@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 16:14:15 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:38 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minihell.h"
+#include "minishell.h"
 
 static char	*handle_env_variable(const char *input, int *i, t_env *env)
 {

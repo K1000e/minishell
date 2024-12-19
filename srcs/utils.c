@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 22:33:19 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:38 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minihell.h"
+#include "minishell.h"
 
 char	*ft_strjoin_free(char *s1, char *s2, int is_free)
 {

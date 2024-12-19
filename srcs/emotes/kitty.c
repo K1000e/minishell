@@ -6,11 +6,11 @@
 /*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 13:28:19 by codespace        ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:38 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minihell.h"
+#include "minishell.h"
 
 void	print_ascii_art_p1(void)
 {

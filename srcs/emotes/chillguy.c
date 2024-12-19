@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   chillguy.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/13 22:18:02 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/15 03:17:32 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:38 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minihell.h"
+#include "minishell.h"
 
 void	print_ascii_chill1(void)
 {

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+         #
+#    By: codespace <codespace@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/22 22:17:39 by mabdessm          #+#    #+#              #
-#    Updated: 2024/12/16 23:56:25 by cgorin           ###   ########.fr        #
+#    Updated: 2024/12/19 17:23:38 by codespace        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,7 +59,7 @@ LST_SRCS	:=	main.c			\
 LST_OBJS	:=	$(LST_SRCS:.c=.o)
 LST_OBJS_B	:=	$(LST_SRCS_B:.c=.o)
 
-LST_INCS	:=	minihell.h
+LST_INCS	:=	minishell.h
 
 SRCS		:=	$(addprefix $(DIR_SRCS)/,$(LST_SRCS))
 OBJS		:=	$(addprefix $(DIR_OBJS)/,$(LST_OBJS))

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/19 23:31:25 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/15 02:18:59 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:38 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minihell.h"
+#include "minishell.h"
 
 void	sigint_handler(int signal)
 {

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   bultins_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/15 02:29:37 by mabdessm          #+#    #+#             */
-/*   Updated: 2024/12/16 23:33:48 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 void	ft_cd_env(t_env *env, t_env *current, char *directory)
 {

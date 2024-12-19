@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   create_command.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 20:31:12 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 static int	count_redir_parsing(char *cmd, char type)
 {
@@ -37,7 +37,7 @@ static int	count_redir_parsing(char *cmd, char type)
 
 static t_cmd	*create_cmd_node(char *cmd_str, char *cmd_tokens, t_cmd *cmd)
 {
-	cmd = malloc(sizeof(t_cmd)); //HERE
+	cmd = malloc(sizeof(t_cmd));
 	cmd->cmd = ft_strdup(cmd_str);
 	cmd->token = ft_strdup(cmd_tokens);
 	if (!cmd->cmd || !cmd->token)

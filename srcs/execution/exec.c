@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cgorin <cgorin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: codespace <codespace@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 18:56:01 by cgorin            #+#    #+#             */
-/*   Updated: 2024/12/16 23:48:38 by cgorin           ###   ########.fr       */
+/*   Updated: 2024/12/19 17:23:50 by codespace        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minihell.h"
+#include "minishell.h"
 
 static void	error(t_pipex *pipex, char *cmd, char *message, int error_code)
 {
@@ -34,11 +34,9 @@ t_bool	is_builtin(char *cmd)
 
 void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 {
-	t_env	*current;
 	t_pipex	*pipex;
 
 	pipex = malloc(sizeof(t_pipex));
-	current = env;
 	pipex->file_i = -1;
 	pipex->file_o = -1;
 	if (cmd->redirection)
@@ -53,13 +51,13 @@ void	execute_builtin(t_cmd *cmd, t_env *env, int single)
 	else if (ft_strcmp(cmd->args[0], "cd") == 0)
 		ft_cd(cmd, env);
 	else if (ft_strcmp(cmd->args[0], "export") == 0)
-		ft_export(cmd, current);
+		ft_export(cmd, env);
 	else if (ft_strcmp(cmd->args[0], "unset") == 0)
-		ft_unset(cmd, current);
+		ft_unset(cmd, env);
 	else if (ft_strcmp(cmd->args[0], "pwd") == 0)
 		ft_pwd(env);
 	else if (ft_strcmp(cmd->args[0], "env") == 0)
-		ft_env(cmd, current);
+		ft_env(cmd, env);
 }
 
 static void	execute_non_builtins(t_pipex *p, t_cmd *cmd, t_env *env,
